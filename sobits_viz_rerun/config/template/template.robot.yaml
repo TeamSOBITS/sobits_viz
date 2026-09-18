@@ -1,0 +1,52 @@
+# Skeleton of a sobits_vla_tools robot descriptor, for a robot that has none
+# yet. Copy config/template/ to config/<robot>/, rename both files to
+# <robot>.robot.yaml and <robot>.yaml, and fill in every <...>. A robot that
+# already has a descriptor in sobits_vla_common/robots/ uses a copy of that
+# instead; only `sensors.lidars` is this package's addition to the schema.
+schema_version: 1
+robot_id: <robot>          # also the topic namespace, /<robot>/...
+version: "0.0.0"
+
+joint_states_topic: /<robot>/joint_states
+
+# One entry per controller. `joints[].ros_name` is what joint_states calls it;
+# a plot tab in <robot>.yaml lists groups by `name`.
+groups:
+  - name: <group>
+    command_topic: /<robot>/<group>_position_controller/joint_trajectory
+    active: true
+    joints:
+      - ros_name: <joint>
+        feature: <joint>
+
+# Leave out for a robot without a mobile base; the Base tab then disappears.
+mobile_base:
+  command_topic: /<robot>/cmd_vel
+  odom_topic: /<robot>/odom
+
+sensors:
+  # A camera with depth is two entries of the same name, the second with
+  # `is_depth: true`. `info_topic` is where its camera_info is published.
+  cameras:
+    - name: <camera>
+      compressed_topic: /<robot>/<camera>/color/image_raw/compressed
+      raw_topic: /<robot>/<camera>/color/image_raw
+      info_topic: /<robot>/<camera>/color/camera_info
+      compressed: true
+      active: true
+    - name: <camera>
+      compressed_topic: /<robot>/<camera>/depth/image_raw/compressedDepth
+      raw_topic: /<robot>/<camera>/depth/image_raw
+      info_topic: /<robot>/<camera>/depth/camera_info
+      encoding: "16UC1"
+      compressed: true
+      active: true
+      is_depth: true
+  # Laser scanners, drawn as points in the 3D view.
+  lidars:
+    - name: <lidar>
+      scan_topic: /<robot>/<lidar>/scan
+      active: true
+
+# Joints in joint_states that no group commands, such as wheels.
+excluded_joints: []

@@ -1,0 +1,86 @@
+# Skeleton of a robot's viewer parameters: the application id the viewer
+# shows, how it runs, and the `views` block, which says what is shown
+# and so what is bridged. Copy with template.robot.yaml to
+# config/<robot>/<robot>.yaml, fill in every <...>, drop what the robot lacks,
+# then generate its layout:
+#   python3 blueprint/make_blueprint.py --params config/<robot>/<robot>.yaml
+# ROS rejects an empty list or map, so leave a key out rather than empty.
+/**:
+  ros__parameters:
+    app_id: "<robot>"
+
+    # ----------------------------------------------------------- Running
+    # The viewer itself (mode, ports) is the launch file's; see rerun.launch.py.
+    # Nothing is written to disk: this package shows the robot, it does not
+    # archive it.
+    # How much the bridge buffers while serving, so a viewer that attaches late
+    # still gets the data logged before it arrived. Only used by `serve`.
+    server_memory_limit: "2GiB"
+
+    executor_threads: 4
+
+    # Bytes an entity may accumulate before the SDK sends it. Below one row, so
+    # each sample ships as logged; an exported RERUN_FLUSH_NUM_BYTES wins.
+    flush_num_bytes: 1000
+
+    views:
+      # The model, transforms, frustums, depth clouds and laser scans.
+      scene:
+        name: "Scene"
+        enable: true
+        # A frame the TF tree reaches; the odometry frame lets the robot move.
+        target_frame: "odom"
+        show_collision: false
+        embed_urdf: true
+        tf_rate_limit_hz: 20.0
+
+      # One entry per camera name in the descriptor. A setting left out gets
+      # the built-in default; see config/sobit_home/sobit_home.yaml for them.
+      cameras:
+        <camera>:
+          name: "<Camera>"
+          enable: true
+          frustum_size_m: 0.3
+          color:
+            use_compressed: true
+            history: false
+            # The frame id its camera_info carries, without the robot prefix.
+            info_frame: "<camera>_color_optical_frame"
+          # Only for a camera the descriptor marks is_depth.
+          depth:
+            enable: true
+            rate_limit_hz: 30.0
+            datatype: "u16"
+            history: false
+            colormap: "viridis"
+            colormap_range_m: [0.0, 0.0]
+            info_frame: "<camera>_depth_optical_frame"
+
+      # One entry per lidar name in the descriptor.
+      lidars:
+        <lidar>:
+          enable: true
+          rate_limit_hz: 10.0
+          point_radius_m: 0.02
+          color: [255, 96, 96]
+
+      joints:
+        rate_limit_hz: 30.0
+        # The plot tabs, in order; each lists descriptor groups and the series
+        # it shows. A group no tab lists is not plotted, so not logged.
+        tabs: ["<tab>"]
+        <tab>:
+          name: "<Tab>"
+          groups: ["<group>"]
+          position: true
+          velocity: false
+          effort: false
+          command: false
+
+      # Only for a robot with a mobile_base in its descriptor.
+      base:
+        name: "Base"
+        enable: true
+        position: false
+        velocity: true
+        command: false

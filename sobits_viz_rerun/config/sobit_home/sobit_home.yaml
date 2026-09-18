@@ -1,0 +1,164 @@
+# SOBIT HOME in the viewer: the application id the viewer shows, how it
+# runs, and the `views` block, which says what is shown and so what is
+# bridged. The cameras, joint groups and lidars it names come from
+# sobit_home.robot.yaml beside it. Regenerate sobit_home.rbl after editing:
+#   python3 blueprint/make_blueprint.py --params config/sobit_home/sobit_home.yaml
+# Override anything from the launch file or with `--ros-args -p <name>:=<value>`.
+/**:
+  ros__parameters:
+    app_id: "sobit_home"
+
+    # ----------------------------------------------------------- Running
+    # The viewer itself (mode, ports) is the launch file's; see rerun.launch.py.
+    # Nothing is written to disk: this package shows the robot, it does not
+    # archive it.
+    # How much the bridge buffers while serving, so a viewer that attaches late
+    # still gets the data logged before it arrived. Only used by `serve`.
+    server_memory_limit: "2GiB"
+
+    executor_threads: 4
+
+    # Bytes an entity may accumulate before the SDK sends it. Below one row, so
+    # each sample ships as logged; an exported RERUN_FLUSH_NUM_BYTES wins.
+    flush_num_bytes: 1000
+
+    # ------------------------------------------------------------------ Views
+    # Read by blueprint/make_blueprint.py for the layout, and by the node for
+    # the `enable` flags: a view that is off is not bridged at all. Regenerate
+    # the .rbl after editing. Cameras and joint groups come from the descriptor
+    # and each gets a view by default. Entries here rename one, turn it off or,
+    # for the joint tabs, merge groups and add or exclude single joints.
+    views:
+      # The model, transforms, frustums, depth clouds and laser scans. Off =
+      # none of them, no TF and no URDF.
+      scene:
+        name: "Scene"
+        enable: true
+        # Frame every pose is resolved into. Must be one the TF tree reaches;
+        # the world-fixed odometry frame lets the robot move in place.
+        target_frame: "odom"
+        # The collision boxes swallow the visual mesh, so they are hidden.
+        show_collision: false
+        # Put the meshes in the stream, so the model shares a stream with
+        # the transforms that pose it. Off leaves the robot undrawn.
+        embed_urdf: true
+        # Transforms are logged at most this often per frame. They arrive far
+        # faster than a viewer needs and every update re-poses the whole model.
+        tf_rate_limit_hz: 20.0
+
+      cameras:
+        # <camera name from the descriptor>: its view name, switch, and a
+        # `color` and a `depth` block saying how each stream is logged. A depth
+        # camera's view is "<name> depth". An unlisted camera, or a setting
+        # left out, gets the built-in defaults: compressed colour with history,
+        # depth at 3 Hz as u16 with history, viridis over each frame's own
+        # range, a 0.3 m frustum, and camera_info frame ids
+        # <camera>_color_optical_frame / <camera>_depth_optical_frame.
+        head_camera:
+          name: "Head"
+          enable: true
+          # Size of the camera frustum drawn in the 3D view, in meters.
+          frustum_size_m: 0.3
+          color:
+            # Forward the JPEG bytes untouched. Raw costs ~80 MB/s.
+            use_compressed: true
+            # false logs the stream as static: the panel still refreshes every
+            # frame but the viewer keeps none, so the session stops growing.
+            history: false
+            # Frame id this stream's camera_info carries, without the robot prefix.
+            # Tells colour from depth when the driver serves both on one topic.
+            info_frame: "head_camera_color_optical_frame"
+          depth:
+            enable: true
+            # The sensor's own rate. With history on, each frame is a 300k
+            # point cloud the viewer keeps: ~23 MB/s, evicting after ~2.5 min.
+            rate_limit_hz: 30.0
+            # Millimetres halve viewer memory and pass 16UC1 through untouched;
+            # "f32" keeps metres for ranges beyond 65 m.
+            datatype: "u16"
+            # As for colour; true keeps frames to scrub back through.
+            history: false
+            colormap: "viridis"
+            # Depths the colormap spans, so one depth keeps one colour; here the
+            # sensor's clip range. Both zero rescales per frame. Nothing is cropped.
+            colormap_range_m: [0.1, 10.0]
+            info_frame: "head_camera_depth_optical_frame"
+        hand_left_camera:
+          name: "Hand Left"
+          enable: true
+          frustum_size_m: 0.3
+          color:
+            use_compressed: true
+            history: false
+            # The wrist cameras name their frame without "color".
+            info_frame: "hand_left_camera_optical_frame"
+        hand_right_camera:
+          name: "Hand Right"
+          enable: true
+          frustum_size_m: 0.3
+          color:
+            use_compressed: true
+            history: false
+            info_frame: "hand_right_camera_optical_frame"
+
+      # <lidar name from the descriptor>: laser scans, drawn as points in the
+      # Scene in their own frame, so they go with it. Returns are kept out to
+      # the scan's own range_max. An unlisted lidar, or a setting left out,
+      # gets 10 Hz, 2 cm white points.
+      lidars:
+        lidar_front:
+          enable: true
+          rate_limit_hz: 10.0
+          point_radius_m: 0.02
+          color: [255, 96, 96]
+        lidar_back:
+          enable: true
+          rate_limit_hz: 10.0
+          point_radius_m: 0.02
+          color: [96, 160, 255]
+
+      joints:
+        # The source publishes joint states at ~1 kHz; a plot needs far fewer.
+        rate_limit_hz: 30.0
+        # One plot tab per entry, in this order; leave a tab out to hide it. A
+        # tab plots the joints of the descriptor groups it lists, plus `add_joints`,
+        # minus `exclude_joints` (leave a list out rather than empty: ROS rejects
+        # `[]`), and the series it switches on: position, velocity, effort.
+        # More than one are stacked in the tab. `command` adds the same series
+        # from the groups' command topics as "<joint> cmd". Only what some tab
+        # plots is logged; a group no tab lists is not, and with no tabs the
+        # joint states are not bridged at all.
+        tabs: ["arms", "head_body", "hands"]
+        arms:
+          name: "Arms"
+          groups: ["arm_left", "arm_right"]
+          position: true
+          velocity: true
+          effort: false
+          command: true
+        head_body:
+          name: "Head & body"
+          groups: ["head", "body"]
+          position: true
+          velocity: false
+          effort: false
+          command: false
+        hands:
+          name: "Hands"
+          groups: ["hand_left", "hand_right"]
+          # Published in joint_states but not commanded, so not in the group.
+          add_joints: ["hand_left_finger_r_mcp_joint", "hand_right_finger_r_mcp_joint"]
+          position: true
+          velocity: false
+          effort: false
+          command: false
+
+      # The descriptor's mobile_base odometry: pose (x, y, yaw) and twist
+      # (linear, speed, yaw rate). More than one are stacked in the tab.
+      # `command` adds the commanded twist to the velocity plot.
+      base:
+        name: "Base"
+        enable: true
+        position: false
+        velocity: true
+        command: true
