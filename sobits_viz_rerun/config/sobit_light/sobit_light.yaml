@@ -1,0 +1,114 @@
+# SOBIT LIGHT in the viewer: the application id the viewer shows, how it
+# runs, and the `views` block, which says what is shown and so what is
+# bridged. The cameras, joint groups and lidars it names come from
+# sobit_light.robot.yaml beside it. Regenerate sobit_light.rbl after editing:
+#   python3 blueprint/make_blueprint.py --params config/sobit_light/sobit_light.yaml
+# Override anything from the launch file or with `--ros-args -p <name>:=<value>`.
+/**:
+  ros__parameters:
+    app_id: "sobit_light"
+
+    # ----------------------------------------------------------- Running
+    # The viewer itself (mode, ports) is the launch file's; see rerun.launch.py.
+    # Nothing is written to disk: this package shows the robot, it does not
+    # archive it.
+    # How much the bridge buffers while serving, so a viewer that attaches late
+    # still gets the data logged before it arrived. Only used by `serve`.
+    server_memory_limit: "2GiB"
+
+    executor_threads: 4
+
+    # Bytes an entity may accumulate before the SDK sends it. Below one row, so
+    # each sample ships as logged; an exported RERUN_FLUSH_NUM_BYTES wins.
+    flush_num_bytes: 1000
+
+    # ------------------------------------------------------------------ Views
+    views:
+      scene:
+        name: "Scene"
+        enable: true
+        # The diff-drive controller's odom frame. TF arrives prefixed
+        # `sobit_light/`; the bridge strips it.
+        target_frame: "odom"
+        show_collision: false
+        embed_urdf: true
+        tf_rate_limit_hz: 20.0
+
+      cameras:
+        head_camera:
+          name: "Head"
+          enable: true
+          frustum_size_m: 0.3
+          color:
+            use_compressed: true
+            # false logs the stream as static: the panel still refreshes every
+            # frame but the viewer keeps none, so the session stops growing.
+            history: false
+            info_frame: "head_camera_color_optical_frame"
+          depth:
+            enable: true
+            rate_limit_hz: 30.0
+            datatype: "u16"
+            history: false
+            colormap: "viridis"
+            # The simulated sensor's clip range, not a real D435-class range.
+            colormap_range_m: [0.1, 10.0]
+            info_frame: "head_camera_depth_optical_frame"
+        hand_camera:
+          name: "Hand"
+          enable: true
+          frustum_size_m: 0.3
+          color:
+            use_compressed: true
+            history: false
+            info_frame: "hand_camera_color_optical_frame"
+          depth:
+            enable: true
+            rate_limit_hz: 30.0
+            datatype: "u16"
+            history: false
+            colormap: "viridis"
+            # The real D405 measures ~0.07-0.5 m; this range is for the simulation.
+            colormap_range_m: [0.1, 10.0]
+            info_frame: "hand_camera_depth_optical_frame"
+
+      lidars:
+        lidar:
+          enable: true
+          rate_limit_hz: 10.0
+          point_radius_m: 0.02
+          color: [255, 96, 96]
+
+      joints:
+        rate_limit_hz: 30.0
+        tabs: ["head", "arm", "hand"]
+        head:
+          name: "Head"
+          groups: ["head"]
+          position: true
+          velocity: false
+          effort: false
+          command: true
+        arm:
+          name: "Arm"
+          groups: ["manipulator"]
+          # Passive mimic, published but not commanded.
+          add_joints: ["arm_shoulder_pitch_sub_joint"]
+          position: true
+          velocity: true
+          effort: false
+          command: true
+        hand:
+          name: "Hand"
+          groups: ["end_effector"]
+          position: true
+          velocity: false
+          effort: false
+          command: false
+
+      base:
+        name: "Base"
+        enable: true
+        position: false
+        velocity: true
+        command: true
