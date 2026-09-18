@@ -101,7 +101,14 @@ def _scene_panel(params: dict, robot: dict, views: dict) -> dict:
     return {
         'followTf': prefix + scene.get('fixed_frame', 'odom'),
         'followMode': 'follow-pose',
-        'scene': {'transforms': {'showLabel': False, 'axisScale': 0.0}},
+        'cameraState': {
+            'distance': float(scene.get('camera_distance_m', 4.0)),
+            'perspective': True, 'phi': 72.0, 'thetaOffset': 135.0,
+            'targetOffset': [0.0, 0.0, float(scene.get('camera_height_m', 0.6))],
+            'fovy': 45.0, 'near': 0.05, 'far': 200.0,
+        },
+        # Foxglove assumes meshes are Y-up; ROS meshes are Z-up.
+        'scene': {'meshUpAxis': 'z_up', 'transforms': {'showLabel': False, 'axisScale': 0.0}},
         'topics': topics,
         'layers': layers,
         'imageMode': {},

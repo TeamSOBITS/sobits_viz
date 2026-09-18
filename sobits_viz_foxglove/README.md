@@ -73,8 +73,9 @@ The layout is imported once; the app remembers it.
 ## The views file
 
 `config/<robot>/<robot>.yaml` says what is shown and, because the bridge is
-given exactly those topics, what is served. `views.scene` sets the fixed frame
-and switches the model, frustums and scans; `views.cameras.<name>` names a
+given exactly those topics, what is served. `views.scene` sets the fixed frame,
+frames the opening view with `camera_distance_m` and `camera_height_m`, and
+switches the model, frustums and scans; `views.cameras.<name>` names a
 camera's panel and picks compressed or raw for colour and depth;
 `views.lidars.<name>` sets point size and colour; `views.joints.tabs` lists the
 plot tabs, each merging descriptor groups with optional `add_joints` and

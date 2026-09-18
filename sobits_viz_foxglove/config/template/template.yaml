@@ -30,6 +30,8 @@
         enable: true
         # A frame the TF tree reaches, with the prefix above applied.
         fixed_frame: "odom"
+        camera_distance_m: 4.0
+        camera_height_m: 0.6
         show_collision: false
         urdf: true
         frusta: true
