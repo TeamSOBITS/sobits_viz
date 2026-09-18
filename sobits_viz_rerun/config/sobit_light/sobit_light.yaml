@@ -71,6 +71,24 @@
             # The real D405 measures ~0.07-0.5 m; this range is for the simulation.
             colormap_range_m: [0.1, 10.0]
             info_frame: "hand_camera_depth_optical_frame"
+        # The Kachaka base cameras have no optical frame in the URDF, so their
+        # camera_info names the camera link itself.
+        camera_front:
+          name: "Front"
+          enable: true
+          frustum_size_m: 0.3
+          color:
+            use_compressed: true
+            history: false
+            info_frame: "camera_front_link"
+        camera_rear:
+          name: "Back"
+          enable: true
+          frustum_size_m: 0.3
+          color:
+            use_compressed: true
+            history: false
+            info_frame: "camera_back_link"
 
       lidars:
         lidar:

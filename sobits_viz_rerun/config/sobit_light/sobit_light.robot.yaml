@@ -3,8 +3,9 @@
 # agree before trusting this copy. Intended differences: groups use the
 # controllers that actually run (`*_position_controller`, not `*_joint_controller`);
 # `manipulator` and `end_effector` drop their passive/excluded mimic joints;
-# cameras gain a depth stream each; and `sensors.lidars` lists the laser
-# scanner, which the original schema has no place for yet.
+# cameras gain a depth stream each; `sensors.lidars` lists the laser
+# scanner, which the original schema has no place for yet; and the base
+# cameras are active.
 schema_version: 1
 robot_id: sobit_light
 
@@ -89,14 +90,14 @@ sensors:
       info_topic: /sobit_light/front_camera/camera_info
       encoding: ""
       compressed: true
-      active: false
+      active: true
     - name: camera_rear
       compressed_topic: /sobit_light/back_camera/image_raw/compressed
       raw_topic: /sobit_light/back_camera/image_raw
       info_topic: /sobit_light/back_camera/camera_info
       encoding: ""
       compressed: true
-      active: false
+      active: true
     # Head camera depth. Not in the original schema entry; added for the viewer.
     - name: head_camera
       compressed_topic: /sobit_light/head_camera/depth/image_rect_raw/compressedDepth
