@@ -98,85 +98,85 @@
           "enabled": true,
           "label": "arm_left_shoulder_tilt_joint",
           "timestampMethod": "receiveTime",
-          "value": "/sobit_home/joint_states.position[:]{name==\"arm_left_shoulder_tilt_joint\"}"
+          "value": "/sobit_home/joint_states.position[1]"
         },
         {
           "enabled": true,
           "label": "arm_left_upper_roll_joint",
           "timestampMethod": "receiveTime",
-          "value": "/sobit_home/joint_states.position[:]{name==\"arm_left_upper_roll_joint\"}"
+          "value": "/sobit_home/joint_states.position[2]"
         },
         {
           "enabled": true,
           "label": "arm_left_upper_flex_joint",
           "timestampMethod": "receiveTime",
-          "value": "/sobit_home/joint_states.position[:]{name==\"arm_left_upper_flex_joint\"}"
+          "value": "/sobit_home/joint_states.position[3]"
         },
         {
           "enabled": true,
           "label": "arm_left_elbow_joint",
           "timestampMethod": "receiveTime",
-          "value": "/sobit_home/joint_states.position[:]{name==\"arm_left_elbow_joint\"}"
+          "value": "/sobit_home/joint_states.position[4]"
         },
         {
           "enabled": true,
           "label": "arm_left_lower_flex_joint",
           "timestampMethod": "receiveTime",
-          "value": "/sobit_home/joint_states.position[:]{name==\"arm_left_lower_flex_joint\"}"
+          "value": "/sobit_home/joint_states.position[5]"
         },
         {
           "enabled": true,
           "label": "arm_left_wrist_tilt_joint",
           "timestampMethod": "receiveTime",
-          "value": "/sobit_home/joint_states.position[:]{name==\"arm_left_wrist_tilt_joint\"}"
+          "value": "/sobit_home/joint_states.position[6]"
         },
         {
           "enabled": true,
           "label": "arm_left_wrist_roll_joint",
           "timestampMethod": "receiveTime",
-          "value": "/sobit_home/joint_states.position[:]{name==\"arm_left_wrist_roll_joint\"}"
+          "value": "/sobit_home/joint_states.position[7]"
         },
         {
           "enabled": true,
           "label": "arm_right_shoulder_tilt_joint",
           "timestampMethod": "receiveTime",
-          "value": "/sobit_home/joint_states.position[:]{name==\"arm_right_shoulder_tilt_joint\"}"
+          "value": "/sobit_home/joint_states.position[16]"
         },
         {
           "enabled": true,
           "label": "arm_right_upper_roll_joint",
           "timestampMethod": "receiveTime",
-          "value": "/sobit_home/joint_states.position[:]{name==\"arm_right_upper_roll_joint\"}"
+          "value": "/sobit_home/joint_states.position[17]"
         },
         {
           "enabled": true,
           "label": "arm_right_upper_flex_joint",
           "timestampMethod": "receiveTime",
-          "value": "/sobit_home/joint_states.position[:]{name==\"arm_right_upper_flex_joint\"}"
+          "value": "/sobit_home/joint_states.position[18]"
         },
         {
           "enabled": true,
           "label": "arm_right_elbow_joint",
           "timestampMethod": "receiveTime",
-          "value": "/sobit_home/joint_states.position[:]{name==\"arm_right_elbow_joint\"}"
+          "value": "/sobit_home/joint_states.position[19]"
         },
         {
           "enabled": true,
           "label": "arm_right_lower_flex_joint",
           "timestampMethod": "receiveTime",
-          "value": "/sobit_home/joint_states.position[:]{name==\"arm_right_lower_flex_joint\"}"
+          "value": "/sobit_home/joint_states.position[20]"
         },
         {
           "enabled": true,
           "label": "arm_right_wrist_tilt_joint",
           "timestampMethod": "receiveTime",
-          "value": "/sobit_home/joint_states.position[:]{name==\"arm_right_wrist_tilt_joint\"}"
+          "value": "/sobit_home/joint_states.position[21]"
         },
         {
           "enabled": true,
           "label": "arm_right_wrist_roll_joint",
           "timestampMethod": "receiveTime",
-          "value": "/sobit_home/joint_states.position[:]{name==\"arm_right_wrist_roll_joint\"}"
+          "value": "/sobit_home/joint_states.position[22]"
         },
         {
           "enabled": true,
@@ -280,85 +280,85 @@
           "enabled": true,
           "label": "arm_left_shoulder_tilt_joint",
           "timestampMethod": "receiveTime",
-          "value": "/sobit_home/joint_states.velocity[:]{name==\"arm_left_shoulder_tilt_joint\"}"
+          "value": "/sobit_home/joint_states.velocity[1]"
         },
         {
           "enabled": true,
           "label": "arm_left_upper_roll_joint",
           "timestampMethod": "receiveTime",
-          "value": "/sobit_home/joint_states.velocity[:]{name==\"arm_left_upper_roll_joint\"}"
+          "value": "/sobit_home/joint_states.velocity[2]"
         },
         {
           "enabled": true,
           "label": "arm_left_upper_flex_joint",
           "timestampMethod": "receiveTime",
-          "value": "/sobit_home/joint_states.velocity[:]{name==\"arm_left_upper_flex_joint\"}"
+          "value": "/sobit_home/joint_states.velocity[3]"
         },
         {
           "enabled": true,
           "label": "arm_left_elbow_joint",
           "timestampMethod": "receiveTime",
-          "value": "/sobit_home/joint_states.velocity[:]{name==\"arm_left_elbow_joint\"}"
+          "value": "/sobit_home/joint_states.velocity[4]"
         },
         {
           "enabled": true,
           "label": "arm_left_lower_flex_joint",
           "timestampMethod": "receiveTime",
-          "value": "/sobit_home/joint_states.velocity[:]{name==\"arm_left_lower_flex_joint\"}"
+          "value": "/sobit_home/joint_states.velocity[5]"
         },
         {
           "enabled": true,
           "label": "arm_left_wrist_tilt_joint",
           "timestampMethod": "receiveTime",
-          "value": "/sobit_home/joint_states.velocity[:]{name==\"arm_left_wrist_tilt_joint\"}"
+          "value": "/sobit_home/joint_states.velocity[6]"
         },
         {
           "enabled": true,
           "label": "arm_left_wrist_roll_joint",
           "timestampMethod": "receiveTime",
-          "value": "/sobit_home/joint_states.velocity[:]{name==\"arm_left_wrist_roll_joint\"}"
+          "value": "/sobit_home/joint_states.velocity[7]"
         },
         {
           "enabled": true,
           "label": "arm_right_shoulder_tilt_joint",
           "timestampMethod": "receiveTime",
-          "value": "/sobit_home/joint_states.velocity[:]{name==\"arm_right_shoulder_tilt_joint\"}"
+          "value": "/sobit_home/joint_states.velocity[16]"
         },
         {
           "enabled": true,
           "label": "arm_right_upper_roll_joint",
           "timestampMethod": "receiveTime",
-          "value": "/sobit_home/joint_states.velocity[:]{name==\"arm_right_upper_roll_joint\"}"
+          "value": "/sobit_home/joint_states.velocity[17]"
         },
         {
           "enabled": true,
           "label": "arm_right_upper_flex_joint",
           "timestampMethod": "receiveTime",
-          "value": "/sobit_home/joint_states.velocity[:]{name==\"arm_right_upper_flex_joint\"}"
+          "value": "/sobit_home/joint_states.velocity[18]"
         },
         {
           "enabled": true,
           "label": "arm_right_elbow_joint",
           "timestampMethod": "receiveTime",
-          "value": "/sobit_home/joint_states.velocity[:]{name==\"arm_right_elbow_joint\"}"
+          "value": "/sobit_home/joint_states.velocity[19]"
         },
         {
           "enabled": true,
           "label": "arm_right_lower_flex_joint",
           "timestampMethod": "receiveTime",
-          "value": "/sobit_home/joint_states.velocity[:]{name==\"arm_right_lower_flex_joint\"}"
+          "value": "/sobit_home/joint_states.velocity[20]"
         },
         {
           "enabled": true,
           "label": "arm_right_wrist_tilt_joint",
           "timestampMethod": "receiveTime",
-          "value": "/sobit_home/joint_states.velocity[:]{name==\"arm_right_wrist_tilt_joint\"}"
+          "value": "/sobit_home/joint_states.velocity[21]"
         },
         {
           "enabled": true,
           "label": "arm_right_wrist_roll_joint",
           "timestampMethod": "receiveTime",
-          "value": "/sobit_home/joint_states.velocity[:]{name==\"arm_right_wrist_roll_joint\"}"
+          "value": "/sobit_home/joint_states.velocity[22]"
         }
       ],
       "showLegend": true,
@@ -422,97 +422,97 @@
           "enabled": true,
           "label": "hand_left_finger_l_mcp_joint",
           "timestampMethod": "receiveTime",
-          "value": "/sobit_home/joint_states.position[:]{name==\"hand_left_finger_l_mcp_joint\"}"
+          "value": "/sobit_home/joint_states.position[10]"
         },
         {
           "enabled": true,
           "label": "hand_left_finger_l_pip_joint",
           "timestampMethod": "receiveTime",
-          "value": "/sobit_home/joint_states.position[:]{name==\"hand_left_finger_l_pip_joint\"}"
+          "value": "/sobit_home/joint_states.position[11]"
         },
         {
           "enabled": true,
           "label": "hand_left_finger_l_dip_joint",
           "timestampMethod": "receiveTime",
-          "value": "/sobit_home/joint_states.position[:]{name==\"hand_left_finger_l_dip_joint\"}"
+          "value": "/sobit_home/joint_states.position[12]"
         },
         {
           "enabled": true,
           "label": "hand_left_finger_c_mcp_joint",
           "timestampMethod": "receiveTime",
-          "value": "/sobit_home/joint_states.position[:]{name==\"hand_left_finger_c_mcp_joint\"}"
+          "value": "/sobit_home/joint_states.position[8]"
         },
         {
           "enabled": true,
           "label": "hand_left_finger_c_ip_joint",
           "timestampMethod": "receiveTime",
-          "value": "/sobit_home/joint_states.position[:]{name==\"hand_left_finger_c_ip_joint\"}"
+          "value": "/sobit_home/joint_states.position[9]"
         },
         {
           "enabled": true,
           "label": "hand_left_finger_r_pip_joint",
           "timestampMethod": "receiveTime",
-          "value": "/sobit_home/joint_states.position[:]{name==\"hand_left_finger_r_pip_joint\"}"
+          "value": "/sobit_home/joint_states.position[14]"
         },
         {
           "enabled": true,
           "label": "hand_left_finger_r_dip_joint",
           "timestampMethod": "receiveTime",
-          "value": "/sobit_home/joint_states.position[:]{name==\"hand_left_finger_r_dip_joint\"}"
+          "value": "/sobit_home/joint_states.position[15]"
         },
         {
           "enabled": true,
           "label": "hand_right_finger_l_mcp_joint",
           "timestampMethod": "receiveTime",
-          "value": "/sobit_home/joint_states.position[:]{name==\"hand_right_finger_l_mcp_joint\"}"
+          "value": "/sobit_home/joint_states.position[25]"
         },
         {
           "enabled": true,
           "label": "hand_right_finger_l_pip_joint",
           "timestampMethod": "receiveTime",
-          "value": "/sobit_home/joint_states.position[:]{name==\"hand_right_finger_l_pip_joint\"}"
+          "value": "/sobit_home/joint_states.position[26]"
         },
         {
           "enabled": true,
           "label": "hand_right_finger_l_dip_joint",
           "timestampMethod": "receiveTime",
-          "value": "/sobit_home/joint_states.position[:]{name==\"hand_right_finger_l_dip_joint\"}"
+          "value": "/sobit_home/joint_states.position[27]"
         },
         {
           "enabled": true,
           "label": "hand_right_finger_c_mcp_joint",
           "timestampMethod": "receiveTime",
-          "value": "/sobit_home/joint_states.position[:]{name==\"hand_right_finger_c_mcp_joint\"}"
+          "value": "/sobit_home/joint_states.position[23]"
         },
         {
           "enabled": true,
           "label": "hand_right_finger_c_ip_joint",
           "timestampMethod": "receiveTime",
-          "value": "/sobit_home/joint_states.position[:]{name==\"hand_right_finger_c_ip_joint\"}"
+          "value": "/sobit_home/joint_states.position[24]"
         },
         {
           "enabled": true,
           "label": "hand_right_finger_r_pip_joint",
           "timestampMethod": "receiveTime",
-          "value": "/sobit_home/joint_states.position[:]{name==\"hand_right_finger_r_pip_joint\"}"
+          "value": "/sobit_home/joint_states.position[29]"
         },
         {
           "enabled": true,
           "label": "hand_right_finger_r_dip_joint",
           "timestampMethod": "receiveTime",
-          "value": "/sobit_home/joint_states.position[:]{name==\"hand_right_finger_r_dip_joint\"}"
+          "value": "/sobit_home/joint_states.position[30]"
         },
         {
           "enabled": true,
           "label": "hand_left_finger_r_mcp_joint",
           "timestampMethod": "receiveTime",
-          "value": "/sobit_home/joint_states.position[:]{name==\"hand_left_finger_r_mcp_joint\"}"
+          "value": "/sobit_home/joint_states.position[13]"
         },
         {
           "enabled": true,
           "label": "hand_right_finger_r_mcp_joint",
           "timestampMethod": "receiveTime",
-          "value": "/sobit_home/joint_states.position[:]{name==\"hand_right_finger_r_mcp_joint\"}"
+          "value": "/sobit_home/joint_states.position[28]"
         }
       ],
       "showLegend": true,
@@ -532,19 +532,19 @@
           "enabled": true,
           "label": "head_pan_joint",
           "timestampMethod": "receiveTime",
-          "value": "/sobit_home/joint_states.position[:]{name==\"head_pan_joint\"}"
+          "value": "/sobit_home/joint_states.position[31]"
         },
         {
           "enabled": true,
           "label": "head_tilt_joint",
           "timestampMethod": "receiveTime",
-          "value": "/sobit_home/joint_states.position[:]{name==\"head_tilt_joint\"}"
+          "value": "/sobit_home/joint_states.position[32]"
         },
         {
           "enabled": true,
           "label": "body_lift_joint",
           "timestampMethod": "receiveTime",
-          "value": "/sobit_home/joint_states.position[:]{name==\"body_lift_joint\"}"
+          "value": "/sobit_home/joint_states.position[0]"
         }
       ],
       "showLegend": true,

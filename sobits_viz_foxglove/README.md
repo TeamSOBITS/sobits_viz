@@ -106,10 +106,21 @@ the bridge log means the workspace holding those meshes was not sourced.
 the simulated cameras publish `32FC1`, so the depth panels subscribe to the raw
 image. On a real robot publishing 16UC1 you can set `use_compressed: true`.
 
-**Commanded joints.** A `JointTrajectory` keeps its names in an array parallel
-to the positions, which a message path cannot filter on, so a command series is
-plotted by the joint's index in its descriptor group. Reordering a group's
-joints in the descriptor changes which series is which.
+**Joints are plotted by index.** A `JointState` keeps its names in an array
+parallel to the values, and a message path filter can only test fields of the
+array it slices, so `position[:]{name=="…"}` matches nothing. Each series is
+`position[<index>]` instead, the index coming from `joint_order` in the views
+file — the order the robot's `joint_states` actually uses. Capture it from the
+running robot, in wire order:
+
+```sh
+$ ros2 topic echo --once /<robot>/joint_states --field name
+```
+
+A joint missing from `joint_order` is skipped, so a passive mimic that no
+publisher sends costs nothing. Commanded joints are indexed the same way,
+within their descriptor group. Regenerate the layout whenever the robot's
+joint set changes.
 
 **Checking without the app.** `scripts/probe_bridge.py` connects the way a
 viewer does and prints the channels the bridge advertises, and fetches one mesh

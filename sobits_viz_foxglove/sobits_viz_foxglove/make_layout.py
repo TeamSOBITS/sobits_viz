@@ -126,16 +126,20 @@ def _image_panels(params: dict, robot: dict, views: dict) -> tuple:
     return panels, ids
 
 
-def _joint_series(topic: str, kind: str, joints: list) -> list:
-    return [
-        {
-            'value': f'{topic}.{kind}[:]{{name=="{joint}"}}',
+def _joint_series(topic: str, kind: str, joints: list, order: list) -> list:
+    # A JointState keeps its names in an array parallel to the values, which a
+    # message path cannot filter on, so a joint is plotted by its index.
+    series = []
+    for joint in joints:
+        if joint not in order:
+            continue
+        series.append({
+            'value': f'{topic}.{kind}[{order.index(joint)}]',
             'label': joint,
             'enabled': True,
             'timestampMethod': 'receiveTime',
-        }
-        for joint in joints
-    ]
+        })
+    return series
 
 
 def _command_series(commands: list, joints: list) -> list:
@@ -174,16 +178,19 @@ def _plot(paths: list, title: str) -> dict:
 def _plot_panels(params: dict, robot: dict, views: dict) -> tuple:
     panels, tabs = {}, []
     states = robot.get('joint_states_topic', '/joint_states')
+    order = params.get('joint_order') or []
 
     for tab in joint_tabs(robot, views.get('joints') or {}):
         shown = [kind for kind in ('position', 'velocity', 'effort') if tab['series'][kind]]
         ids = []
         for kind in shown:
-            paths = _joint_series(states, kind, tab['joints'])
+            paths = _joint_series(states, kind, tab['joints'], order)
             if kind == 'position' and tab['series']['command']:
                 paths += _command_series(tab['commands'], tab['joints'])
             panel_id = f"Plot!{tab['key']}_{kind}"
             title = tab['name'] if len(shown) == 1 else f"{tab['name']} {kind}"
+            if not paths:
+                continue
             panels[panel_id] = _plot(paths, title)
             ids.append(panel_id)
         if ids:

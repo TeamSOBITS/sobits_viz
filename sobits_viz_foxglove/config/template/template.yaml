@@ -18,6 +18,11 @@
       input_topic: "robot_description"
       output_topic: "robot_description_foxglove"
 
+    # The order joint_states uses, since a message path indexes the value
+    # arrays: ros2 topic echo --once /<robot>/joint_states --field name
+    joint_order:
+      - <joint>
+
     views:
       # The model, transforms, laser scans and camera frustums.
       scene:

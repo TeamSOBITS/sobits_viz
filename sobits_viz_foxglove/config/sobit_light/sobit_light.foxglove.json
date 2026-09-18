@@ -118,43 +118,37 @@
           "enabled": true,
           "label": "arm_shoulder_roll_joint",
           "timestampMethod": "receiveTime",
-          "value": "/sobit_light/joint_states.position[:]{name==\"arm_shoulder_roll_joint\"}"
+          "value": "/sobit_light/joint_states.position[5]"
         },
         {
           "enabled": true,
           "label": "arm_shoulder_pitch_joint",
           "timestampMethod": "receiveTime",
-          "value": "/sobit_light/joint_states.position[:]{name==\"arm_shoulder_pitch_joint\"}"
+          "value": "/sobit_light/joint_states.position[6]"
         },
         {
           "enabled": true,
           "label": "arm_elbow_pitch_joint",
           "timestampMethod": "receiveTime",
-          "value": "/sobit_light/joint_states.position[:]{name==\"arm_elbow_pitch_joint\"}"
+          "value": "/sobit_light/joint_states.position[7]"
         },
         {
           "enabled": true,
           "label": "arm_forearm_roll_joint",
           "timestampMethod": "receiveTime",
-          "value": "/sobit_light/joint_states.position[:]{name==\"arm_forearm_roll_joint\"}"
+          "value": "/sobit_light/joint_states.position[8]"
         },
         {
           "enabled": true,
           "label": "arm_wrist_pitch_joint",
           "timestampMethod": "receiveTime",
-          "value": "/sobit_light/joint_states.position[:]{name==\"arm_wrist_pitch_joint\"}"
+          "value": "/sobit_light/joint_states.position[9]"
         },
         {
           "enabled": true,
           "label": "arm_wrist_roll_joint",
           "timestampMethod": "receiveTime",
-          "value": "/sobit_light/joint_states.position[:]{name==\"arm_wrist_roll_joint\"}"
-        },
-        {
-          "enabled": true,
-          "label": "arm_shoulder_pitch_sub_joint",
-          "timestampMethod": "receiveTime",
-          "value": "/sobit_light/joint_states.position[:]{name==\"arm_shoulder_pitch_sub_joint\"}"
+          "value": "/sobit_light/joint_states.position[10]"
         },
         {
           "enabled": true,
@@ -210,43 +204,37 @@
           "enabled": true,
           "label": "arm_shoulder_roll_joint",
           "timestampMethod": "receiveTime",
-          "value": "/sobit_light/joint_states.velocity[:]{name==\"arm_shoulder_roll_joint\"}"
+          "value": "/sobit_light/joint_states.velocity[5]"
         },
         {
           "enabled": true,
           "label": "arm_shoulder_pitch_joint",
           "timestampMethod": "receiveTime",
-          "value": "/sobit_light/joint_states.velocity[:]{name==\"arm_shoulder_pitch_joint\"}"
+          "value": "/sobit_light/joint_states.velocity[6]"
         },
         {
           "enabled": true,
           "label": "arm_elbow_pitch_joint",
           "timestampMethod": "receiveTime",
-          "value": "/sobit_light/joint_states.velocity[:]{name==\"arm_elbow_pitch_joint\"}"
+          "value": "/sobit_light/joint_states.velocity[7]"
         },
         {
           "enabled": true,
           "label": "arm_forearm_roll_joint",
           "timestampMethod": "receiveTime",
-          "value": "/sobit_light/joint_states.velocity[:]{name==\"arm_forearm_roll_joint\"}"
+          "value": "/sobit_light/joint_states.velocity[8]"
         },
         {
           "enabled": true,
           "label": "arm_wrist_pitch_joint",
           "timestampMethod": "receiveTime",
-          "value": "/sobit_light/joint_states.velocity[:]{name==\"arm_wrist_pitch_joint\"}"
+          "value": "/sobit_light/joint_states.velocity[9]"
         },
         {
           "enabled": true,
           "label": "arm_wrist_roll_joint",
           "timestampMethod": "receiveTime",
-          "value": "/sobit_light/joint_states.velocity[:]{name==\"arm_wrist_roll_joint\"}"
-        },
-        {
-          "enabled": true,
-          "label": "arm_shoulder_pitch_sub_joint",
-          "timestampMethod": "receiveTime",
-          "value": "/sobit_light/joint_states.velocity[:]{name==\"arm_shoulder_pitch_sub_joint\"}"
+          "value": "/sobit_light/joint_states.velocity[10]"
         }
       ],
       "showLegend": true,
@@ -304,7 +292,7 @@
           "enabled": true,
           "label": "hand_joint",
           "timestampMethod": "receiveTime",
-          "value": "/sobit_light/joint_states.position[:]{name==\"hand_joint\"}"
+          "value": "/sobit_light/joint_states.position[11]"
         }
       ],
       "showLegend": true,
@@ -324,13 +312,13 @@
           "enabled": true,
           "label": "head_yaw_joint",
           "timestampMethod": "receiveTime",
-          "value": "/sobit_light/joint_states.position[:]{name==\"head_yaw_joint\"}"
+          "value": "/sobit_light/joint_states.position[3]"
         },
         {
           "enabled": true,
           "label": "head_pitch_joint",
           "timestampMethod": "receiveTime",
-          "value": "/sobit_light/joint_states.position[:]{name==\"head_pitch_joint\"}"
+          "value": "/sobit_light/joint_states.position[4]"
         },
         {
           "enabled": true,

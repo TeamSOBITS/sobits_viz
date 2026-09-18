@@ -16,6 +16,23 @@
       input_topic: "robot_description"
       output_topic: "robot_description_foxglove"
 
+    # The order joint_states uses, since a message path indexes the value
+    # arrays; regenerate the layout when the robot's joint set changes.
+    joint_order:
+      - base_l_drive_wheel_joint
+      - base_r_drive_wheel_joint
+      - docking_joint
+      - head_yaw_joint
+      - head_pitch_joint
+      - arm_shoulder_roll_joint
+      - arm_shoulder_pitch_joint
+      - arm_elbow_pitch_joint
+      - arm_forearm_roll_joint
+      - arm_wrist_pitch_joint
+      - arm_wrist_roll_joint
+      - hand_joint
+      - hand_sub_joint
+
     views:
       scene:
         name: "Scene"
