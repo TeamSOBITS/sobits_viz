@@ -41,19 +41,19 @@
       "topics": {
         "/sobit_home/hand_left_camera/color/camera_info": {
           "distance": 0.3,
-          "visible": true
+          "visible": false
         },
         "/sobit_home/hand_right_camera/color/camera_info": {
           "distance": 0.3,
-          "visible": true
+          "visible": false
         },
         "/sobit_home/head_camera/camera_info": {
           "distance": 0.3,
-          "visible": true
+          "visible": false
         },
         "/sobit_home/head_camera/depth/camera_info": {
           "distance": 0.3,
-          "visible": true
+          "visible": false
         },
         "/sobit_home/lidar_back/scan": {
           "colorMode": "flat",

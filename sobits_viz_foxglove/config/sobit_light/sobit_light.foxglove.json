@@ -41,27 +41,27 @@
       "topics": {
         "/sobit_light/back_camera/camera_info": {
           "distance": 0.3,
-          "visible": true
+          "visible": false
         },
         "/sobit_light/front_camera/camera_info": {
           "distance": 0.3,
-          "visible": true
+          "visible": false
         },
         "/sobit_light/hand_camera/color/camera_info": {
           "distance": 0.3,
-          "visible": true
+          "visible": false
         },
         "/sobit_light/hand_camera/depth/camera_info": {
           "distance": 0.3,
-          "visible": true
+          "visible": false
         },
         "/sobit_light/head_camera/color/camera_info": {
           "distance": 0.3,
-          "visible": true
+          "visible": false
         },
         "/sobit_light/head_camera/depth/camera_info": {
           "distance": 0.3,
-          "visible": true
+          "visible": false
         },
         "/sobit_light/lidar/scan": {
           "colorMode": "flat",

@@ -42,7 +42,7 @@
         camera_height_m: 0.4
         show_collision: false
         urdf: true
-        frusta: true
+        frusta: false
         scans: true
 
       cameras:
