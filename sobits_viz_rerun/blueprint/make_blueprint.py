@@ -7,10 +7,9 @@ rather than in panels of their own. This script writes a blueprint that gives
 each camera its own 2D view next to the 3D scene, so the layout is the same
 every time instead of depending on what the viewer guesses.
 
-The cameras and joint groups come from the robot descriptor the node reads, and
-the `views` block of the robot's parameter file names, enables or merges them.
-Both live in config/<robot>/ with the layout this writes. Run it after changing
-either:
+The cameras and joint groups come from the robot descriptor the node reads,
+which lives in sobits_viz_robots, and the `views` block of the robot's
+parameter file names, enables or merges them. Run it after changing either:
 
     python3 blueprint/make_blueprint.py --params config/<robot>/<robot>.yaml
 """
@@ -22,6 +21,17 @@ from pathlib import Path
 
 import rerun.blueprint as rrb
 import yaml
+
+
+def default_descriptor(app_id: str) -> Path:
+    """Where sobits_viz_robots keeps this robot's descriptor."""
+    try:
+        from ament_index_python.packages import get_package_share_directory
+        config = Path(get_package_share_directory("sobits_viz_robots")) / "config"
+    except Exception:
+        # Running from the source tree, before the workspace is built.
+        config = Path(__file__).resolve().parents[2] / "sobits_viz_robots" / "config"
+    return config / app_id / f"{app_id}.robot.yaml"
 
 
 def load_params(path: Path) -> dict:
@@ -210,8 +220,8 @@ def main() -> None:
     parser.add_argument(
         "--descriptor",
         type=Path,
-        help="the sobits_vla_tools .robot.yaml; defaults to <app_id>.robot.yaml "
-             "next to the parameter file, as the launch file's default does",
+        help="the sobits_vla_tools .robot.yaml; defaults to the copy "
+             "sobits_viz_robots keeps for <app_id>, as the launch file does",
     )
     parser.add_argument(
         "--application-id",
@@ -228,7 +238,7 @@ def main() -> None:
     params = load_params(args.params)
     app_id = args.application_id or params.get("app_id", "robot")
     output = args.output or args.params.resolve().parent / f"{app_id}.rbl"
-    descriptor = args.descriptor or args.params.resolve().parent / f"{app_id}.robot.yaml"
+    descriptor = args.descriptor or default_descriptor(app_id)
 
     output.parent.mkdir(parents=True, exist_ok=True)
     build(params, descriptor).save(app_id, output)

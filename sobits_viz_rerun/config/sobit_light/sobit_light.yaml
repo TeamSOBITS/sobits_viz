@@ -1,7 +1,7 @@
 # SOBIT LIGHT in the viewer: the application id the viewer shows, how it
 # runs, and the `views` block, which says what is shown and so what is
 # bridged. The cameras, joint groups and lidars it names come from
-# sobit_light.robot.yaml beside it. Regenerate sobit_light.rbl after editing:
+# sobits_viz_robots config/sobit_light/sobit_light.robot.yaml. Regenerate the layout:
 #   python3 blueprint/make_blueprint.py --params config/sobit_light/sobit_light.yaml
 # Override anything from the launch file or with `--ros-args -p <name>:=<value>`.
 /**:

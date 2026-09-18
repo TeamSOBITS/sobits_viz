@@ -10,17 +10,16 @@ from launch_ros.actions import Node
 
 def generate_launch_description():
     return LaunchDescription([
-        # A robot's files live in config/<robot_name>/: its descriptor, its
-        # parameters (app id and views) and the layout generated from them.
-        # Each can be pointed elsewhere; empty means that folder.
+        # A robot's parameters and layout live in config/<robot_name>/; its
+        # descriptor in sobits_viz_robots. Each can be pointed elsewhere.
         DeclareLaunchArgument(
             'robot_name',
             description='Robot folder under config/ (sobit_home, sobit_light, ...)',
         ),
         DeclareLaunchArgument(
             'robot_descriptor', default_value='',
-            description='The sobits_vla_tools .robot.yaml describing the robot to bridge; '
-                        'empty means config/<robot_name>/<robot_name>.robot.yaml',
+            description='The sobits_vla_tools .robot.yaml describing the robot to bridge; empty '
+                        'means sobits_viz_robots config/<robot_name>/<robot_name>.robot.yaml',
         ),
         DeclareLaunchArgument(
             'robot_params', default_value='',
@@ -77,20 +76,22 @@ def launch_setup(context, *args, **kwargs):
 
     config_dir = os.path.join(get_package_share_directory('sobits_viz_rerun'), 'config')
     robot_dir = os.path.join(config_dir, robot_name)
+    robots_dir = os.path.join(get_package_share_directory('sobits_viz_robots'), 'config')
 
     def robot_file(arg, suffix):
         return LaunchConfiguration(arg).perform(context) or \
             os.path.join(robot_dir, f'{robot_name}{suffix}')
 
-    robot_descriptor = robot_file('robot_descriptor', '.robot.yaml')
+    robot_descriptor = LaunchConfiguration('robot_descriptor').perform(context) or \
+        os.path.join(robots_dir, robot_name, f'{robot_name}.robot.yaml')
     if not os.path.isfile(robot_descriptor):
         robots = sorted(
-            d for d in os.listdir(config_dir)
-            if d != 'template' and os.path.isdir(os.path.join(config_dir, d))
+            d for d in os.listdir(robots_dir)
+            if d != 'template' and os.path.isdir(os.path.join(robots_dir, d))
         )
         raise RuntimeError(
             f'No robot descriptor at {robot_descriptor}. '
-            f"Robots in this package: {', '.join(robots)}")
+            f"Robots in sobits_viz_robots: {', '.join(robots)}")
     robot_params = robot_file('robot_params', '.yaml')
     blueprint = robot_file('blueprint', '.rbl')
     viewer_mode = LaunchConfiguration('viewer_mode').perform(context)

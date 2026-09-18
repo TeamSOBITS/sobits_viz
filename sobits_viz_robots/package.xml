@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
-  <name>sobits_viz_rerun</name>
+  <name>sobits_viz_robots</name>
   <version>0.1.0</version>
-  <description>Bridge a TeamSOBITS robot's camera, TF, joint-state and URDF topics into the Rerun viewer</description>
+  <description>Robot descriptors shared by every sobits_viz visualizer</description>
   <maintainer email="kvalentincardenas@gmail.com">VALENTIN Keith</maintainer>
   <license>BSD-3-Clause</license>
 
@@ -15,26 +15,8 @@
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 
-  <depend>rclcpp</depend>
-  <depend>sensor_msgs</depend>
-  <depend>std_msgs</depend>
-  <depend>geometry_msgs</depend>
-  <depend>tf2_msgs</depend>
-  <depend>nav_msgs</depend>
-  <depend>trajectory_msgs</depend>
-  <depend>yaml-cpp</depend>
-  <depend>libopencv-dev</depend>
-
-  <exec_depend>launch</exec_depend>
-  <exec_depend>launch_ros</exec_depend>
-  <!-- blueprint/make_blueprint.py reads the node's own parameter file. -->
-  <exec_depend>python3-yaml</exec_depend>
-  <exec_depend>sobits_viz_robots</exec_depend>
-  <!-- The Rerun viewer binary comes from the pip package `rerun-sdk==0.37.2`,
-       installed by sobits_viz/install.sh. There is no rosdep key for it. -->
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
-  <test_depend>ament_cmake_gtest</test_depend>
 
   <export>
     <build_type>ament_cmake</build_type>

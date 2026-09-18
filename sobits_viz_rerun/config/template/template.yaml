@@ -1,8 +1,8 @@
 # Skeleton of a robot's viewer parameters: the application id the viewer
 # shows, how it runs, and the `views` block, which says what is shown
-# and so what is bridged. Copy with template.robot.yaml to
-# config/<robot>/<robot>.yaml, fill in every <...>, drop what the robot lacks,
-# then generate its layout:
+# and so what is bridged. Copy to config/<robot>/<robot>.yaml, fill in every
+# <...>, drop what the robot lacks, then generate its layout (the descriptor
+# it names lives in sobits_viz_robots):
 #   python3 blueprint/make_blueprint.py --params config/<robot>/<robot>.yaml
 # ROS rejects an empty list or map, so leave a key out rather than empty.
 /**:

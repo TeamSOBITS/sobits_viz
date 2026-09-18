@@ -1,8 +1,8 @@
 # Skeleton of a sobits_vla_tools robot descriptor, for a robot that has none
-# yet. Copy config/template/ to config/<robot>/, rename both files to
-# <robot>.robot.yaml and <robot>.yaml, and fill in every <...>. A robot that
+# yet. Copy it to config/<robot>/<robot>.robot.yaml and fill in every <...>;
+# each viewer keeps its own <robot>.yaml beside its layout. A robot that
 # already has a descriptor in sobits_vla_common/robots/ uses a copy of that
-# instead; only `sensors.lidars` is this package's addition to the schema.
+# instead; only `sensors.lidars` is this repository's addition to the schema.
 schema_version: 1
 robot_id: <robot>          # also the topic namespace, /<robot>/...
 version: "0.0.0"

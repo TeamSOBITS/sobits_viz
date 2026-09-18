@@ -108,7 +108,7 @@ snapshot is ever wanted.
 | Argument | Default | Meaning |
 | --- | --- | --- |
 | `robot_name` | required | Names the robot's folder, `config/<robot_name>/`, and its topic namespace |
-| `robot_descriptor` | `config/<robot_name>/<robot_name>.robot.yaml` | The `sobits_vla_tools` `.robot.yaml` describing the robot. Required. |
+| `robot_descriptor` | `sobits_viz_robots` `config/<robot_name>/<robot_name>.robot.yaml` | The `sobits_vla_tools` `.robot.yaml` describing the robot. Required. |
 | `robot_params` | `config/<robot_name>/<robot_name>.yaml` | The robot's `app_id`, sink and `views` |
 | `blueprint` | `config/<robot_name>/<robot_name>.rbl` | The viewer layout generated from the two above |
 | `robot_description_topic` | `robot_description` | Where `robot_state_publisher` latches the URDF, under `/<robot_name>/` unless it starts with `/` |
@@ -129,9 +129,9 @@ parameter file, `config/<robot_name>/<robot_name>.yaml`.
 The robot is described by a
 [sobits_vla_tools](https://github.com/TeamSOBITS/sobits_vla_tools) descriptor,
 which names every camera and topic. A copy for each supported robot ships in
-`config/<robot>/`, next to that robot's own parameters and layout, and is used
-by default from `robot_name`; point the node at a different descriptor to
-override it:
+the `sobits_viz_robots` package, shared by every viewer in this repository, and
+is used by default from `robot_name`; point the node at a different descriptor
+to override it:
 
 ```sh
 $ ros2 launch sobits_viz_rerun rerun.launch.py robot_name:=sobit_light \
@@ -142,14 +142,15 @@ Cameras marked `active: false` are skipped, and a camera with `is_depth: true`
 is read as depth. Laser scanners come from a `sensors.lidars` list of
 `{name, scan_topic, active}`, which the bundled copy adds to the schema.
 
-A new robot starts from `config/template/`: copy it to `config/<robot>/`,
-rename `template.robot.yaml` and `template.yaml` to `<robot>.robot.yaml` and
-`<robot>.yaml`, fill in the `<...>` placeholders (or replace the descriptor
-with the robot's own from `sobits_vla_common/robots/`), generate the layout
-with `make_blueprint.py --params config/<robot>/<robot>.yaml`, and launch with
-`robot_name:=<robot>`. There is no second description to fall back on: the
-launch file stops, naming the robots it does have, if `config/<robot>/` or
-its descriptor is missing.
+A new robot takes two templates: copy
+`sobits_viz_robots/config/template/template.robot.yaml` to
+`sobits_viz_robots/config/<robot>/<robot>.robot.yaml` (or use the robot's own
+descriptor from `sobits_vla_common/robots/`), and `config/template/template.yaml`
+here to `config/<robot>/<robot>.yaml`. Fill in the `<...>` placeholders, generate
+the layout with `make_blueprint.py --params config/<robot>/<robot>.yaml`, and
+launch with `robot_name:=<robot>`. There is no second description to fall back
+on: the launch file stops, naming the robots it does have, if the descriptor is
+missing.
 
 Everything else a robot needs, its `app_id`, where the data goes and its
 `views`, is in `config/<robot_name>/<robot_name>.yaml`. Among them, the cameras' `color.info_frame` and `depth.info_frame`
