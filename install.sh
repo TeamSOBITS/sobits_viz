@@ -9,4 +9,10 @@ echo "╔══╣ Install: SOBITS VIZ (STARTING) ╠══╗"
 python3 -m pip install --break-system-packages rerun-sdk==0.37.2
 rerun --version
 
+# The Foxglove bridge is an apt package; the viewer itself is the desktop app
+# from https://foxglove.dev/download, or the web app.
+if command -v apt-get > /dev/null; then
+    sudo apt-get install -y "ros-${ROS_DISTRO}-foxglove-bridge"
+fi
+
 echo "╚══╣ Install: SOBITS VIZ (FINISHED) ╠══╝"

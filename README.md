@@ -22,10 +22,11 @@ SOBIT LIGHT, ...). Every visualizer shares one robot description: the
 
 | Package | Purpose | README |
 | ------- | ------- | ------ |
+| `sobits_viz_robots` | The robot descriptors every viewer shares | [README](sobits_viz_robots/README.md) |
 | `sobits_viz_rerun` | Streams cameras, depth, laser scans, TF, joints, odometry and the robot model into the Rerun viewer | [README](sobits_viz_rerun/README.md) |
+| `sobits_viz_foxglove` | Serves the same to the Foxglove viewer, with a layout generated per robot | [README](sobits_viz_foxglove/README.md) |
 
-Planned: `sobits_viz_rviz` (shared RViz configs) and `sobits_viz_foxglove`
-(Foxglove bridge and layouts).
+Planned: `sobits_viz_rviz` (shared RViz configs).
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -64,6 +65,14 @@ or, for SOBIT LIGHT:
 
 ```sh
 ros2 launch sobits_viz_rerun rerun.launch.py robot_name:=sobit_light use_sim_time:=true
+```
+
+For Foxglove instead, start the bridge and open `ws://localhost:8765` in the
+[desktop app](https://foxglove.dev/download) or at
+[app.foxglove.dev](https://app.foxglove.dev), then import the layout it names:
+
+```sh
+ros2 launch sobits_viz_foxglove foxglove.launch.py robot_name:=sobit_home use_sim_time:=true
 ```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>

@@ -22,10 +22,11 @@ SOBITS Vizは，TeamSOBITSのロボット（SOBIT HOME，SOBIT LIGHT，...）向
 
 | パッケージ | 役割 | README |
 | ------- | ------- | ------ |
+| `sobits_viz_robots` | すべてのビューアが共有するロボット記述子 | [README](sobits_viz_robots/README.md) |
 | `sobits_viz_rerun` | カメラ，深度，レーザースキャン，TF，関節，オドメトリ，ロボットモデルをRerunビューアにストリーミング | [README](sobits_viz_rerun/README.md) |
+| `sobits_viz_foxglove` | 同じデータをFoxgloveビューアに配信し，ロボットごとのレイアウトを生成 | [README](sobits_viz_foxglove/README.md) |
 
-予定: `sobits_viz_rviz`（共有RViz設定）と`sobits_viz_foxglove`（Foxglove
-ブリッジとレイアウト）。
+予定: `sobits_viz_rviz`（共有RViz設定）。
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -64,6 +65,14 @@ SOBIT LIGHTの場合も同様です:
 
 ```sh
 ros2 launch sobits_viz_rerun rerun.launch.py robot_name:=sobit_light use_sim_time:=true
+```
+
+Foxgloveを使う場合は，ブリッジを起動し，[デスクトップアプリ](https://foxglove.dev/download)
+または[app.foxglove.dev](https://app.foxglove.dev)で`ws://localhost:8765`に接続し，
+起動時に表示されるレイアウトをインポートします：
+
+```sh
+ros2 launch sobits_viz_foxglove foxglove.launch.py robot_name:=sobit_home use_sim_time:=true
 ```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>

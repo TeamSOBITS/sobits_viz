@@ -111,6 +111,19 @@ to the positions, which a message path cannot filter on, so a command series is
 plotted by the joint's index in its descriptor group. Reordering a group's
 joints in the descriptor changes which series is which.
 
+**Checking without the app.** `scripts/probe_bridge.py` connects the way a
+viewer does and prints the channels the bridge advertises, and fetches one mesh
+to prove the asset service and the relay work together:
+
+```sh
+$ python3 scripts/probe_bridge.py ws://127.0.0.1:8765 package://kachaka_description/meshes/kachaka/body.stl
+capabilities: ['clientPublish', 'connectionGraph', 'parameters', ..., 'assets']
+channels (21):
+  /sobit_light/head_camera/color/image_raw/compressed | sensor_msgs/msg/CompressedImage
+  ...
+fetchAsset package://...: request 1, status 0, error '', 1439634 bytes
+```
+
 **Sessions are not kept.** The bridge streams live data only; it records
 nothing. Use Foxglove's own recording, or `ros2 bag`.
 
