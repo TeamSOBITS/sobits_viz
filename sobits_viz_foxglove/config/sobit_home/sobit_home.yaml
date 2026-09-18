@@ -1,0 +1,95 @@
+# SOBIT HOME in Foxglove: which topics the bridge serves and how the generated
+# layout arranges them. The cameras, joint groups and lidars it names come from
+# sobits_viz_robots config/sobit_home/sobit_home.robot.yaml. Regenerate after editing:
+#   ros2 run sobits_viz_foxglove make_layout --params config/sobit_home/sobit_home.yaml
+/**:
+  ros__parameters:
+    app_id: "sobit_home"
+
+    # SOBIT HOME publishes bare frame names; Foxglove does no stripping, so a
+    # robot whose driver prefixes its frames sets this instead.
+    frame_prefix: ""
+
+    # The bridge only serves package:// meshes to a viewer, so the relay
+    # rewrites the description's installed file:// paths and republishes it.
+    relay:
+      input_topic: "robot_description"
+      output_topic: "robot_description_foxglove"
+
+    views:
+      scene:
+        name: "Scene"
+        enable: true
+        fixed_frame: "odom"
+        show_collision: false
+        urdf: true
+        frusta: true
+        scans: true
+
+      cameras:
+        head_camera:
+          name: "Head"
+          enable: true
+          frustum_size_m: 0.3
+          color:
+            use_compressed: true
+          depth:
+            enable: true
+            # The Image panel decodes 16-bit PNG compressedDepth only, and the
+            # simulated camera sends 32FC1, so depth is shown raw.
+            use_compressed: false
+            range_m: [0.1, 10.0]
+        hand_left_camera:
+          name: "Hand Left"
+          enable: true
+          frustum_size_m: 0.3
+          color:
+            use_compressed: true
+        hand_right_camera:
+          name: "Hand Right"
+          enable: true
+          frustum_size_m: 0.3
+          color:
+            use_compressed: true
+
+      lidars:
+        lidar_front:
+          enable: true
+          point_size_px: 4.0
+          color: [255, 96, 96]
+        lidar_back:
+          enable: true
+          point_size_px: 4.0
+          color: [96, 160, 255]
+
+      joints:
+        tabs: ["arms", "head_body", "hands"]
+        arms:
+          name: "Arms"
+          groups: ["arm_left", "arm_right"]
+          position: true
+          velocity: true
+          effort: false
+          command: true
+        head_body:
+          name: "Head & body"
+          groups: ["head", "body"]
+          position: true
+          velocity: false
+          effort: false
+          command: false
+        hands:
+          name: "Hands"
+          groups: ["hand_left", "hand_right"]
+          # Published in joint_states but not commanded, so not in the group.
+          add_joints: ["hand_left_finger_r_mcp_joint", "hand_right_finger_r_mcp_joint"]
+          position: true
+          velocity: false
+          effort: false
+          command: false
+
+      base:
+        name: "Base"
+        enable: true
+        velocity: true
+        command: true

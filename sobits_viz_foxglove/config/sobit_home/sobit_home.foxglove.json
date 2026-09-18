@@ -1,0 +1,615 @@
+{
+  "configById": {
+    "3D!scene": {
+      "followMode": "follow-pose",
+      "followTf": "odom",
+      "imageMode": {},
+      "layers": {
+        "robot_model": {
+          "displayMode": "visual",
+          "framePrefix": "",
+          "instanceId": "robot_model",
+          "label": "sobit_home",
+          "layerId": "foxglove.Urdf",
+          "order": 1,
+          "sourceType": "topic",
+          "topic": "/sobit_home/robot_description_foxglove",
+          "visible": true
+        }
+      },
+      "scene": {
+        "transforms": {
+          "axisScale": 0.0,
+          "showLabel": false
+        }
+      },
+      "topics": {
+        "/sobit_home/hand_left_camera/color/camera_info": {
+          "distance": 0.3,
+          "visible": true
+        },
+        "/sobit_home/hand_right_camera/color/camera_info": {
+          "distance": 0.3,
+          "visible": true
+        },
+        "/sobit_home/head_camera/camera_info": {
+          "distance": 0.3,
+          "visible": true
+        },
+        "/sobit_home/head_camera/depth/camera_info": {
+          "distance": 0.3,
+          "visible": true
+        },
+        "/sobit_home/lidar_back/scan": {
+          "colorMode": "flat",
+          "flatColor": "rgba(96, 160, 255, 1.0)",
+          "pointSize": 4.0,
+          "visible": true
+        },
+        "/sobit_home/lidar_front/scan": {
+          "colorMode": "flat",
+          "flatColor": "rgba(255, 96, 96, 1.0)",
+          "pointSize": 4.0,
+          "visible": true
+        }
+      }
+    },
+    "Image!hand_left_camera": {
+      "foxglovePanelTitle": "Hand Left",
+      "imageMode": {
+        "calibrationTopic": "/sobit_home/hand_left_camera/color/camera_info",
+        "imageTopic": "/sobit_home/hand_left_camera/color/image_raw/compressed",
+        "synchronize": false
+      }
+    },
+    "Image!hand_right_camera": {
+      "foxglovePanelTitle": "Hand Right",
+      "imageMode": {
+        "calibrationTopic": "/sobit_home/hand_right_camera/color/camera_info",
+        "imageTopic": "/sobit_home/hand_right_camera/color/image_raw/compressed",
+        "synchronize": false
+      }
+    },
+    "Image!head_camera": {
+      "foxglovePanelTitle": "Head",
+      "imageMode": {
+        "calibrationTopic": "/sobit_home/head_camera/camera_info",
+        "imageTopic": "/sobit_home/head_camera/color/image_raw/compressed",
+        "synchronize": false
+      }
+    },
+    "Image!head_camera_depth": {
+      "foxglovePanelTitle": "Head depth",
+      "imageMode": {
+        "calibrationTopic": "/sobit_home/head_camera/depth/camera_info",
+        "imageTopic": "/sobit_home/head_camera/depth/image_raw",
+        "maxValue": 10.0,
+        "minValue": 0.1,
+        "synchronize": false
+      }
+    },
+    "Plot!arms_position": {
+      "followingViewWidth": 30,
+      "foxglovePanelTitle": "Arms position",
+      "isSynced": true,
+      "legendDisplay": "floating",
+      "paths": [
+        {
+          "enabled": true,
+          "label": "arm_left_shoulder_tilt_joint",
+          "timestampMethod": "receiveTime",
+          "value": "/sobit_home/joint_states.position[:]{name==\"arm_left_shoulder_tilt_joint\"}"
+        },
+        {
+          "enabled": true,
+          "label": "arm_left_upper_roll_joint",
+          "timestampMethod": "receiveTime",
+          "value": "/sobit_home/joint_states.position[:]{name==\"arm_left_upper_roll_joint\"}"
+        },
+        {
+          "enabled": true,
+          "label": "arm_left_upper_flex_joint",
+          "timestampMethod": "receiveTime",
+          "value": "/sobit_home/joint_states.position[:]{name==\"arm_left_upper_flex_joint\"}"
+        },
+        {
+          "enabled": true,
+          "label": "arm_left_elbow_joint",
+          "timestampMethod": "receiveTime",
+          "value": "/sobit_home/joint_states.position[:]{name==\"arm_left_elbow_joint\"}"
+        },
+        {
+          "enabled": true,
+          "label": "arm_left_lower_flex_joint",
+          "timestampMethod": "receiveTime",
+          "value": "/sobit_home/joint_states.position[:]{name==\"arm_left_lower_flex_joint\"}"
+        },
+        {
+          "enabled": true,
+          "label": "arm_left_wrist_tilt_joint",
+          "timestampMethod": "receiveTime",
+          "value": "/sobit_home/joint_states.position[:]{name==\"arm_left_wrist_tilt_joint\"}"
+        },
+        {
+          "enabled": true,
+          "label": "arm_left_wrist_roll_joint",
+          "timestampMethod": "receiveTime",
+          "value": "/sobit_home/joint_states.position[:]{name==\"arm_left_wrist_roll_joint\"}"
+        },
+        {
+          "enabled": true,
+          "label": "arm_right_shoulder_tilt_joint",
+          "timestampMethod": "receiveTime",
+          "value": "/sobit_home/joint_states.position[:]{name==\"arm_right_shoulder_tilt_joint\"}"
+        },
+        {
+          "enabled": true,
+          "label": "arm_right_upper_roll_joint",
+          "timestampMethod": "receiveTime",
+          "value": "/sobit_home/joint_states.position[:]{name==\"arm_right_upper_roll_joint\"}"
+        },
+        {
+          "enabled": true,
+          "label": "arm_right_upper_flex_joint",
+          "timestampMethod": "receiveTime",
+          "value": "/sobit_home/joint_states.position[:]{name==\"arm_right_upper_flex_joint\"}"
+        },
+        {
+          "enabled": true,
+          "label": "arm_right_elbow_joint",
+          "timestampMethod": "receiveTime",
+          "value": "/sobit_home/joint_states.position[:]{name==\"arm_right_elbow_joint\"}"
+        },
+        {
+          "enabled": true,
+          "label": "arm_right_lower_flex_joint",
+          "timestampMethod": "receiveTime",
+          "value": "/sobit_home/joint_states.position[:]{name==\"arm_right_lower_flex_joint\"}"
+        },
+        {
+          "enabled": true,
+          "label": "arm_right_wrist_tilt_joint",
+          "timestampMethod": "receiveTime",
+          "value": "/sobit_home/joint_states.position[:]{name==\"arm_right_wrist_tilt_joint\"}"
+        },
+        {
+          "enabled": true,
+          "label": "arm_right_wrist_roll_joint",
+          "timestampMethod": "receiveTime",
+          "value": "/sobit_home/joint_states.position[:]{name==\"arm_right_wrist_roll_joint\"}"
+        },
+        {
+          "enabled": true,
+          "label": "arm_left_shoulder_tilt_joint cmd",
+          "timestampMethod": "receiveTime",
+          "value": "/sobit_home/arm_left_position_controller/joint_trajectory.points[-1].positions[0]"
+        },
+        {
+          "enabled": true,
+          "label": "arm_left_upper_roll_joint cmd",
+          "timestampMethod": "receiveTime",
+          "value": "/sobit_home/arm_left_position_controller/joint_trajectory.points[-1].positions[1]"
+        },
+        {
+          "enabled": true,
+          "label": "arm_left_upper_flex_joint cmd",
+          "timestampMethod": "receiveTime",
+          "value": "/sobit_home/arm_left_position_controller/joint_trajectory.points[-1].positions[2]"
+        },
+        {
+          "enabled": true,
+          "label": "arm_left_elbow_joint cmd",
+          "timestampMethod": "receiveTime",
+          "value": "/sobit_home/arm_left_position_controller/joint_trajectory.points[-1].positions[3]"
+        },
+        {
+          "enabled": true,
+          "label": "arm_left_lower_flex_joint cmd",
+          "timestampMethod": "receiveTime",
+          "value": "/sobit_home/arm_left_position_controller/joint_trajectory.points[-1].positions[4]"
+        },
+        {
+          "enabled": true,
+          "label": "arm_left_wrist_tilt_joint cmd",
+          "timestampMethod": "receiveTime",
+          "value": "/sobit_home/arm_left_position_controller/joint_trajectory.points[-1].positions[5]"
+        },
+        {
+          "enabled": true,
+          "label": "arm_left_wrist_roll_joint cmd",
+          "timestampMethod": "receiveTime",
+          "value": "/sobit_home/arm_left_position_controller/joint_trajectory.points[-1].positions[6]"
+        },
+        {
+          "enabled": true,
+          "label": "arm_right_shoulder_tilt_joint cmd",
+          "timestampMethod": "receiveTime",
+          "value": "/sobit_home/arm_right_position_controller/joint_trajectory.points[-1].positions[0]"
+        },
+        {
+          "enabled": true,
+          "label": "arm_right_upper_roll_joint cmd",
+          "timestampMethod": "receiveTime",
+          "value": "/sobit_home/arm_right_position_controller/joint_trajectory.points[-1].positions[1]"
+        },
+        {
+          "enabled": true,
+          "label": "arm_right_upper_flex_joint cmd",
+          "timestampMethod": "receiveTime",
+          "value": "/sobit_home/arm_right_position_controller/joint_trajectory.points[-1].positions[2]"
+        },
+        {
+          "enabled": true,
+          "label": "arm_right_elbow_joint cmd",
+          "timestampMethod": "receiveTime",
+          "value": "/sobit_home/arm_right_position_controller/joint_trajectory.points[-1].positions[3]"
+        },
+        {
+          "enabled": true,
+          "label": "arm_right_lower_flex_joint cmd",
+          "timestampMethod": "receiveTime",
+          "value": "/sobit_home/arm_right_position_controller/joint_trajectory.points[-1].positions[4]"
+        },
+        {
+          "enabled": true,
+          "label": "arm_right_wrist_tilt_joint cmd",
+          "timestampMethod": "receiveTime",
+          "value": "/sobit_home/arm_right_position_controller/joint_trajectory.points[-1].positions[5]"
+        },
+        {
+          "enabled": true,
+          "label": "arm_right_wrist_roll_joint cmd",
+          "timestampMethod": "receiveTime",
+          "value": "/sobit_home/arm_right_position_controller/joint_trajectory.points[-1].positions[6]"
+        }
+      ],
+      "showLegend": true,
+      "showPlotValuesInLegend": false,
+      "showXAxisLabels": true,
+      "showYAxisLabels": true,
+      "sidebarDimension": 240,
+      "xAxisVal": "timestamp"
+    },
+    "Plot!arms_velocity": {
+      "followingViewWidth": 30,
+      "foxglovePanelTitle": "Arms velocity",
+      "isSynced": true,
+      "legendDisplay": "floating",
+      "paths": [
+        {
+          "enabled": true,
+          "label": "arm_left_shoulder_tilt_joint",
+          "timestampMethod": "receiveTime",
+          "value": "/sobit_home/joint_states.velocity[:]{name==\"arm_left_shoulder_tilt_joint\"}"
+        },
+        {
+          "enabled": true,
+          "label": "arm_left_upper_roll_joint",
+          "timestampMethod": "receiveTime",
+          "value": "/sobit_home/joint_states.velocity[:]{name==\"arm_left_upper_roll_joint\"}"
+        },
+        {
+          "enabled": true,
+          "label": "arm_left_upper_flex_joint",
+          "timestampMethod": "receiveTime",
+          "value": "/sobit_home/joint_states.velocity[:]{name==\"arm_left_upper_flex_joint\"}"
+        },
+        {
+          "enabled": true,
+          "label": "arm_left_elbow_joint",
+          "timestampMethod": "receiveTime",
+          "value": "/sobit_home/joint_states.velocity[:]{name==\"arm_left_elbow_joint\"}"
+        },
+        {
+          "enabled": true,
+          "label": "arm_left_lower_flex_joint",
+          "timestampMethod": "receiveTime",
+          "value": "/sobit_home/joint_states.velocity[:]{name==\"arm_left_lower_flex_joint\"}"
+        },
+        {
+          "enabled": true,
+          "label": "arm_left_wrist_tilt_joint",
+          "timestampMethod": "receiveTime",
+          "value": "/sobit_home/joint_states.velocity[:]{name==\"arm_left_wrist_tilt_joint\"}"
+        },
+        {
+          "enabled": true,
+          "label": "arm_left_wrist_roll_joint",
+          "timestampMethod": "receiveTime",
+          "value": "/sobit_home/joint_states.velocity[:]{name==\"arm_left_wrist_roll_joint\"}"
+        },
+        {
+          "enabled": true,
+          "label": "arm_right_shoulder_tilt_joint",
+          "timestampMethod": "receiveTime",
+          "value": "/sobit_home/joint_states.velocity[:]{name==\"arm_right_shoulder_tilt_joint\"}"
+        },
+        {
+          "enabled": true,
+          "label": "arm_right_upper_roll_joint",
+          "timestampMethod": "receiveTime",
+          "value": "/sobit_home/joint_states.velocity[:]{name==\"arm_right_upper_roll_joint\"}"
+        },
+        {
+          "enabled": true,
+          "label": "arm_right_upper_flex_joint",
+          "timestampMethod": "receiveTime",
+          "value": "/sobit_home/joint_states.velocity[:]{name==\"arm_right_upper_flex_joint\"}"
+        },
+        {
+          "enabled": true,
+          "label": "arm_right_elbow_joint",
+          "timestampMethod": "receiveTime",
+          "value": "/sobit_home/joint_states.velocity[:]{name==\"arm_right_elbow_joint\"}"
+        },
+        {
+          "enabled": true,
+          "label": "arm_right_lower_flex_joint",
+          "timestampMethod": "receiveTime",
+          "value": "/sobit_home/joint_states.velocity[:]{name==\"arm_right_lower_flex_joint\"}"
+        },
+        {
+          "enabled": true,
+          "label": "arm_right_wrist_tilt_joint",
+          "timestampMethod": "receiveTime",
+          "value": "/sobit_home/joint_states.velocity[:]{name==\"arm_right_wrist_tilt_joint\"}"
+        },
+        {
+          "enabled": true,
+          "label": "arm_right_wrist_roll_joint",
+          "timestampMethod": "receiveTime",
+          "value": "/sobit_home/joint_states.velocity[:]{name==\"arm_right_wrist_roll_joint\"}"
+        }
+      ],
+      "showLegend": true,
+      "showPlotValuesInLegend": false,
+      "showXAxisLabels": true,
+      "showYAxisLabels": true,
+      "sidebarDimension": 240,
+      "xAxisVal": "timestamp"
+    },
+    "Plot!base": {
+      "followingViewWidth": 30,
+      "foxglovePanelTitle": "Base",
+      "isSynced": true,
+      "legendDisplay": "floating",
+      "paths": [
+        {
+          "enabled": true,
+          "label": "linear x (m/s)",
+          "timestampMethod": "receiveTime",
+          "value": "/sobit_home/odom.twist.twist.linear.x"
+        },
+        {
+          "enabled": true,
+          "label": "linear y (m/s)",
+          "timestampMethod": "receiveTime",
+          "value": "/sobit_home/odom.twist.twist.linear.y"
+        },
+        {
+          "enabled": true,
+          "label": "yaw rate (rad/s)",
+          "timestampMethod": "receiveTime",
+          "value": "/sobit_home/odom.twist.twist.angular.z"
+        },
+        {
+          "enabled": true,
+          "label": "cmd linear x (m/s)",
+          "timestampMethod": "receiveTime",
+          "value": "/sobit_home/cmd_vel.linear.x"
+        },
+        {
+          "enabled": true,
+          "label": "cmd yaw rate (rad/s)",
+          "timestampMethod": "receiveTime",
+          "value": "/sobit_home/cmd_vel.angular.z"
+        }
+      ],
+      "showLegend": true,
+      "showPlotValuesInLegend": false,
+      "showXAxisLabels": true,
+      "showYAxisLabels": true,
+      "sidebarDimension": 240,
+      "xAxisVal": "timestamp"
+    },
+    "Plot!hands_position": {
+      "followingViewWidth": 30,
+      "foxglovePanelTitle": "Hands",
+      "isSynced": true,
+      "legendDisplay": "floating",
+      "paths": [
+        {
+          "enabled": true,
+          "label": "hand_left_finger_l_mcp_joint",
+          "timestampMethod": "receiveTime",
+          "value": "/sobit_home/joint_states.position[:]{name==\"hand_left_finger_l_mcp_joint\"}"
+        },
+        {
+          "enabled": true,
+          "label": "hand_left_finger_l_pip_joint",
+          "timestampMethod": "receiveTime",
+          "value": "/sobit_home/joint_states.position[:]{name==\"hand_left_finger_l_pip_joint\"}"
+        },
+        {
+          "enabled": true,
+          "label": "hand_left_finger_l_dip_joint",
+          "timestampMethod": "receiveTime",
+          "value": "/sobit_home/joint_states.position[:]{name==\"hand_left_finger_l_dip_joint\"}"
+        },
+        {
+          "enabled": true,
+          "label": "hand_left_finger_c_mcp_joint",
+          "timestampMethod": "receiveTime",
+          "value": "/sobit_home/joint_states.position[:]{name==\"hand_left_finger_c_mcp_joint\"}"
+        },
+        {
+          "enabled": true,
+          "label": "hand_left_finger_c_ip_joint",
+          "timestampMethod": "receiveTime",
+          "value": "/sobit_home/joint_states.position[:]{name==\"hand_left_finger_c_ip_joint\"}"
+        },
+        {
+          "enabled": true,
+          "label": "hand_left_finger_r_pip_joint",
+          "timestampMethod": "receiveTime",
+          "value": "/sobit_home/joint_states.position[:]{name==\"hand_left_finger_r_pip_joint\"}"
+        },
+        {
+          "enabled": true,
+          "label": "hand_left_finger_r_dip_joint",
+          "timestampMethod": "receiveTime",
+          "value": "/sobit_home/joint_states.position[:]{name==\"hand_left_finger_r_dip_joint\"}"
+        },
+        {
+          "enabled": true,
+          "label": "hand_right_finger_l_mcp_joint",
+          "timestampMethod": "receiveTime",
+          "value": "/sobit_home/joint_states.position[:]{name==\"hand_right_finger_l_mcp_joint\"}"
+        },
+        {
+          "enabled": true,
+          "label": "hand_right_finger_l_pip_joint",
+          "timestampMethod": "receiveTime",
+          "value": "/sobit_home/joint_states.position[:]{name==\"hand_right_finger_l_pip_joint\"}"
+        },
+        {
+          "enabled": true,
+          "label": "hand_right_finger_l_dip_joint",
+          "timestampMethod": "receiveTime",
+          "value": "/sobit_home/joint_states.position[:]{name==\"hand_right_finger_l_dip_joint\"}"
+        },
+        {
+          "enabled": true,
+          "label": "hand_right_finger_c_mcp_joint",
+          "timestampMethod": "receiveTime",
+          "value": "/sobit_home/joint_states.position[:]{name==\"hand_right_finger_c_mcp_joint\"}"
+        },
+        {
+          "enabled": true,
+          "label": "hand_right_finger_c_ip_joint",
+          "timestampMethod": "receiveTime",
+          "value": "/sobit_home/joint_states.position[:]{name==\"hand_right_finger_c_ip_joint\"}"
+        },
+        {
+          "enabled": true,
+          "label": "hand_right_finger_r_pip_joint",
+          "timestampMethod": "receiveTime",
+          "value": "/sobit_home/joint_states.position[:]{name==\"hand_right_finger_r_pip_joint\"}"
+        },
+        {
+          "enabled": true,
+          "label": "hand_right_finger_r_dip_joint",
+          "timestampMethod": "receiveTime",
+          "value": "/sobit_home/joint_states.position[:]{name==\"hand_right_finger_r_dip_joint\"}"
+        },
+        {
+          "enabled": true,
+          "label": "hand_left_finger_r_mcp_joint",
+          "timestampMethod": "receiveTime",
+          "value": "/sobit_home/joint_states.position[:]{name==\"hand_left_finger_r_mcp_joint\"}"
+        },
+        {
+          "enabled": true,
+          "label": "hand_right_finger_r_mcp_joint",
+          "timestampMethod": "receiveTime",
+          "value": "/sobit_home/joint_states.position[:]{name==\"hand_right_finger_r_mcp_joint\"}"
+        }
+      ],
+      "showLegend": true,
+      "showPlotValuesInLegend": false,
+      "showXAxisLabels": true,
+      "showYAxisLabels": true,
+      "sidebarDimension": 240,
+      "xAxisVal": "timestamp"
+    },
+    "Plot!head_body_position": {
+      "followingViewWidth": 30,
+      "foxglovePanelTitle": "Head & body",
+      "isSynced": true,
+      "legendDisplay": "floating",
+      "paths": [
+        {
+          "enabled": true,
+          "label": "head_pan_joint",
+          "timestampMethod": "receiveTime",
+          "value": "/sobit_home/joint_states.position[:]{name==\"head_pan_joint\"}"
+        },
+        {
+          "enabled": true,
+          "label": "head_tilt_joint",
+          "timestampMethod": "receiveTime",
+          "value": "/sobit_home/joint_states.position[:]{name==\"head_tilt_joint\"}"
+        },
+        {
+          "enabled": true,
+          "label": "body_lift_joint",
+          "timestampMethod": "receiveTime",
+          "value": "/sobit_home/joint_states.position[:]{name==\"body_lift_joint\"}"
+        }
+      ],
+      "showLegend": true,
+      "showPlotValuesInLegend": false,
+      "showXAxisLabels": true,
+      "showYAxisLabels": true,
+      "sidebarDimension": 240,
+      "xAxisVal": "timestamp"
+    },
+    "Tab!plots": {
+      "activeTabIdx": 0,
+      "tabs": [
+        {
+          "layout": {
+            "direction": "row",
+            "first": "Plot!arms_position",
+            "second": "Plot!arms_velocity",
+            "splitPercentage": 50
+          },
+          "title": "Arms"
+        },
+        {
+          "layout": "Plot!head_body_position",
+          "title": "Head & body"
+        },
+        {
+          "layout": "Plot!hands_position",
+          "title": "Hands"
+        },
+        {
+          "layout": "Plot!base",
+          "title": "Base"
+        }
+      ]
+    }
+  },
+  "globalVariables": {},
+  "layout": {
+    "direction": "row",
+    "first": {
+      "direction": "column",
+      "first": "3D!scene",
+      "second": "Tab!plots",
+      "splitPercentage": 66
+    },
+    "second": {
+      "direction": "column",
+      "first": {
+        "direction": "row",
+        "first": "Image!head_camera",
+        "second": "Image!hand_left_camera",
+        "splitPercentage": 50
+      },
+      "second": {
+        "direction": "row",
+        "first": "Image!hand_right_camera",
+        "second": "Image!head_camera_depth",
+        "splitPercentage": 50
+      },
+      "splitPercentage": 33.333333333333336
+    },
+    "splitPercentage": 60
+  },
+  "playbackConfig": {
+    "speed": 1
+  },
+  "userNodes": {}
+}

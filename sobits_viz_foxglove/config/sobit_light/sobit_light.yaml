@@ -1,0 +1,102 @@
+# SOBIT LIGHT in Foxglove: which topics the bridge serves and how the generated
+# layout arranges them. The cameras, joint groups and lidars it names come from
+# sobits_viz_robots config/sobit_light/sobit_light.robot.yaml. Regenerate after editing:
+#   ros2 run sobits_viz_foxglove make_layout --params config/sobit_light/sobit_light.yaml
+/**:
+  ros__parameters:
+    app_id: "sobit_light"
+
+    # SOBIT LIGHT prefixes every frame with its name and Foxglove does no
+    # stripping, so the layout's frames carry the prefix.
+    frame_prefix: "sobit_light/"
+
+    # The bridge only serves package:// meshes to a viewer, so the relay
+    # rewrites the description's installed file:// paths and republishes it.
+    relay:
+      input_topic: "robot_description"
+      output_topic: "robot_description_foxglove"
+
+    views:
+      scene:
+        name: "Scene"
+        enable: true
+        fixed_frame: "odom"
+        show_collision: false
+        urdf: true
+        frusta: true
+        scans: true
+
+      cameras:
+        head_camera:
+          name: "Head"
+          enable: true
+          frustum_size_m: 0.3
+          color:
+            use_compressed: true
+          depth:
+            enable: true
+            # The Image panel decodes 16-bit PNG compressedDepth only, and the
+            # simulated camera sends 32FC1, so depth is shown raw.
+            use_compressed: false
+            range_m: [0.1, 10.0]
+        hand_camera:
+          name: "Hand"
+          enable: true
+          frustum_size_m: 0.3
+          color:
+            use_compressed: true
+          depth:
+            enable: true
+            use_compressed: false
+            # The real D405 measures ~0.07-0.5 m; this range is the simulation's.
+            range_m: [0.1, 10.0]
+        camera_front:
+          name: "Front"
+          enable: true
+          frustum_size_m: 0.3
+          color:
+            use_compressed: true
+        camera_rear:
+          name: "Back"
+          enable: true
+          frustum_size_m: 0.3
+          color:
+            use_compressed: true
+
+      lidars:
+        lidar:
+          enable: true
+          point_size_px: 4.0
+          color: [255, 96, 96]
+
+      joints:
+        tabs: ["head", "arm", "hand"]
+        head:
+          name: "Head"
+          groups: ["head"]
+          position: true
+          velocity: false
+          effort: false
+          command: true
+        arm:
+          name: "Arm"
+          groups: ["manipulator"]
+          # Passive mimic, published but not commanded.
+          add_joints: ["arm_shoulder_pitch_sub_joint"]
+          position: true
+          velocity: true
+          effort: false
+          command: true
+        hand:
+          name: "Hand"
+          groups: ["end_effector"]
+          position: true
+          velocity: false
+          effort: false
+          command: false
+
+      base:
+        name: "Base"
+        enable: true
+        velocity: true
+        command: true

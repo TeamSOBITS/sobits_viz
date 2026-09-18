@@ -1,0 +1,73 @@
+# Skeleton of a robot's Foxglove settings: which topics the bridge serves and
+# how the generated layout arranges them. Copy to config/<robot>/<robot>.yaml,
+# fill in every <...>, drop what the robot lacks, then generate its layout (the
+# descriptor it names lives in sobits_viz_robots):
+#   ros2 run sobits_viz_foxglove make_layout --params config/<robot>/<robot>.yaml
+# ROS rejects an empty list or map, so leave a key out rather than empty.
+/**:
+  ros__parameters:
+    app_id: "<robot>"
+
+    # Empty when the driver publishes bare frame names; "<robot>/" when it
+    # prefixes them, since Foxglove shows frames exactly as they arrive.
+    frame_prefix: ""
+
+    # The bridge only serves package:// meshes to a viewer, so the relay
+    # rewrites the description's installed file:// paths and republishes it.
+    relay:
+      input_topic: "robot_description"
+      output_topic: "robot_description_foxglove"
+
+    views:
+      # The model, transforms, laser scans and camera frustums.
+      scene:
+        name: "Scene"
+        enable: true
+        # A frame the TF tree reaches, with the prefix above applied.
+        fixed_frame: "odom"
+        show_collision: false
+        urdf: true
+        frusta: true
+        scans: true
+
+      # One entry per camera name in the descriptor; each gets an image panel.
+      cameras:
+        <camera>:
+          name: "<Camera>"
+          enable: true
+          frustum_size_m: 0.3
+          color:
+            use_compressed: true
+          # Only for a camera the descriptor marks is_depth. Foxglove decodes
+          # 16-bit PNG compressedDepth only; anything else must be raw.
+          depth:
+            enable: true
+            use_compressed: false
+            range_m: [0.1, 10.0]
+
+      # One entry per lidar name in the descriptor.
+      lidars:
+        <lidar>:
+          enable: true
+          point_size_px: 4.0
+          color: [255, 96, 96]
+
+      joints:
+        # One plot tab per entry, in this order; each lists descriptor groups
+        # and the series it shows. `command` adds the group's commanded
+        # positions to the position plot.
+        tabs: ["<tab>"]
+        <tab>:
+          name: "<Tab>"
+          groups: ["<group>"]
+          position: true
+          velocity: false
+          effort: false
+          command: false
+
+      # Only for a robot with a mobile_base in its descriptor.
+      base:
+        name: "Base"
+        enable: true
+        velocity: true
+        command: false
