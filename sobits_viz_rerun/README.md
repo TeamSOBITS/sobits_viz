@@ -2,20 +2,20 @@
 
 # sobits_viz_rerun
 
-Streams the SOBIT HOME cameras, transforms and robot model into the
+Streams a TeamSOBITS robot's cameras, transforms and robot model into the
 [Rerun](https://rerun.io) viewer.
 
 Rerun does not speak ROS, so this package provides a node that subscribes to the
 usual topics, converts each message and logs it to a Rerun stream. The result
-is a single viewer showing the three camera streams as 2D images, the same
-images projected into 3D as camera frustums, the depth cloud from the head
-camera, the robot model posed by `/tf`, and every joint plotted over time.
+is a single viewer showing the robot's camera streams as 2D images, the same
+images projected into 3D as camera frustums, depth clouds from any depth
+camera, the robot model posed by `/tf`, and every joint plotted over time. The
+cameras, joint groups, lidars and topics come from the robot's descriptor; see
+[Supported robots](#supported-robots) below.
 
 | What | Where it ends up in Rerun |
 | --- | --- |
-| `head_camera` colour and depth | `cameras/head_camera/color`, `cameras/head_camera/depth` |
-| `hand_left_camera` colour | `cameras/hand_left_camera/color` |
-| `hand_right_camera` colour | `cameras/hand_right_camera/color` |
+| descriptor `sensors.cameras` colour and depth | `cameras/<name>/color`, `cameras/<name>/depth` |
 | `/tf`, `/tf_static` | `tf/<frame>`, `tf_static/<frame>` |
 | descriptor `sensors.lidars` scans | `lidars/<name>/scan`, points in the scanner's frame |
 | `joint_states` | `joints/position/<joint>`, `joints/velocity/<joint>`, `joints/effort/<joint>`, each only when a plot tab shows it |
@@ -25,10 +25,19 @@ camera, the robot model posed by `/tf`, and every joint plotted over time.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
+## Supported robots
+
+| Robot | `robot_name` | Bringup for testing | Notes |
+| --- | --- | --- | --- |
+| SOBIT HOME | `sobit_home` | `ros2 launch sobit_home_bringup gz_minimal.launch.py headless:=true use_rviz:=false camera_rate:=30` | Wrist cameras name their frame `hand_*_camera_optical_frame`; five `.dae` covers fail Rerun's COLLADA reader |
+| SOBIT LIGHT | `sobit_light` | `ros2 launch sobit_light_bringup gz_minimal.launch.py headless:=true use_rviz:=false enable_moveit:=false camera_rate:=30` | TF frames are prefixed `sobit_light/` by default, which the bridge strips |
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
 ## Requirements
 
 The viewer binary comes from the Rerun Python package and has to match the SDK
-version this node is built against (0.37.2). `sobit_home/install.sh` installs
+version this node is built against (0.37.2). `sobits_viz/install.sh` installs
 it, or you can do it by hand:
 
 ```sh
@@ -57,15 +66,16 @@ $ colcon build --packages-select sobits_viz_rerun \
 ## Launch and Usage
 
 Start the robot first, in simulation or on the real hardware, then the bridge.
+`robot_name` is required; it selects the robot's folder under `config/`.
 
 ```sh
-# Simulation
+# Simulation, SOBIT HOME
 $ ros2 launch sobit_home_bringup gz_minimal.launch.py
-$ ros2 launch sobits_viz_rerun rerun.launch.py use_sim_time:=true
+$ ros2 launch sobits_viz_rerun rerun.launch.py robot_name:=sobit_home use_sim_time:=true
 
-# Real robot
+# Real robot, SOBIT HOME
 $ ros2 launch sobit_home_bringup real_minimal.launch.py
-$ ros2 launch sobits_viz_rerun rerun.launch.py
+$ ros2 launch sobits_viz_rerun rerun.launch.py robot_name:=sobit_home
 ```
 
 Where the viewer runs is a launch argument; what is shown is the robot's
@@ -76,16 +86,16 @@ parameter file, `config/<robot_name>/<robot_name>.yaml`.
 | --- | --- |
 | `spawn` (default) | Opens a viewer window next to the node. Needs a display. The bridge hosts the stream and the viewer connects back to it, so no data is lost while the viewer starts. |
 | `web` | Serves the viewer as a web page on port 9090 and prints the URL to open; it carries the two sources the page must connect to, so open that URL and not the bare port. Works for a short look, not for watching. The browser viewer is 32-bit WebAssembly with a fixed 2.3 GiB ceiling that no argument raises ([rerun#11699](https://github.com/rerun-io/rerun/issues/11699)); at this data volume it reaches it within a minute or two, its garbage collector finds nothing to free, and the module crashes (`RuntimeError: unreachable`), which looks like a frozen page. Lower rates only delay it; Firefox grew past 20 GB instead. Use `spawn` on a display. Open the page soon after launching: the bridge replays everything it has buffered to a late viewer. |
-| `connect` | Streams to a viewer that is already running, locally or on your laptop (`rerun --port 9876 sobit_home.rbl`, then `connect_url:=rerun+http://<viewer-host>:9876/proxy`). Start the viewer first: anything logged before it accepts the connection is discarded. |
-| `serve` | Hosts the data in this process, buffered, for a viewer you start yourself — on the robot or on your laptop: `rerun --connect rerun+http://<robot>:9876/proxy sobit_home.rbl`. The `--connect` matters: `rerun <uri>` alone takes a listening bridge for a viewer and streams into it instead of opening a window. The remote option that works. |
+| `connect` | Streams to a viewer that is already running, locally or on your laptop (`rerun --port 9876 <robot>.rbl`, then `connect_url:=rerun+http://<viewer-host>:9876/proxy`). Start the viewer first: anything logged before it accepts the connection is discarded. |
+| `serve` | Hosts the data in this process, buffered, for a viewer you start yourself — on the robot or on your laptop: `rerun --connect rerun+http://<robot>:9876/proxy <robot>.rbl`. The `--connect` matters: `rerun <uri>` alone takes a listening bridge for a viewer and streams into it instead of opening a window. The remote option that works. |
 
 ```sh
 # Browser viewer, useful over SSH; open the "connect at" URL it prints
-$ ros2 launch sobits_viz_rerun rerun.launch.py viewer_mode:=web
+$ ros2 launch sobits_viz_rerun rerun.launch.py robot_name:=sobit_home viewer_mode:=web
 
 # Viewer on your laptop, bridge on the robot
 $ rerun --serve-web                      # on the laptop
-$ ros2 launch sobits_viz_rerun rerun.launch.py \
+$ ros2 launch sobits_viz_rerun rerun.launch.py robot_name:=sobit_home \
       viewer_mode:=connect connect_url:=rerun+http://<laptop-ip>:9876/proxy
 ```
 
@@ -97,7 +107,7 @@ snapshot is ever wanted.
 
 | Argument | Default | Meaning |
 | --- | --- | --- |
-| `robot_name` | `sobit_home` | Names the robot's folder, `config/<robot_name>/`, and its topic namespace |
+| `robot_name` | required | Names the robot's folder, `config/<robot_name>/`, and its topic namespace |
 | `robot_descriptor` | `config/<robot_name>/<robot_name>.robot.yaml` | The `sobits_vla_tools` `.robot.yaml` describing the robot. Required. |
 | `robot_params` | `config/<robot_name>/<robot_name>.yaml` | The robot's `app_id`, sink and `views` |
 | `blueprint` | `config/<robot_name>/<robot_name>.rbl` | The viewer layout generated from the two above |
@@ -118,12 +128,13 @@ parameter file, `config/<robot_name>/<robot_name>.yaml`.
 
 The robot is described by a
 [sobits_vla_tools](https://github.com/TeamSOBITS/sobits_vla_tools) descriptor,
-which names every camera and topic. A copy for SOBIT HOME ships in
-`config/sobit_home/`, next to the robot's own parameters and layout,
-and is used by default; point the node at another robot's to bridge that one:
+which names every camera and topic. A copy for each supported robot ships in
+`config/<robot>/`, next to that robot's own parameters and layout, and is used
+by default from `robot_name`; point the node at a different descriptor to
+override it:
 
 ```sh
-$ ros2 launch sobits_viz_rerun rerun.launch.py \
+$ ros2 launch sobits_viz_rerun rerun.launch.py robot_name:=sobit_light \
       robot_descriptor:=.../sobits_vla_common/robots/sobit_light.robot.yaml
 ```
 
@@ -136,14 +147,15 @@ rename `template.robot.yaml` and `template.yaml` to `<robot>.robot.yaml` and
 `<robot>.yaml`, fill in the `<...>` placeholders (or replace the descriptor
 with the robot's own from `sobits_vla_common/robots/`), generate the layout
 with `make_blueprint.py --params config/<robot>/<robot>.yaml`, and launch with
-`robot_name:=<robot>`. There is no second description to fall back on: the node
-stops if the descriptor is missing or unreadable.
+`robot_name:=<robot>`. There is no second description to fall back on: the
+launch file stops, naming the robots it does have, if `config/<robot>/` or
+its descriptor is missing.
 
 Everything else a robot needs, its `app_id`, where the data goes and its
 `views`, is in `config/<robot_name>/<robot_name>.yaml`. Among them, the cameras' `color.info_frame` and `depth.info_frame`
 describe the robot rather than the viewer: a different
-robot needs its own values for these, and nothing in the node assumes the
-SOBIT HOME layout.
+robot needs its own values for these, and nothing in the node assumes any one
+robot's layout.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -163,13 +175,15 @@ $ rerun $(ros2 pkg prefix sobits_viz_rerun)/share/sobits_viz_rerun/config/sobit_
 
 The layout follows the robot descriptor: every active camera gets a 2D view and
 every joint group a plot tab, with the base velocity from `mobile_base`. The
-`views` block of [config/sobit_home/sobit_home.yaml](config/sobit_home/sobit_home.yaml) adjusts that without
-touching the descriptor: it renames a view, turns one off, sets the frame the
-scene is resolved into, and for the joint tabs merges groups and adds or
-excludes single joints. The node reads the same block: a view that is off is
-not bridged either, and a camera's stream settings live in its entry, so each
-camera is described in one place. A camera, or a setting, left out gets the
-built-in defaults:
+`views` block of the robot's parameter file, e.g.
+[config/sobit_home/sobit_home.yaml](config/sobit_home/sobit_home.yaml) for
+SOBIT HOME, adjusts that without touching the descriptor: it renames a view,
+turns one off, sets the frame the scene is resolved into, and for the joint
+tabs merges groups and adds or excludes single joints. The node reads the
+same block: a view that is off is not bridged either, and a camera's stream
+settings live in its entry, so each camera is described in one place. A
+camera, or a setting, left out gets the built-in defaults, shown here for
+SOBIT HOME:
 
 ```yaml
 views:
@@ -224,21 +238,23 @@ $ python3 blueprint/make_blueprint.py --params /path/to/other_robot.yaml \
 
 ## Notes
 
-**Frame names.** The real wrist cameras stamp their images with frame ids like
-`sobit_home/hand_left_camera_optical_frame`, while the URDF uses the bare
-`hand_left_camera_optical_frame`. The bridge strips the robot name prefix from
-every frame id it sees so that both spellings land on the same frame. Set
-`enable_frame_prefix:=false` to turn that off, or `frame_prefix:=other/` to strip
-something else.
+**Frame names.** On SOBIT HOME the real wrist cameras stamp their images with
+frame ids like `sobit_home/hand_left_camera_optical_frame`, while the URDF
+uses the bare `hand_left_camera_optical_frame`. The bridge strips the robot
+name prefix from every frame id it sees so that both spellings land on the
+same frame; SOBIT LIGHT's `sobit_light/` TF prefix is stripped the same way.
+Set `enable_frame_prefix:=false` to turn that off, or `frame_prefix:=other/`
+to strip something else.
 
-**Depth units.** The head camera publishes millimetres as `16UC1` on the real
-robot and metres as `32FC1` in simulation. Both are handled. Simulated depth
-pixels beyond the far clip arrive as infinity and are logged as "no
+**Depth units.** SOBIT HOME's head camera publishes millimetres as `16UC1` on
+the real robot and metres as `32FC1` in simulation. Both are handled. Simulated
+depth pixels beyond the far clip arrive as infinity and are logged as "no
 measurement", otherwise they would stretch the viewer's depth range.
 
-**Bandwidth.** Three raw colour streams at 30 Hz are roughly 80 MB/s, and about
-1.5 GB per minute in the viewer, which is why `use_compressed` defaults to on.
-Set it to `false` if you need the unaltered pixels.
+**Bandwidth.** Three raw colour streams at 30 Hz, as on SOBIT HOME, are
+roughly 80 MB/s, and about 1.5 GB per minute in the viewer, which is why
+`use_compressed` defaults to on. Set it to `false` if you need the unaltered
+pixels.
 
 **Colour lagging depth by seconds.** The SDK batches rows per entity and
 sends an entity once its pending bytes reach `RERUN_FLUSH_NUM_BYTES`. At the
@@ -253,13 +269,13 @@ dropping the oldest data once its ceiling is reached and losing all of it when
 the node exits. Streams logged with `history: false` are not even kept that
 long: only their latest frame is in the viewer at any time.
 
-**Missing covers on the model.** Rerun's COLLADA reader rejects the five `.dae`
-meshes in `sobit_home_description` with `unexpected element library_nodes`, so
-the cosmetic covers are absent while every `.stl` part loads. Converting those
-meshes to STL is the workaround.
+**Missing covers on the model.** On SOBIT HOME, Rerun's COLLADA reader rejects
+the five `.dae` meshes in `sobit_home_description` with `unexpected element
+library_nodes`, so the cosmetic covers are absent while every `.stl` part
+loads. Converting those meshes to STL is the workaround.
 
 **Nothing shows up.** Check that the robot is publishing
-(`ros2 topic hz /sobit_home/head_camera/color/image_raw`) and that the DDS
+(e.g. `ros2 topic hz /sobit_home/head_camera/color/image_raw`) and that the DDS
 settings match; in the container that means
 `export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp`. If the robot model is missing
 but the images are fine, the node logs a warning naming the first mesh file it

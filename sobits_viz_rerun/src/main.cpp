@@ -125,7 +125,7 @@ int main(int argc, char ** argv)
   rclcpp::NodeOptions config_options;
   config_options.use_global_arguments(true);
   auto config = std::make_shared<rclcpp::Node>("rerun_bridge", config_options);
-  const auto app_id = config->declare_parameter<std::string>("app_id", "sobit_home");
+  const auto app_id = config->declare_parameter<std::string>("app_id", "robot");
   const auto mode = config->declare_parameter<std::string>("viewer_mode", "spawn");
   config->declare_parameter<std::string>(
     "connect_url", "rerun+http://127.0.0.1:9876/proxy");

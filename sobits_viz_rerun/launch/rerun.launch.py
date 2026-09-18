@@ -13,7 +13,10 @@ def generate_launch_description():
         # A robot's files live in config/<robot_name>/: its descriptor, its
         # parameters (app id and views) and the layout generated from them.
         # Each can be pointed elsewhere; empty means that folder.
-        DeclareLaunchArgument('robot_name',      default_value='sobit_home'),
+        DeclareLaunchArgument(
+            'robot_name',
+            description='Robot folder under config/ (sobit_home, sobit_light, ...)',
+        ),
         DeclareLaunchArgument(
             'robot_descriptor', default_value='',
             description='The sobits_vla_tools .robot.yaml describing the robot to bridge; '
@@ -52,7 +55,7 @@ def generate_launch_description():
                               description='Where robot_state_publisher latches the URDF; the one '
                                           'topic no descriptor names. Relative to /<robot_name>/, '
                                           'or absolute with a leading slash'),
-        DeclareLaunchArgument('urdf_path', default_value='/tmp/sobits_viz_rerun.urdf',
+        DeclareLaunchArgument('urdf_path', default_value='',
                               description='Where the robot description is written, for opening '
                                           'in a viewer by hand when embed_urdf is off'),
         DeclareLaunchArgument('memory_limit', default_value='10%',
@@ -72,13 +75,22 @@ def _bool(lc, context):
 def launch_setup(context, *args, **kwargs):
     robot_name = LaunchConfiguration('robot_name').perform(context)
 
-    robot_dir = os.path.join(get_package_share_directory('sobits_viz_rerun'), 'config', robot_name)
+    config_dir = os.path.join(get_package_share_directory('sobits_viz_rerun'), 'config')
+    robot_dir = os.path.join(config_dir, robot_name)
 
     def robot_file(arg, suffix):
         return LaunchConfiguration(arg).perform(context) or \
             os.path.join(robot_dir, f'{robot_name}{suffix}')
 
     robot_descriptor = robot_file('robot_descriptor', '.robot.yaml')
+    if not os.path.isfile(robot_descriptor):
+        robots = sorted(
+            d for d in os.listdir(config_dir)
+            if d != 'template' and os.path.isdir(os.path.join(config_dir, d))
+        )
+        raise RuntimeError(
+            f'No robot descriptor at {robot_descriptor}. '
+            f"Robots in this package: {', '.join(robots)}")
     robot_params = robot_file('robot_params', '.yaml')
     blueprint = robot_file('blueprint', '.rbl')
     viewer_mode = LaunchConfiguration('viewer_mode').perform(context)
@@ -87,7 +99,8 @@ def launch_setup(context, *args, **kwargs):
     web_port = LaunchConfiguration('web_port').perform(context)
 
     actions = []
-    urdf_path = LaunchConfiguration('urdf_path').perform(context)
+    urdf_path = LaunchConfiguration('urdf_path').perform(context) or \
+        f'/tmp/sobits_viz_rerun_{robot_name}.urdf'
 
     # Two modes run the viewer as a separate process rather than letting the
     # SDK spawn one, so it can be handed the layout as a file. In both the

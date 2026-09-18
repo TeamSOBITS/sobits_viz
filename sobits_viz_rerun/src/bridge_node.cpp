@@ -105,7 +105,11 @@ RerunBridge::RerunBridge(
 
 void RerunBridge::declare_parameters()
 {
-  robot_name_ = declare_parameter<std::string>("robot_name", "sobit_home");
+  robot_name_ = declare_parameter<std::string>("robot_name", "");
+  if (robot_name_.empty()) {
+    throw std::runtime_error(
+            "robot_name is required: the launch file sets it from robot_name:=<robot>");
+  }
   // Whether the driver's frame ids carry a prefix the URDF's do not. The
   // launch file sets both; empty means "<robot_name>/".
   enable_frame_prefix_ = declare_parameter<bool>("enable_frame_prefix", true);
@@ -1000,8 +1004,9 @@ void RerunBridge::on_urdf(const std_msgs::msg::String::ConstSharedPtr msg)
 
   // Written out and imported by path: given the contents directly, Rerun
   // embeds every mesh at once instead of reading them from disk as needed.
+  const std::string temp_name = "sobits_viz_rerun_" + robot_name_ + ".urdf";
   const std::string path = urdf_path_.empty() ?
-    (std::filesystem::temp_directory_path() / "sobits_viz_rerun.urdf").string() :
+    (std::filesystem::temp_directory_path() / temp_name).string() :
     urdf_path_;
 
   std::ofstream out(path, std::ios::binary | std::ios::trunc);

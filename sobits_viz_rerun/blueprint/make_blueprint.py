@@ -12,7 +12,7 @@ the `views` block of the robot's parameter file names, enables or merges them.
 Both live in config/<robot>/ with the layout this writes. Run it after changing
 either:
 
-    python3 blueprint/make_blueprint.py --params config/sobit_home/sobit_home.yaml
+    python3 blueprint/make_blueprint.py --params config/<robot>/<robot>.yaml
 """
 
 from __future__ import annotations
@@ -22,10 +22,6 @@ from pathlib import Path
 
 import rerun.blueprint as rrb
 import yaml
-
-DEFAULT_PARAMS = (
-    Path(__file__).resolve().parent.parent / "config" / "sobit_home" / "sobit_home.yaml"
-)
 
 
 def load_params(path: Path) -> dict:
@@ -205,7 +201,12 @@ def build(params: dict, descriptor: Path) -> rrb.Blueprint:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--params", type=Path, default=DEFAULT_PARAMS)
+    parser.add_argument(
+        "--params",
+        type=Path,
+        required=True,
+        help="the robot's parameter file, config/<robot>/<robot>.yaml",
+    )
     parser.add_argument(
         "--descriptor",
         type=Path,
