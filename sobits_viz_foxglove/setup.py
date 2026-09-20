@@ -40,6 +40,7 @@ setup(
         'console_scripts': [
             'description_relay = sobits_viz_foxglove.description_relay:main',
             'make_layout = sobits_viz_foxglove.make_layout:main',
+            'transform_throttle = sobits_viz_foxglove.transform_throttle:main',
         ],
     },
 )

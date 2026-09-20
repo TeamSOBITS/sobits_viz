@@ -45,6 +45,9 @@ def generate_launch_description():
                               description='Where robot_state_publisher latches the URDF. '
                                           'Relative to /<robot_name>/, or absolute with a slash'),
         DeclareLaunchArgument('use_sim_time', default_value='false'),
+        DeclareLaunchArgument(
+            'tf_rate_hz', default_value='10.0',
+            description='Rate /tf is republished at; 0 serves it untouched'),
         OpaqueFunction(function=launch_setup),
     ])
 
@@ -83,6 +86,11 @@ def launch_setup(context, *args, **kwargs):
     use_sim_time = _bool(LaunchConfiguration('use_sim_time'), context) == 'true'
     port = LaunchConfiguration('port').perform(context)
 
+    # A viewer preloads every transform, so an idle robot's repeats fill its buffer.
+    tf_rate = float(LaunchConfiguration('tf_rate_hz').perform(context))
+    if tf_rate > 0:
+        topics = ['/tf_throttled' if topic == '/tf' else topic for topic in topics]
+
     # Only what the layout shows is served; the bridge advertises everything by default.
     bridge = Node(
         package='foxglove_bridge',
@@ -117,8 +125,17 @@ def launch_setup(context, *args, **kwargs):
         }],
     )
 
+    throttle = Node(
+        package='sobits_viz_foxglove',
+        executable='transform_throttle',
+        name='transform_throttle',
+        output='screen',
+        parameters=[{'rate_hz': tf_rate, 'use_sim_time': use_sim_time}],
+    )
+
     return [
         bridge,
         relay,
+        *([throttle] if tf_rate > 0 else []),
         LogInfo(msg=f'Foxglove: connect to ws://127.0.0.1:{port} and import {layout}'),
     ]
