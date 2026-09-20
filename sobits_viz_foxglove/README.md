@@ -66,6 +66,7 @@ The layout is imported once; the app remembers it.
 | `address` | `0.0.0.0` | Address it binds to |
 | `video_transcode` | `false` | `true` lets the bridge re-encode images to video, which costs CPU and is unnecessary on a local network |
 | `robot_description_topic` | `robot_description` | Where `robot_state_publisher` latches the URDF, under `/<robot_name>/` |
+| `tf_rate_hz` | `10.0` | Rate `/tf` is republished at for the viewer; `0` serves it untouched |
 | `use_sim_time` | `false` | Set this to `true` in simulation |
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
@@ -102,6 +103,22 @@ running on this machine could read those, and the browser never can. The relay
 rewrites them to `package://<pkg>/…` and republishes the description, which the
 bridge's asset service resolves for any client. `Failed to retrieve asset` in
 the bridge log means the workspace holding those meshes was not sourced.
+
+**Why `/tf` is throttled.** Foxglove preloads transforms and refuses more than
+645277 per topic, then warns `Failed to process all transforms on topic /tf`.
+SOBIT HOME publishes 42 frames at about 43 Hz, some 1800 transforms a second,
+so that ceiling arrives in six minutes even standing still, where every repeat
+carries the same pose. `transform_throttle` keeps the newest transform per
+child frame and republishes them at `tf_rate_hz` on `/tf_throttled`, which the
+bridge serves in place of `/tf`; motion still arrives, and the buffer lasts
+about half an hour. Raise the rate for fast motion, or pass `tf_rate_hz:=0` to
+serve `/tf` untouched.
+
+**Camera frustums are off.** Foxglove draws the head colour frustum 90 degrees
+out, pointing up rather than forward, from a `CameraInfo` indistinguishable
+from the depth one beside it that draws correctly, on frames that differ only
+by 24 mm of translation. The overlay carries no information the panels lack,
+so `views.scene.frusta` ships `false`.
 
 **Depth images.** Foxglove decodes `compressedDepth` only as 16-bit PNG, and
 the simulated cameras publish `32FC1`, so the depth panels subscribe to the raw
