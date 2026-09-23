@@ -33,9 +33,9 @@
             use_compressed: true
           depth:
             enable: true
-            # RViz decodes 16-bit PNG compressedDepth only, and a Gazebo
-            # depth sensor always sends 32FC1, so depth is shown raw.
-            use_compressed: false
+            # RViz decodes every compressedDepth variant, and the compressed
+            # frame is a few kB against more than a megabyte raw.
+            use_compressed: true
             range_m: 10.0
             # The cloud is one point per pixel, so it is off by default.
             points: false

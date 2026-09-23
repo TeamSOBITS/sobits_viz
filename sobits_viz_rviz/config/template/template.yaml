@@ -37,10 +37,11 @@
             enable: true
             use_compressed: true
           # Only for a camera the descriptor marks is_depth. RViz decodes
-          # 16-bit PNG compressedDepth only; anything else must be raw.
+          # RViz decodes every compressedDepth variant, so depth compresses
+          # like colour does.
           depth:
             enable: true
-            use_compressed: false
+            use_compressed: true
             range_m: 10.0
             # The cloud is one point per pixel, so it is off by default.
             points: false

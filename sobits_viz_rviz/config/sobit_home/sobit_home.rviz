@@ -132,7 +132,7 @@ Visualization Manager:
     Max Value: 10.0
     Median window: 5
     Topic:
-      Value: /sobit_home/head_camera/depth/image_raw
+      Value: /sobit_home/head_camera/depth/image_raw/compressedDepth
       Depth: 5
       History Policy: Keep Last
       Reliability Policy: Best Effort
