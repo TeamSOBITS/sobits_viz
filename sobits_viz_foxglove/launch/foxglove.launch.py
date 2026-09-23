@@ -1,5 +1,7 @@
+import json
 import os
 import re
+import tempfile
 
 from ament_index_python.packages import get_package_share_directory
 
@@ -8,6 +10,7 @@ from launch.actions import DeclareLaunchArgument, LogInfo, OpaqueFunction
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 
+from sobits_viz_foxglove.make_layout import build
 from sobits_viz_foxglove.robot_views import bridged_topics, load_descriptor, load_params
 
 
@@ -45,6 +48,11 @@ def generate_launch_description():
                               description='Where robot_state_publisher latches the URDF. '
                                           'Relative to /<robot_name>/, or absolute with a slash'),
         DeclareLaunchArgument('use_sim_time', default_value='false'),
+        # The robot's own flag, so the same value can be passed to both: with
+        # it the driver stamps frames as "<robot_name>/<link>".
+        DeclareLaunchArgument(
+            'enable_tf_prefix', default_value='false',
+            description='Frames are prefixed with <robot_name>/, as the robot does'),
         DeclareLaunchArgument(
             'tf_rate_hz', default_value='10.0',
             description='Rate /tf is republished at; 0 serves it untouched'),
@@ -55,6 +63,16 @@ def generate_launch_description():
 def _bool(lc, context):
     """Normalize CLI true/True/1 -> 'true', anything else -> 'false'."""
     return 'true' if lc.perform(context).lower() in ('true', '1', 'yes') else 'false'
+
+
+def _prefixed(robot_name: str, params_path: str, descriptor: str) -> str:
+    """Write a layout whose frames carry the robot's prefix, and return it."""
+    params = load_params(params_path)
+    params['frame_prefix'] = f'{robot_name}/'
+    handle, path = tempfile.mkstemp(prefix=f'{robot_name}_', suffix='.foxglove.json')
+    with os.fdopen(handle, 'w') as out:
+        json.dump(build(params, descriptor), out, indent=2)
+    return path
 
 
 def launch_setup(context, *args, **kwargs):
@@ -80,6 +98,8 @@ def launch_setup(context, *args, **kwargs):
             f"Robots in sobits_viz_robots: {', '.join(robots)}")
     robot_params = robot_file('robot_params', '.yaml')
     layout = robot_file('layout', '.foxglove.json')
+    if _bool(LaunchConfiguration('enable_tf_prefix'), context) == 'true':
+        layout = _prefixed(robot_name, robot_params, robot_descriptor)
 
     params = load_params(robot_params)
     topics = bridged_topics(params, load_descriptor(robot_descriptor))

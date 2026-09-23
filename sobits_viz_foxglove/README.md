@@ -68,6 +68,7 @@ The layout is imported once; the app remembers it.
 | `robot_description_topic` | `robot_description` | Where `robot_state_publisher` latches the URDF, under `/<robot_name>/` |
 | `tf_rate_hz` | `10.0` | Rate `/tf` is republished at for the viewer; `0` serves it untouched |
 | `use_sim_time` | `false` | Set this to `true` in simulation |
+| `enable_tf_prefix` | `false` | Frames are prefixed with `<robot_name>/`, matching the robot's own argument of the same name |
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
