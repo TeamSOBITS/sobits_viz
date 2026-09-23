@@ -138,7 +138,7 @@ Visualization Manager:
       Reliability Policy: Best Effort
       Durability Policy: Volatile
   - Class: rviz_default_plugins/PointCloud2
-    Name: Head depth points
+    Name: Head cloud
     Enabled: false
     Value: false
     Alpha: 1

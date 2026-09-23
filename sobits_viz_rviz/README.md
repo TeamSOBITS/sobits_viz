@@ -50,7 +50,9 @@ $ ros2 launch sobits_viz_rviz rviz.launch.py robot_name:=sobit_light use_sim_tim
 `views.scene` sets the fixed frame, frames the opening view with
 `camera_distance_m` and `camera_height_m`, and switches the grid, model, TF
 tree and scans on or off; `views.cameras.<name>` names a camera's Image
-display and picks compressed or raw for colour and depth;
+display and picks compressed or raw for colour and depth, with `depth.name`
+and `depth.points_name` naming the depth and cloud displays and
+`depth.points` deciding whether the cloud opens ticked;
 `views.lidars.<name>` sets point size and colour for a LaserScan display;
 `views.base` adds an Odometry display. `frame_prefix` is prepended to the
 fixed frame and given to the model's `TF Prefix`, for robots whose driver

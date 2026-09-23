@@ -59,7 +59,7 @@ def cameras(robot: dict, settings: dict) -> list:
             depth = view.get('depth') or {}
             if not depth.get('enable', True):
                 continue
-            shown.append((camera, f'{label} depth', entry, depth))
+            shown.append((camera, depth.get('name', f'{label} depth'), entry, depth))
         else:
             shown.append((camera, label, entry, view.get('color') or {}))
     return shown

@@ -32,6 +32,7 @@
             enable: true
             use_compressed: true
           depth:
+            name: "Head depth"
             enable: true
             # RViz decodes every compressedDepth variant, and the compressed
             # frame is a few kB against more than a megabyte raw.
@@ -39,6 +40,7 @@
             range_m: 10.0
             # Listed in the display tree; unticked, being one point per pixel.
             points: false
+            points_name: "Head cloud"
             points_size_px: 2.0
         hand_camera:
           name: "Hand"
@@ -47,11 +49,13 @@
             enable: true
             use_compressed: true
           depth:
+            name: "Hand depth"
             enable: true
             use_compressed: true
             range_m: 10.0
             # Listed in the display tree; unticked, being one point per pixel.
             points: false
+            points_name: "Hand cloud"
             points_size_px: 2.0
         camera_front:
           name: "Front"

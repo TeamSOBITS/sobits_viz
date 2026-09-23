@@ -214,8 +214,9 @@ def _displays(params: dict, robot: dict, views: dict, prefix: str) -> list:
         displays.append(_image_display(label, topic, depth_range))
         # Listed whatever `points` says, so the cloud is one click away.
         if entry.get('points_topic'):
+            cloud = view.get('points_name', f'{label} points')
             displays.append(
-                _point_cloud_display(f'{label} points', entry['points_topic'], view))
+                _point_cloud_display(cloud, entry['points_topic'], view))
 
     base = views.get('base') or {}
     mobile = robot.get('mobile_base') or {}

@@ -41,10 +41,12 @@
           # like colour does.
           depth:
             enable: true
+            name: "<camera> depth"
             use_compressed: true
             range_m: 10.0
             # Listed in the display tree; unticked, being one point per pixel.
             points: false
+            points_name: "<camera> cloud"
             points_size_px: 2.0
 
       # One entry per lidar name in the descriptor.
