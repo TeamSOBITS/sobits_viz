@@ -45,6 +45,17 @@
         frusta: false
         scans: true
 
+      tf:
+        enable: false
+        names: true
+        scale: 0.4
+        # Names are bare here; frame_prefix is prepended for you.
+        frames:
+          - base_footprint
+          - head_camera_link
+          - hand_camera_link
+        exclude: []
+
       cameras:
         head_camera:
           name: "Head"

@@ -38,6 +38,14 @@
         scans: true
 
       # One entry per camera name in the descriptor; each gets an image panel.
+      tf:
+        enable: false
+        names: true
+        scale: 0.4
+        # Empty lists every frame; name a few to keep the view readable.
+        frames: []
+        exclude: []
+
       cameras:
         <camera>:
           name: "<Camera>"

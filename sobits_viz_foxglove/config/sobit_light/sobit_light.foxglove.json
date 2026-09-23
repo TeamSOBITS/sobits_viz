@@ -35,7 +35,7 @@
         "meshUpAxis": "z_up",
         "transforms": {
           "axisScale": 0.0,
-          "showLabel": false
+          "showLabel": true
         }
       },
       "topics": {
@@ -69,7 +69,8 @@
           "pointSize": 4.0,
           "visible": true
         }
-      }
+      },
+      "transforms": {}
     },
     "Image!camera_front": {
       "foxglovePanelTitle": "Front",

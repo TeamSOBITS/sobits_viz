@@ -73,6 +73,18 @@
         frusta: false
         scans: true
 
+      tf:
+        enable: false
+        names: true
+        scale: 0.4
+        # Empty lists every frame, which buries the model in axes.
+        frames:
+          - base_footprint
+          - head_camera_color_frame
+          - hand_left_end_effector_link
+          - hand_right_end_effector_link
+        exclude: []
+
       cameras:
         head_camera:
           name: "Head"

@@ -65,6 +65,7 @@ def _grid(ids: list) -> dict:
 
 def _scene_panel(params: dict, robot: dict, views: dict) -> dict:
     scene = views.get('scene') or {}
+    tf = views.get('tf') or {}
     prefix = params.get('frame_prefix', '')
     topics = {}
 
@@ -108,11 +109,26 @@ def _scene_panel(params: dict, robot: dict, views: dict) -> dict:
             'fovy': 45.0, 'near': 0.05, 'far': 200.0,
         },
         # Foxglove assumes meshes are Y-up; ROS meshes are Z-up.
-        'scene': {'meshUpAxis': 'z_up', 'transforms': {'showLabel': False, 'axisScale': 0.0}},
+        'scene': {'meshUpAxis': 'z_up', 'transforms': {
+            'showLabel': bool(tf.get('names', False)),
+            'axisScale': float(tf.get('scale', 0.0)) if tf.get('enable') else 0.0,
+        }},
+        'transforms': _frames(tf, prefix),
         'topics': topics,
         'layers': layers,
         'imageMode': {},
     }
+
+
+def _frames(tf: dict, prefix: str) -> dict:
+    # Foxglove keys each frame's visibility as frame:<name>.
+    if not tf.get('enable'):
+        return {}
+    shown = tf.get('frames') or []
+    hidden = tf.get('exclude') or []
+    frames = {f'frame:{prefix}{f}': {'visible': True} for f in shown}
+    frames.update({f'frame:{prefix}{f}': {'visible': False} for f in hidden})
+    return frames
 
 
 def _image_panels(params: dict, robot: dict, views: dict) -> tuple:
