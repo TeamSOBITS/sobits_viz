@@ -169,6 +169,7 @@ sensors:
       compressed: true
       active: true
       is_depth: true
+      points_topic: /sobit_home/head_camera/depth/points
   # Laser scanners, drawn as points in the 3D view. Not in the original.
   lidars:
     - name: lidar_front

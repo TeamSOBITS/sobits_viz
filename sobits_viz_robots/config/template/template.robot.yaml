@@ -42,6 +42,8 @@ sensors:
       compressed: true
       active: true
       is_depth: true
+      # Where a depth-to-cloud node publishes, if one runs.
+      points_topic: /<robot>/<camera>/depth/points
   # Laser scanners, drawn as points in the 3D view.
   lidars:
     - name: <lidar>

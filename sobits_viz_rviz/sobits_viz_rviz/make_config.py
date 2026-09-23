@@ -131,6 +131,31 @@ def _image_display(name: str, topic: str, depth_range=None) -> dict:
     }
 
 
+def _point_cloud_display(name: str, topic: str, view: dict) -> dict:
+    # depth_image_proc emits bare xyz, so colouring by intensity fails; height
+    # needs no channel.
+    colour = view.get('points_color')
+    return {
+        'Class': 'rviz_default_plugins/PointCloud2',
+        'Name': name,
+        'Enabled': True,
+        'Value': True,
+        'Alpha': 1,
+        'Axis': 'Z',
+        'Color': _rgb(colour or [255, 255, 255]),
+        'Color Transformer': 'FlatColor' if colour else 'AxisColor',
+        'Decay Time': 0,
+        'Position Transformer': 'XYZ',
+        'Selectable': True,
+        'Size (Pixels)': view.get('points_size_px', 2.0),
+        'Size (m)': 0.01,
+        'Style': 'Points',
+        'Use Fixed Frame': True,
+        'Use rainbow': True,
+        'Topic': _best_effort_topic(topic),
+    }
+
+
 def _laser_scan_display(name: str, topic: str, view: dict) -> dict:
     return {
         'Class': 'rviz_default_plugins/LaserScan',
@@ -186,6 +211,9 @@ def _displays(params: dict, robot: dict, views: dict, prefix: str) -> list:
         topic = entry.get('compressed_topic') if compressed else entry.get('raw_topic')
         depth_range = view.get('range_m') if entry.get('is_depth') else None
         displays.append(_image_display(label, topic, depth_range))
+        if view.get('points') and entry.get('points_topic'):
+            displays.append(
+                _point_cloud_display(f'{label} points', entry['points_topic'], view))
 
     base = views.get('base') or {}
     mobile = robot.get('mobile_base') or {}

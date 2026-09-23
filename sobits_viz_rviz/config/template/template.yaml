@@ -42,6 +42,9 @@
             enable: true
             use_compressed: false
             range_m: 10.0
+            # The cloud is one point per pixel, so it is off by default.
+            points: false
+            points_size_px: 2.0
 
       # One entry per lidar name in the descriptor.
       lidars:

@@ -37,6 +37,9 @@
             # simulated camera sends 32FC1, so depth is shown raw.
             use_compressed: false
             range_m: 10.0
+            # The cloud is one point per pixel, so it is off by default.
+            points: false
+            points_size_px: 2.0
         hand_left_camera:
           name: "Hand Left"
           enable: true
