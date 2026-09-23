@@ -14,8 +14,8 @@ the other viewers read, shared through the `sobits_viz_robots` package.
 
 | Robot | `robot_name` | Bringup for testing | Notes |
 | --- | --- | --- | --- |
-| SOBIT HOME | `sobit_home` | `ros2 launch sobit_home_bringup gz_minimal.launch.py headless:=true use_rviz:=false camera_rate:=30` | bare frame names |
-| SOBIT LIGHT | `sobit_light` | `ros2 launch sobit_light_bringup gz_minimal.launch.py headless:=true use_rviz:=false enable_moveit:=false camera_rate:=30` | frames prefixed `sobit_light/` |
+| SOBIT HOME | `sobit_home` | `ros2 launch sobit_home_bringup gz_minimal.launch.py headless:=true use_rviz:=false` | bare frame names |
+| SOBIT LIGHT | `sobit_light` | `ros2 launch sobit_light_bringup gz_minimal.launch.py headless:=true use_rviz:=false enable_moveit:=false` | frames prefixed `sobit_light/` |
 
 ## Requirements
 
