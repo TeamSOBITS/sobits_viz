@@ -53,9 +53,10 @@ tree and scans on or off; `views.tf` names the TF display and lists the
 `frames` it draws and the ones to `exclude`, with `names` and `scale` sizing
 the labels and axes; `views.cameras.<name>` names a camera's Image
 display and picks compressed or raw for colour and depth, with `depth.name`
-and `depth.points_name` naming the depth and cloud displays and
-`depth.points` deciding whether the cloud opens ticked;
-`views.lidars.<name>` sets point size and colour for a LaserScan display;
+naming the depth display and `depth.points` holding the cloud's `name`,
+`enable` and `size_px`;
+`views.lidars.<name>` names a LaserScan display and sets its point size and
+colour;
 `views.base` adds an Odometry display. `frame_prefix` is prepended to the
 fixed frame and given to the model's `TF Prefix`, for robots whose driver
 prefixes its frames.

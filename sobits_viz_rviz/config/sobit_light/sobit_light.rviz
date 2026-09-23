@@ -52,7 +52,7 @@ Visualization Manager:
     Filter (whitelist): ^(sobit_light/base_footprint|sobit_light/head_camera_link|sobit_light/hand_camera_link)$
     Filter (blacklist): ''
   - Class: rviz_default_plugins/LaserScan
-    Name: lidar
+    Name: Lidar
     Enabled: true
     Value: true
     Alpha: 1

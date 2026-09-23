@@ -50,9 +50,10 @@
             use_compressed: true
             range_m: 10.0
             # Listed in the display tree; unticked, being one point per pixel.
-            points: false
-            points_name: "Head cloud"
-            points_size_px: 2.0
+            points:
+              name: "Head cloud"
+              enable: false
+              size_px: 2.0
         hand_camera:
           name: "Hand"
           enable: true
@@ -65,9 +66,10 @@
             use_compressed: true
             range_m: 10.0
             # Listed in the display tree; unticked, being one point per pixel.
-            points: false
-            points_name: "Hand cloud"
-            points_size_px: 2.0
+            points:
+              name: "Hand cloud"
+              enable: false
+              size_px: 2.0
         camera_front:
           name: "Front"
           enable: true
@@ -83,6 +85,7 @@
 
       lidars:
         lidar:
+          name: "Lidar"
           enable: true
           point_size_px: 3.0
           color: [255, 0, 0]

@@ -74,5 +74,5 @@ def lidars(robot: dict, settings: dict) -> list:
         view = settings.get(entry['name']) or {}
         if not view.get('enable', True):
             continue
-        shown.append((entry['name'], entry, view))
+        shown.append((view.get('name', title(entry['name'])), entry, view))
     return shown

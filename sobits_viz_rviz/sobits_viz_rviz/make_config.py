@@ -140,11 +140,11 @@ def _image_display(name: str, topic: str, depth_range=None) -> dict:
     }
 
 
-def _point_cloud_display(name: str, topic: str, view: dict) -> dict:
+def _point_cloud_display(name: str, topic: str, points: dict) -> dict:
     # depth_image_proc emits bare xyz, so colouring by intensity fails; height
     # needs no channel.
-    colour = view.get('points_color')
-    shown = bool(view.get('points'))
+    colour = points.get('color')
+    shown = bool(points.get('enable'))
     return {
         'Class': 'rviz_default_plugins/PointCloud2',
         'Name': name,
@@ -157,7 +157,7 @@ def _point_cloud_display(name: str, topic: str, view: dict) -> dict:
         'Decay Time': 0,
         'Position Transformer': 'XYZ',
         'Selectable': True,
-        'Size (Pixels)': view.get('points_size_px', 2.0),
+        'Size (Pixels)': points.get('size_px', 2.0),
         'Size (m)': 0.01,
         'Style': 'Points',
         'Use Fixed Frame': True,
@@ -221,11 +221,12 @@ def _displays(params: dict, robot: dict, views: dict, prefix: str) -> list:
         topic = entry.get('compressed_topic') if compressed else entry.get('raw_topic')
         depth_range = view.get('range_m') if entry.get('is_depth') else None
         displays.append(_image_display(label, topic, depth_range))
-        # Listed whatever `points` says, so the cloud is one click away.
+        # Listed whatever `enable` says, so the cloud is one click away.
         if entry.get('points_topic'):
-            cloud = view.get('points_name', f'{label} points')
+            points = view.get('points') or {}
+            cloud = points.get('name', f'{label} points')
             displays.append(
-                _point_cloud_display(cloud, entry['points_topic'], view))
+                _point_cloud_display(cloud, entry['points_topic'], points))
 
     base = views.get('base') or {}
     mobile = robot.get('mobile_base') or {}
