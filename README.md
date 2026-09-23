@@ -25,8 +25,7 @@ SOBIT LIGHT, ...). Every visualizer shares one robot description: the
 | `sobits_viz_robots` | The robot descriptors every viewer shares | [README](sobits_viz_robots/README.md) |
 | `sobits_viz_rerun` | Streams cameras, depth, laser scans, TF, joints, odometry and the robot model into the Rerun viewer | [README](sobits_viz_rerun/README.md) |
 | `sobits_viz_foxglove` | Serves the same to the Foxglove viewer, with a layout generated per robot | [README](sobits_viz_foxglove/README.md) |
-
-Planned: `sobits_viz_rviz` (shared RViz configs).
+| `sobits_viz_rviz` | Generates an RViz2 config per robot from the same descriptor | [README](sobits_viz_rviz/README.md) |
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -49,7 +48,6 @@ git clone -b jazzy-devel https://github.com/TeamSOBITS/sobits_viz.git
 cd sobits_viz
 bash install.sh
 cd ~/colcon_ws
-rosdep install -i --from-paths src/sobits_viz -y
 colcon build --symlink-install --packages-up-to sobits_viz
 ```
 
@@ -65,6 +63,12 @@ or, for SOBIT LIGHT:
 
 ```sh
 ros2 launch sobits_viz_rerun rerun.launch.py robot_name:=sobit_light use_sim_time:=true
+```
+
+For RViz:
+
+```sh
+ros2 launch sobits_viz_rviz rviz.launch.py robot_name:=sobit_home use_sim_time:=true
 ```
 
 For Foxglove instead, start the bridge and open `ws://localhost:8765` in the

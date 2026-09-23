@@ -25,8 +25,7 @@ SOBITS Vizは，TeamSOBITSのロボット（SOBIT HOME，SOBIT LIGHT，...）向
 | `sobits_viz_robots` | すべてのビューアが共有するロボット記述子 | [README](sobits_viz_robots/README.md) |
 | `sobits_viz_rerun` | カメラ，深度，レーザースキャン，TF，関節，オドメトリ，ロボットモデルをRerunビューアにストリーミング | [README](sobits_viz_rerun/README.md) |
 | `sobits_viz_foxglove` | 同じデータをFoxgloveビューアに配信し，ロボットごとのレイアウトを生成 | [README](sobits_viz_foxglove/README.md) |
-
-予定: `sobits_viz_rviz`（共有RViz設定）。
+| `sobits_viz_rviz` | 同じ記述子からロボットごとのRViz2設定を生成 | [README](sobits_viz_rviz/README.md) |
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -49,7 +48,6 @@ git clone -b jazzy-devel https://github.com/TeamSOBITS/sobits_viz.git
 cd sobits_viz
 bash install.sh
 cd ~/colcon_ws
-rosdep install -i --from-paths src/sobits_viz -y
 colcon build --symlink-install --packages-up-to sobits_viz
 ```
 
@@ -65,6 +63,12 @@ SOBIT LIGHTの場合も同様です:
 
 ```sh
 ros2 launch sobits_viz_rerun rerun.launch.py robot_name:=sobit_light use_sim_time:=true
+```
+
+RVizを使う場合：
+
+```sh
+ros2 launch sobits_viz_rviz rviz.launch.py robot_name:=sobit_home use_sim_time:=true
 ```
 
 Foxgloveを使う場合は，ブリッジを起動し，[デスクトップアプリ](https://foxglove.dev/download)
