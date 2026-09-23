@@ -54,8 +54,8 @@
             use_compressed: true
           depth:
             enable: true
-            # The Image panel decodes 16-bit PNG compressedDepth only, and the
-            # simulated camera sends 32FC1, so depth is shown raw.
+            # The Image panel decodes 16-bit PNG compressedDepth only, and a
+            # Gazebo depth sensor always sends 32FC1, so depth is shown raw.
             use_compressed: false
             range_m: [0.1, 10.0]
         hand_camera:

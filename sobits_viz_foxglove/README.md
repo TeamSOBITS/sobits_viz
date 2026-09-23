@@ -120,9 +120,13 @@ from the depth one beside it that draws correctly, on frames that differ only
 by 24 mm of translation. The overlay carries no information the panels lack,
 so `views.scene.frusta` ships `false`.
 
-**Depth images.** Foxglove decodes `compressedDepth` only as 16-bit PNG, and
-the simulated cameras publish `32FC1`, so the depth panels subscribe to the raw
-image. On a real robot publishing 16UC1 you can set `use_compressed: true`.
+**Depth images.** Foxglove decodes `compressedDepth` only as 16-bit PNG, so the
+depth panels subscribe to the raw image. The descriptors record the hardware
+encoding, `16UC1`, and on a robot that publishes it you can set
+`use_compressed: true`. A Gazebo depth sensor always emits `32FC1` whatever the
+SDF asks for, which is twice the bytes: measured on SOBIT HOME, 1.23 MB a frame
+against 0.92 MB for colour, enough that only 7 of 30 frames a second arrive and
+their timestamps fall far enough behind for transform lookups to fail.
 
 **Joints are plotted by index.** A `JointState` keeps its names in an array
 parallel to the values, and a message path filter can only test fields of the
