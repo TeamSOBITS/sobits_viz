@@ -39,6 +39,18 @@ Visualization Manager:
       Durability Policy: Transient Local
     TF Prefix: ''
     Update Interval: 0
+  - Class: rviz_default_plugins/TF
+    Name: TF
+    Enabled: false
+    Value: false
+    Frame Timeout: 15
+    Marker Scale: 0.4
+    Show Arrows: false
+    Show Axes: true
+    Show Names: true
+    Update Interval: 0
+    Filter (whitelist): ^(base_footprint|head_camera_link|arm_left_wrist_roll_link|arm_right_wrist_roll_link)$
+    Filter (blacklist): ''
   - Class: rviz_default_plugins/LaserScan
     Name: lidar_front
     Enabled: true

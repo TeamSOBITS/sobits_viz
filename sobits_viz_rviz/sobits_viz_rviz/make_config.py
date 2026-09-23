@@ -16,6 +16,7 @@ Run it after changing either file:
 
 import argparse
 from pathlib import Path
+import re
 
 from sobits_viz_rviz.robot_views import (
     cameras,
@@ -100,18 +101,26 @@ def _robot_model_display(params: dict, scene: dict, prefix: str) -> dict:
     }
 
 
-def _tf_display() -> dict:
+def _tf_display(scene: dict, prefix: str) -> dict:
+    # Both filters are a single regex, so the frames become one alternation.
+    def framed(key):
+        names = [re.escape(prefix + f) for f in (scene.get(key) or [])]
+        return '^(' + '|'.join(names) + ')$' if names else ''
+
+    shown = bool(scene.get('tf'))
     return {
         'Class': 'rviz_default_plugins/TF',
         'Name': 'TF',
-        'Enabled': True,
-        'Value': True,
+        'Enabled': shown,
+        'Value': shown,
         'Frame Timeout': 15,
-        'Marker Scale': 0.5,
+        'Marker Scale': float(scene.get('tf_scale', 0.5)),
         'Show Arrows': False,
         'Show Axes': True,
-        'Show Names': False,
+        'Show Names': bool(scene.get('tf_names', False)),
         'Update Interval': 0,
+        'Filter (whitelist)': framed('tf_frames'),
+        'Filter (blacklist)': framed('tf_exclude'),
     }
 
 
@@ -200,8 +209,8 @@ def _displays(params: dict, robot: dict, views: dict, prefix: str) -> list:
         displays.append(_grid_display())
     if scene.get('urdf', True):
         displays.append(_robot_model_display(params, scene, prefix.rstrip('/')))
-    if scene.get('tf', True):
-        displays.append(_tf_display())
+    # Listed whatever `tf` says, so the frames are one click away.
+    displays.append(_tf_display(scene, prefix))
 
     for name, entry, view in lidars(robot, views.get('lidars') or {}):
         if scene.get('scans', True):

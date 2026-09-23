@@ -21,6 +21,15 @@
         urdf: true
         grid: true
         tf: false
+        tf_names: true
+        tf_scale: 0.4
+        # Empty shows every frame, which buries the model in axes.
+        tf_frames:
+          - base_footprint
+          - head_camera_link
+          - arm_left_wrist_roll_link
+          - arm_right_wrist_roll_link
+        tf_exclude: []
         scans: true
         description_topic: "robot_description"
 
