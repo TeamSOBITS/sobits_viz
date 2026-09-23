@@ -49,7 +49,7 @@ Visualization Manager:
     Show Axes: true
     Show Names: true
     Update Interval: 0
-    Filter (whitelist): ^(base_footprint|head_camera_link|arm_left_wrist_roll_link|arm_right_wrist_roll_link)$
+    Filter (whitelist): ^(base_footprint|head_camera_color_frame|hand_left_end_effector_link|hand_right_end_effector_link)$
     Filter (blacklist): ''
   - Class: rviz_default_plugins/LaserScan
     Name: lidar_front

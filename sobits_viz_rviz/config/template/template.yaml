@@ -24,16 +24,19 @@
         show_collision: false
         urdf: true
         grid: true
-        tf: true
-        tf_names: true
-        tf_scale: 0.4
-        # Empty lists every frame; name a few to keep the view readable.
-        tf_frames: []
-        tf_exclude: []
         scans: true
         description_topic: "robot_description"
 
       # One entry per camera name in the descriptor; each gets an Image display.
+      tf:
+        name: "TF"
+        enable: false
+        names: true
+        scale: 0.4
+        # Empty lists every frame; name a few to keep the view readable.
+        frames: []
+        exclude: []
+
       cameras:
         <camera>:
           name: "<Camera>"

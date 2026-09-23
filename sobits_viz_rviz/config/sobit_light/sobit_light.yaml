@@ -20,17 +20,20 @@
         show_collision: false
         urdf: true
         grid: true
-        tf: false
-        tf_names: true
-        tf_scale: 0.4
-        # Names are bare here; frame_prefix is prepended for you.
-        tf_frames:
-          - base_footprint
-          - head_camera_link
-          - arm_wrist_roll_link
-        tf_exclude: []
         scans: true
         description_topic: "robot_description"
+
+      tf:
+        name: "TF"
+        enable: false
+        names: true
+        scale: 0.4
+        # Names are bare here; frame_prefix is prepended for you.
+        frames:
+          - base_footprint
+          - head_camera_link
+          - hand_camera_link
+        exclude: []
 
       cameras:
         head_camera:

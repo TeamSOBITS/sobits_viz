@@ -20,18 +20,21 @@
         show_collision: false
         urdf: true
         grid: true
-        tf: false
-        tf_names: true
-        tf_scale: 0.4
-        # Empty shows every frame, which buries the model in axes.
-        tf_frames:
-          - base_footprint
-          - head_camera_link
-          - arm_left_wrist_roll_link
-          - arm_right_wrist_roll_link
-        tf_exclude: []
         scans: true
         description_topic: "robot_description"
+
+      tf:
+        name: "TF"
+        enable: false
+        names: true
+        scale: 0.4
+        # Empty lists every frame, which buries the model in axes.
+        frames:
+          - base_footprint
+          - head_camera_color_frame
+          - hand_left_end_effector_link
+          - hand_right_end_effector_link
+        exclude: []
 
       cameras:
         head_camera:

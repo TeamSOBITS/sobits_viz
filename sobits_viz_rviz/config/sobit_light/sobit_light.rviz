@@ -49,7 +49,7 @@ Visualization Manager:
     Show Axes: true
     Show Names: true
     Update Interval: 0
-    Filter (whitelist): ^(sobit_light/base_footprint|sobit_light/head_camera_link|sobit_light/arm_wrist_roll_link)$
+    Filter (whitelist): ^(sobit_light/base_footprint|sobit_light/head_camera_link|sobit_light/hand_camera_link)$
     Filter (blacklist): ''
   - Class: rviz_default_plugins/LaserScan
     Name: lidar
