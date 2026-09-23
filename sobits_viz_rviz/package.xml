@@ -13,7 +13,7 @@
   <author email="team.sobits@gmail.com">Team SOBITS</author>
   <author email="kvalentincardenas@gmail.com">VALENTIN Keith</author>
 
-  <buildtool_depend>ament_python</buildtool_depend>
+  <buildtool_depend>python3-setuptools</buildtool_depend>
 
   <depend>rviz2</depend>
 

@@ -4,15 +4,19 @@ set -e
 
 echo "╔══╣ Install: SOBITS VIZ (STARTING) ╠══╗"
 
-# The Rerun viewer binary is the pip package, and it must match the C++ SDK
-# version sobits_viz_rerun's bridge is built against.
+DIR=`pwd`
+cd ..
+
+# Everything from apt, including foxglove_bridge and rviz2, is declared in the
+# packages' manifests and comes from rosdep.
+rosdep update
+rosdep install -r -y -i --from-paths ${DIR}
+
+# The Rerun viewer is a pip package with no rosdep rule, and its version must
+# match the C++ SDK sobits_viz_rerun is built against.
 python3 -m pip install --break-system-packages rerun-sdk==0.37.2
 rerun --version
 
-# The Foxglove bridge is an apt package; the viewer itself is the desktop app
-# from https://foxglove.dev/download, or the web app.
-if command -v apt-get > /dev/null; then
-    sudo apt-get install -y "ros-${ROS_DISTRO}-foxglove-bridge"
-fi
+cd ${DIR}
 
 echo "╚══╣ Install: SOBITS VIZ (FINISHED) ╠══╝"
