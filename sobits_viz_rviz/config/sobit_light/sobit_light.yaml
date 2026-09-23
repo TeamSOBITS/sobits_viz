@@ -31,8 +31,8 @@
         # Names are bare here; frame_prefix is prepended for you.
         frames:
           - base_footprint
-          - head_camera_link
-          - hand_camera_link
+          - head_camera_color_frame
+          - hand_end_effector_link
         exclude: []
 
       cameras:
