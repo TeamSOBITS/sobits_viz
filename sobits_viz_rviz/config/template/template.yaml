@@ -1,0 +1,56 @@
+# Skeleton of a robot's RViz2 settings: which displays the generated config
+# shows. Copy to config/<robot>/<robot>.yaml, fill in every <...>, drop what
+# the robot lacks, then generate its config (the descriptor it names lives in
+# sobits_viz_robots):
+#   ros2 run sobits_viz_rviz make_config --params config/<robot>/<robot>.yaml
+# ROS rejects an empty list or map, so leave a key out rather than empty.
+/**:
+  ros__parameters:
+    app_id: "<robot>"
+
+    # Empty when the driver publishes bare frame names; "<robot>/" when it
+    # prefixes them, since RViz shows frames exactly as they arrive.
+    frame_prefix: ""
+
+    views:
+      # The model, grid, TF tree and laser scans.
+      scene:
+        name: "Scene"
+        enable: true
+        # A frame the TF tree reaches, with the prefix above applied.
+        fixed_frame: "odom"
+        camera_distance_m: 4.0
+        camera_height_m: 0.6
+        show_collision: false
+        urdf: true
+        grid: true
+        tf: true
+        scans: true
+        description_topic: "robot_description"
+
+      # One entry per camera name in the descriptor; each gets an Image display.
+      cameras:
+        <camera>:
+          name: "<Camera>"
+          enable: true
+          color:
+            enable: true
+            use_compressed: true
+          # Only for a camera the descriptor marks is_depth. RViz decodes
+          # 16-bit PNG compressedDepth only; anything else must be raw.
+          depth:
+            enable: true
+            use_compressed: false
+            range_m: 10.0
+
+      # One entry per lidar name in the descriptor.
+      lidars:
+        <lidar>:
+          enable: true
+          point_size_px: 3.0
+          color: [255, 0, 0]
+
+      # Only for a robot with a mobile_base in its descriptor.
+      base:
+        name: "Base"
+        enable: true

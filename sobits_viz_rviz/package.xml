@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>sobits_viz_rviz</name>
+  <version>0.1.0</version>
+  <description>Generate RViz2 configs for a TeamSOBITS robot from its shared descriptor</description>
+  <maintainer email="kvalentincardenas@gmail.com">VALENTIN Keith</maintainer>
+  <license>BSD-3-Clause</license>
+
+  <url type="website">https://home.soka.ac.jp/~choi/index.html</url>
+  <url type="repository">https://github.com/TeamSOBITS/sobits_viz</url>
+  <url type="bugtracker">https://github.com/TeamSOBITS/sobits_viz/issues</url>
+  <author email="team.sobits@gmail.com">Team SOBITS</author>
+  <author email="kvalentincardenas@gmail.com">VALENTIN Keith</author>
+
+  <buildtool_depend>ament_python</buildtool_depend>
+
+  <depend>rviz2</depend>
+
+  <exec_depend>ament_index_python</exec_depend>
+  <exec_depend>launch</exec_depend>
+  <exec_depend>launch_ros</exec_depend>
+  <exec_depend>python3-yaml</exec_depend>
+  <exec_depend>sobits_viz_robots</exec_depend>
+
+  <test_depend>ament_copyright</test_depend>
+  <test_depend>ament_flake8</test_depend>
+  <test_depend>ament_pep257</test_depend>
+  <test_depend>python3-pytest</test_depend>
+
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>

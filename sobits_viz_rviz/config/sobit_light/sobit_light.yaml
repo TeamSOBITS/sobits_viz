@@ -1,0 +1,71 @@
+# SOBIT LIGHT in RViz2: which displays the generated config shows. The
+# cameras and lidars it names come from sobits_viz_robots
+# config/sobit_light/sobit_light.robot.yaml. Regenerate after editing:
+#   ros2 run sobits_viz_rviz make_config --params config/sobit_light/sobit_light.yaml
+/**:
+  ros__parameters:
+    app_id: "sobit_light"
+
+    # SOBIT LIGHT prefixes every frame with its name and RViz does no
+    # stripping, so the config's frames carry the prefix.
+    frame_prefix: "sobit_light/"
+
+    views:
+      scene:
+        name: "Scene"
+        enable: true
+        fixed_frame: "odom"
+        camera_distance_m: 3.0
+        camera_height_m: 0.4
+        show_collision: false
+        urdf: true
+        grid: true
+        tf: false
+        scans: true
+        description_topic: "robot_description"
+
+      cameras:
+        head_camera:
+          name: "Head"
+          enable: true
+          color:
+            enable: true
+            use_compressed: true
+          depth:
+            enable: true
+            # RViz decodes 16-bit PNG compressedDepth only, and the
+            # simulated camera sends 32FC1, so depth is shown raw.
+            use_compressed: false
+            range_m: 10.0
+        hand_camera:
+          name: "Hand"
+          enable: true
+          color:
+            enable: true
+            use_compressed: true
+          depth:
+            enable: true
+            use_compressed: false
+            range_m: 10.0
+        camera_front:
+          name: "Front"
+          enable: true
+          color:
+            enable: true
+            use_compressed: true
+        camera_rear:
+          name: "Back"
+          enable: true
+          color:
+            enable: true
+            use_compressed: true
+
+      lidars:
+        lidar:
+          enable: true
+          point_size_px: 3.0
+          color: [255, 0, 0]
+
+      base:
+        name: "Base"
+        enable: true
