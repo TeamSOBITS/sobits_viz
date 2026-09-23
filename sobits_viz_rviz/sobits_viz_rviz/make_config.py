@@ -135,11 +135,12 @@ def _point_cloud_display(name: str, topic: str, view: dict) -> dict:
     # depth_image_proc emits bare xyz, so colouring by intensity fails; height
     # needs no channel.
     colour = view.get('points_color')
+    shown = bool(view.get('points'))
     return {
         'Class': 'rviz_default_plugins/PointCloud2',
         'Name': name,
-        'Enabled': True,
-        'Value': True,
+        'Enabled': shown,
+        'Value': shown,
         'Alpha': 1,
         'Axis': 'Z',
         'Color': _rgb(colour or [255, 255, 255]),
@@ -211,7 +212,8 @@ def _displays(params: dict, robot: dict, views: dict, prefix: str) -> list:
         topic = entry.get('compressed_topic') if compressed else entry.get('raw_topic')
         depth_range = view.get('range_m') if entry.get('is_depth') else None
         displays.append(_image_display(label, topic, depth_range))
-        if view.get('points') and entry.get('points_topic'):
+        # Listed whatever `points` says, so the cloud is one click away.
+        if entry.get('points_topic'):
             displays.append(
                 _point_cloud_display(f'{label} points', entry['points_topic'], view))
 

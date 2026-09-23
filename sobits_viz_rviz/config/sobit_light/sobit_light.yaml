@@ -37,7 +37,7 @@
             # frame is a few kB against more than a megabyte raw.
             use_compressed: true
             range_m: 10.0
-            # The cloud is one point per pixel, so it is off by default.
+            # Listed in the display tree; unticked, being one point per pixel.
             points: false
             points_size_px: 2.0
         hand_camera:
@@ -50,7 +50,7 @@
             enable: true
             use_compressed: true
             range_m: 10.0
-            # The cloud is one point per pixel, so it is off by default.
+            # Listed in the display tree; unticked, being one point per pixel.
             points: false
             points_size_px: 2.0
         camera_front:

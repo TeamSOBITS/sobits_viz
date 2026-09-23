@@ -130,6 +130,28 @@ Visualization Manager:
       History Policy: Keep Last
       Reliability Policy: Best Effort
       Durability Policy: Volatile
+  - Class: rviz_default_plugins/PointCloud2
+    Name: Head depth points
+    Enabled: false
+    Value: false
+    Alpha: 1
+    Axis: Z
+    Color: 255; 255; 255
+    Color Transformer: AxisColor
+    Decay Time: 0
+    Position Transformer: XYZ
+    Selectable: true
+    Size (Pixels): 2.0
+    Size (m): 0.01
+    Style: Points
+    Use Fixed Frame: true
+    Use rainbow: true
+    Topic:
+      Value: /sobit_light/head_camera/depth/points
+      Depth: 5
+      History Policy: Keep Last
+      Reliability Policy: Best Effort
+      Durability Policy: Volatile
   - Class: rviz_default_plugins/Image
     Name: Hand depth
     Enabled: true
@@ -140,6 +162,28 @@ Visualization Manager:
     Median window: 5
     Topic:
       Value: /sobit_light/hand_camera/depth/image_rect_raw/compressedDepth
+      Depth: 5
+      History Policy: Keep Last
+      Reliability Policy: Best Effort
+      Durability Policy: Volatile
+  - Class: rviz_default_plugins/PointCloud2
+    Name: Hand depth points
+    Enabled: false
+    Value: false
+    Alpha: 1
+    Axis: Z
+    Color: 255; 255; 255
+    Color Transformer: AxisColor
+    Decay Time: 0
+    Position Transformer: XYZ
+    Selectable: true
+    Size (Pixels): 2.0
+    Size (m): 0.01
+    Style: Points
+    Use Fixed Frame: true
+    Use rainbow: true
+    Topic:
+      Value: /sobit_light/hand_camera/depth/points
       Depth: 5
       History Policy: Keep Last
       Reliability Policy: Best Effort
