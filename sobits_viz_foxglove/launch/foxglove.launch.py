@@ -1,12 +1,15 @@
+import glob
+import hashlib
 import json
 import os
 import re
 import tempfile
+import time
 
 from ament_index_python.packages import get_package_share_directory
 
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, LogInfo, OpaqueFunction
+from launch.actions import DeclareLaunchArgument, ExecuteProcess, LogInfo, OpaqueFunction
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 
@@ -48,6 +51,9 @@ def generate_launch_description():
                               description='Where robot_state_publisher latches the URDF. '
                                           'Relative to /<robot_name>/, or absolute with a slash'),
         DeclareLaunchArgument('use_sim_time', default_value='false'),
+        # The bridge only serves data; this says who opens a window on it.
+        DeclareLaunchArgument('viewer_mode', default_value='spawn',
+                              description='spawn (the desktop app) | connect (serve only)'),
         # The robot's own flag, so the same value can be passed to both: with
         # it the driver stamps frames as "<robot_name>/<link>".
         DeclareLaunchArgument(
@@ -63,6 +69,52 @@ def generate_launch_description():
 def _bool(lc, context):
     """Normalize CLI true/True/1 -> 'true', anything else -> 'false'."""
     return 'true' if lc.perform(context).lower() in ('true', '1', 'yes') else 'false'
+
+
+def _selected_layout_id(store: str) -> str:
+    """Read the layout id the app will open from its Local Storage."""
+    # The app reopens whatever it had selected, so writing a new layout beside
+    # it changes nothing until that id is the one on disk.
+    leveldb = os.path.expanduser('~/.config/Foxglove/Local Storage/leveldb')
+    found = ''
+    for name in sorted(os.listdir(leveldb)) if os.path.isdir(leveldb) else []:
+        try:
+            blob = open(os.path.join(leveldb, name), 'rb').read()
+        except OSError:
+            continue
+        for match in re.finditer(rb'"currentLayoutId":"(lay_[A-Za-z0-9]+)"', blob):
+            found = match.group(1).decode()
+    return found
+
+
+def _install_layout(robot_name: str, layout: str) -> None:
+    """Put the layout where the app reads it, so panels exist on connect."""
+    # Connecting alone shows an empty session: with no panels, nothing
+    # subscribes and the bridge serves only the latched description.
+    store = os.path.expanduser('~/.config/Foxglove/studio-datastores')
+    if not os.path.isdir(store) or not os.path.isfile(layout):
+        return
+    chosen = _selected_layout_id(store)
+    target = os.path.join(store, 'layouts-local')
+    for existing in sorted(glob.glob(os.path.join(store, 'layouts-*'))):
+        if chosen and os.path.isfile(os.path.join(existing, chosen)):
+            target = existing
+            break
+    os.makedirs(target, exist_ok=True)
+    saved = time.strftime('%Y-%m-%dT%H:%M:%S.000Z', time.gmtime())
+    # The app wants lay_ and 16 alphanumerics; anything else it tries to sync
+    # and the server rejects as an invalid id.
+    digest = hashlib.sha1(robot_name.encode()).hexdigest()[:16]
+    entry_id = chosen or f'lay_{digest}'
+    entry = {
+        'id': entry_id,
+        'name': f'{robot_name} (sobits_viz)',
+        'permission': 'CREATOR_WRITE',
+        'baseline': {'data': json.load(open(layout)), 'savedAt': saved},
+        'working': None,
+    }
+    with open(os.path.join(target, entry_id), 'w') as out:
+        json.dump(entry, out)
 
 
 def _prefixed(robot_name: str, params_path: str, descriptor: str) -> str:
@@ -153,9 +205,23 @@ def launch_setup(context, *args, **kwargs):
         parameters=[{'rate_hz': tf_rate, 'use_sim_time': use_sim_time}],
     )
 
+    mode = LaunchConfiguration('viewer_mode').perform(context).strip().lower()
+    if mode not in ('spawn', 'connect'):
+        raise RuntimeError(f"viewer_mode must be spawn or connect, not '{mode}'")
+
+    started = []
+    if mode == 'spawn':
+        _install_layout(robot_name, layout)
+        started.append(ExecuteProcess(
+            cmd=['foxglove-studio', '--no-sandbox',
+                 f'foxglove://open?ds=foxglove-websocket&ds.url=ws://127.0.0.1:{port}'],
+            output='log',
+        ))
+
     return [
         bridge,
         relay,
         *([throttle] if tf_rate > 0 else []),
+        *started,
         LogInfo(msg=f'Foxglove: connect to ws://127.0.0.1:{port} and import {layout}'),
     ]

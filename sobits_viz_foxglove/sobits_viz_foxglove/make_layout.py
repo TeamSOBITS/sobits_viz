@@ -110,7 +110,7 @@ def _scene_panel(params: dict, robot: dict, views: dict) -> dict:
         },
         # Foxglove assumes meshes are Y-up; ROS meshes are Z-up.
         'scene': {'meshUpAxis': 'z_up', 'transforms': {
-            'showLabel': bool(tf.get('names', False)),
+            'showLabel': bool(tf.get('enable')) and bool(tf.get('names', False)),
             'axisScale': float(tf.get('scale', 0.0)) if tf.get('enable') else 0.0,
         }},
         'transforms': _frames(tf, prefix),
@@ -121,13 +121,13 @@ def _scene_panel(params: dict, robot: dict, views: dict) -> dict:
 
 
 def _frames(tf: dict, prefix: str) -> dict:
-    # Foxglove keys each frame's visibility as frame:<name>.
-    if not tf.get('enable'):
-        return {}
-    shown = tf.get('frames') or []
-    hidden = tf.get('exclude') or []
-    frames = {f'frame:{prefix}{f}': {'visible': True} for f in shown}
-    frames.update({f'frame:{prefix}{f}': {'visible': False} for f in hidden})
+    # Foxglove gives every frame its own visible flag and shows the ones it has
+    # never heard of, so `frames` can only turn the named ones on: hiding the
+    # rest means naming them in `exclude`.
+    on = bool(tf.get('enable'))
+    frames = {f'frame:{prefix}{f}': {'visible': on} for f in (tf.get('frames') or [])}
+    frames.update({f'frame:{prefix}{f}': {'visible': False}
+                   for f in (tf.get('exclude') or [])})
     return frames
 
 

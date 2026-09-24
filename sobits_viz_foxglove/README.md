@@ -78,8 +78,9 @@ The layout is imported once; the app remembers it.
 given exactly those topics, what is served. `views.scene` sets the fixed frame,
 frames the opening view with `camera_distance_m` and `camera_height_m`, and
 switches the model, frustums and scans; `views.tf` draws an axis at each of
-the `frames` it lists and hides the ones in `exclude`, with `names` and
-`scale` sizing the labels and axes; `views.cameras.<name>` names a
+the `frames` it lists, with `names` labelling them, and hides the ones in
+`exclude`, which a frame needs to be named in because the panel shows every
+frame it has not been told about; `views.cameras.<name>` names a
 camera's panel and picks compressed or raw for colour and depth;
 `views.lidars.<name>` sets point size and colour; `views.joints.tabs` lists the
 plot tabs, each merging descriptor groups with optional `add_joints` and

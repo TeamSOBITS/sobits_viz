@@ -35,7 +35,7 @@
         "meshUpAxis": "z_up",
         "transforms": {
           "axisScale": 0.0,
-          "showLabel": true
+          "showLabel": false
         }
       },
       "topics": {
@@ -70,7 +70,17 @@
           "visible": true
         }
       },
-      "transforms": {}
+      "transforms": {
+        "frame:sobit_light/base_footprint": {
+          "visible": false
+        },
+        "frame:sobit_light/hand_end_effector_link": {
+          "visible": false
+        },
+        "frame:sobit_light/head_camera_color_frame": {
+          "visible": false
+        }
+      }
     },
     "Image!camera_front": {
       "foxglovePanelTitle": "Front",
