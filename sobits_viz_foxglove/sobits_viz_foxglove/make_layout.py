@@ -211,6 +211,9 @@ def _plot(paths: list, title: str) -> dict:
 def _plot_panels(params: dict, robot: dict, views: dict) -> tuple:
     panels, tabs = {}, []
     states = robot.get('joint_states_topic', '/joint_states')
+    # The launch reads the order from the running robot. Guessing it instead
+    # would plot whichever joint happens to sit at that index, so without one
+    # the measured series are left out and only the commands are drawn.
     order = params.get('joint_order') or []
 
     for tab in joint_tabs(robot, views.get('joints') or {}):

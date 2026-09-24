@@ -137,42 +137,6 @@
       "paths": [
         {
           "enabled": true,
-          "label": "arm_shoulder_roll_joint",
-          "timestampMethod": "receiveTime",
-          "value": "/sobit_light/joint_states.position[5]"
-        },
-        {
-          "enabled": true,
-          "label": "arm_shoulder_pitch_joint",
-          "timestampMethod": "receiveTime",
-          "value": "/sobit_light/joint_states.position[6]"
-        },
-        {
-          "enabled": true,
-          "label": "arm_elbow_pitch_joint",
-          "timestampMethod": "receiveTime",
-          "value": "/sobit_light/joint_states.position[7]"
-        },
-        {
-          "enabled": true,
-          "label": "arm_forearm_roll_joint",
-          "timestampMethod": "receiveTime",
-          "value": "/sobit_light/joint_states.position[8]"
-        },
-        {
-          "enabled": true,
-          "label": "arm_wrist_pitch_joint",
-          "timestampMethod": "receiveTime",
-          "value": "/sobit_light/joint_states.position[9]"
-        },
-        {
-          "enabled": true,
-          "label": "arm_wrist_roll_joint",
-          "timestampMethod": "receiveTime",
-          "value": "/sobit_light/joint_states.position[10]"
-        },
-        {
-          "enabled": true,
           "label": "arm_shoulder_roll_joint cmd",
           "timestampMethod": "receiveTime",
           "value": "/sobit_light/arm_position_controller/joint_trajectory.points[-1].positions[0]"
@@ -206,56 +170,6 @@
           "label": "arm_wrist_roll_joint cmd",
           "timestampMethod": "receiveTime",
           "value": "/sobit_light/arm_position_controller/joint_trajectory.points[-1].positions[5]"
-        }
-      ],
-      "showLegend": true,
-      "showPlotValuesInLegend": false,
-      "showXAxisLabels": true,
-      "showYAxisLabels": true,
-      "sidebarDimension": 240,
-      "xAxisVal": "timestamp"
-    },
-    "Plot!arm_velocity": {
-      "followingViewWidth": 30,
-      "foxglovePanelTitle": "Arm velocity",
-      "isSynced": true,
-      "legendDisplay": "floating",
-      "paths": [
-        {
-          "enabled": true,
-          "label": "arm_shoulder_roll_joint",
-          "timestampMethod": "receiveTime",
-          "value": "/sobit_light/joint_states.velocity[5]"
-        },
-        {
-          "enabled": true,
-          "label": "arm_shoulder_pitch_joint",
-          "timestampMethod": "receiveTime",
-          "value": "/sobit_light/joint_states.velocity[6]"
-        },
-        {
-          "enabled": true,
-          "label": "arm_elbow_pitch_joint",
-          "timestampMethod": "receiveTime",
-          "value": "/sobit_light/joint_states.velocity[7]"
-        },
-        {
-          "enabled": true,
-          "label": "arm_forearm_roll_joint",
-          "timestampMethod": "receiveTime",
-          "value": "/sobit_light/joint_states.velocity[8]"
-        },
-        {
-          "enabled": true,
-          "label": "arm_wrist_pitch_joint",
-          "timestampMethod": "receiveTime",
-          "value": "/sobit_light/joint_states.velocity[9]"
-        },
-        {
-          "enabled": true,
-          "label": "arm_wrist_roll_joint",
-          "timestampMethod": "receiveTime",
-          "value": "/sobit_light/joint_states.velocity[10]"
         }
       ],
       "showLegend": true,
@@ -303,44 +217,12 @@
       "sidebarDimension": 240,
       "xAxisVal": "timestamp"
     },
-    "Plot!hand_position": {
-      "followingViewWidth": 30,
-      "foxglovePanelTitle": "Hand",
-      "isSynced": true,
-      "legendDisplay": "floating",
-      "paths": [
-        {
-          "enabled": true,
-          "label": "hand_joint",
-          "timestampMethod": "receiveTime",
-          "value": "/sobit_light/joint_states.position[11]"
-        }
-      ],
-      "showLegend": true,
-      "showPlotValuesInLegend": false,
-      "showXAxisLabels": true,
-      "showYAxisLabels": true,
-      "sidebarDimension": 240,
-      "xAxisVal": "timestamp"
-    },
     "Plot!head_position": {
       "followingViewWidth": 30,
       "foxglovePanelTitle": "Head",
       "isSynced": true,
       "legendDisplay": "floating",
       "paths": [
-        {
-          "enabled": true,
-          "label": "head_yaw_joint",
-          "timestampMethod": "receiveTime",
-          "value": "/sobit_light/joint_states.position[3]"
-        },
-        {
-          "enabled": true,
-          "label": "head_pitch_joint",
-          "timestampMethod": "receiveTime",
-          "value": "/sobit_light/joint_states.position[4]"
-        },
         {
           "enabled": true,
           "label": "head_yaw_joint cmd",
@@ -369,17 +251,8 @@
           "title": "Head"
         },
         {
-          "layout": {
-            "direction": "row",
-            "first": "Plot!arm_position",
-            "second": "Plot!arm_velocity",
-            "splitPercentage": 50
-          },
+          "layout": "Plot!arm_position",
           "title": "Arm"
-        },
-        {
-          "layout": "Plot!hand_position",
-          "title": "Hand"
         },
         {
           "layout": "Plot!base",
