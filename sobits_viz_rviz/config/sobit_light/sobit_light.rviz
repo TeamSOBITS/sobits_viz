@@ -37,7 +37,7 @@ Visualization Manager:
       History Policy: Keep Last
       Reliability Policy: Reliable
       Durability Policy: Transient Local
-    TF Prefix: sobit_light
+    TF Prefix: ''
     Update Interval: 0
   - Class: rviz_default_plugins/TF
     Name: TF
@@ -49,7 +49,7 @@ Visualization Manager:
     Show Axes: true
     Show Names: true
     Update Interval: 0
-    Filter (whitelist): ^(sobit_light/base_footprint|sobit_light/head_camera_color_frame|sobit_light/hand_end_effector_link)$
+    Filter (whitelist): ^(base_footprint|head_camera_color_frame|hand_end_effector_link)$
     Filter (blacklist): ''
   - Class: rviz_default_plugins/LaserScan
     Name: Lidar
@@ -218,7 +218,7 @@ Visualization Manager:
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
-    Fixed Frame: sobit_light/odom
+    Fixed Frame: odom
     Frame Rate: 30
   Name: root
   Tools:
@@ -246,7 +246,7 @@ Visualization Manager:
         X: 0
         Y: 0
         Z: 0.4
-      Target Frame: sobit_light/odom
+      Target Frame: odom
     Saved: null
 Window Geometry:
   Height: 1000

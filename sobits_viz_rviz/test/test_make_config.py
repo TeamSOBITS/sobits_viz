@@ -94,8 +94,14 @@ def test_committed_config_matches_the_generator(robot):
     assert committed == expected
 
 
-def test_fixed_frame_carries_the_frame_prefix_for_sobit_light():
-    params, config = config_of('sobit_light')
+@pytest.mark.parametrize('robot', robots())
+def test_fixed_frame_carries_the_frame_prefix(robot):
+    # The prefix is empty in the file and set by the launch, so the test drives
+    # it rather than asserting what a robot happens to ship with.
+    params, config = config_of(robot)
     fixed_frame = config['Visualization Manager']['Global Options']['Fixed Frame']
-    assert fixed_frame == params['frame_prefix'] + params['views']['scene']['fixed_frame']
-    assert fixed_frame.startswith('sobit_light/')
+    assert fixed_frame == params.get('frame_prefix', '') + params['views']['scene']['fixed_frame']
+    params['frame_prefix'] = 'prefixed/'
+    prefixed = build(params, ROBOTS / robot / f'{robot}.robot.yaml')
+    assert prefixed['Visualization Manager']['Global Options']['Fixed Frame'].startswith(
+        'prefixed/')

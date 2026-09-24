@@ -16,12 +16,12 @@
         "thetaOffset": 135.0
       },
       "followMode": "follow-pose",
-      "followTf": "sobit_light/odom",
+      "followTf": "odom",
       "imageMode": {},
       "layers": {
         "robot_model": {
           "displayMode": "visual",
-          "framePrefix": "sobit_light/",
+          "framePrefix": "",
           "instanceId": "robot_model",
           "label": "sobit_light",
           "layerId": "foxglove.Urdf",

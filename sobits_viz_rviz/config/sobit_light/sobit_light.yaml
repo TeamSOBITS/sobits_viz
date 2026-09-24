@@ -6,9 +6,9 @@
   ros__parameters:
     app_id: "sobit_light"
 
-    # SOBIT LIGHT prefixes every frame with its name and RViz does no
-    # stripping, so the config's frames carry the prefix.
-    frame_prefix: "sobit_light/"
+    # Empty: the bringup passes enable_tf_prefix, and the launch prefixes
+    # every frame from robot_name when it is set.
+    frame_prefix: ""
 
     views:
       scene:
