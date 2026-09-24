@@ -140,7 +140,7 @@ Visualization Manager:
     Enabled: true
     Value: true
     Normalize Range: false
-    Min Value: 0.0
+    Min Value: 0.1
     Max Value: 10.0
     Median window: 5
     Topic:

@@ -114,6 +114,7 @@ snapshot is ever wanted.
 | `robot_description_topic` | `robot_description` | Where `robot_state_publisher` latches the URDF, under `/<robot_name>/` unless it starts with `/` |
 | `enable_frame_prefix` | `true` | Strip `frame_prefix` from every frame id the drivers send |
 | `frame_prefix` | `<robot_name>/` | The prefix to strip |
+| `urdf_path` | `''` | Where the description is written, for opening in a viewer by hand when `embed_urdf` is off |
 | `use_sim_time` | `false` | Set this to `true` in simulation |
 | `viewer_mode` | `spawn` | See the table above |
 | `grpc_port` | `9876` | Port the bridge and viewer talk over |

@@ -22,8 +22,8 @@
       tf:
         name: "TF"
         enable: false
-        names: true
-        scale: 0.4
+        label: true
+        axis_scale: 0.4
         # Empty lists every frame, which buries the model in axes.
         frames:
           - base_footprint
@@ -45,7 +45,7 @@
             # RViz decodes every compressedDepth variant, and the compressed
             # frame is a few kB against more than a megabyte raw.
             use_compressed: true
-            range_m: 10.0
+            range_m: [0.1, 10.0]
             # Listed in the display tree; unticked, being one point per pixel.
             points:
               name: "Head cloud"

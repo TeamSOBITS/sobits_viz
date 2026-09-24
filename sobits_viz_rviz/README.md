@@ -47,20 +47,64 @@ $ ros2 launch sobits_viz_rviz rviz.launch.py robot_name:=sobit_light use_sim_tim
 
 ## The views file
 
-`config/<robot>/<robot>.yaml` says what the config displays.
-`views.scene` sets the fixed frame, frames the opening view with
-`camera_distance_m` and `camera_height_m`, and switches the grid, model, TF
-tree on or off; `views.tf` names the TF display and lists the
-`frames` it draws and the ones to `exclude`, with `names` and `scale` sizing
-the labels and axes; `views.cameras.<name>` names a camera's Image
-display and picks compressed or raw for colour and depth, with `depth.name`
-naming the depth display and `depth.points` holding the cloud's `name`,
-`enable` and `size_px`;
-`views.lidars.<name>` names a LaserScan display, ticks it with `scan`, and
-sets its point size and colour;
-`views.base` adds an Odometry display. `frame_prefix` is prepended to the
-fixed frame and given to the model's `TF Prefix`, for robots whose driver
-prefixes its frames.
+`config/<robot>/<robot>.yaml` says what the config displays. Every setting
+below is optional; the default is what the table shows.
+
+**`views.scene`** — the 3D view itself.
+
+| Key | Default | Effect |
+| --- | --- | --- |
+| `enable` | `true` | `false` writes a config with no displays at all |
+| `fixed_frame` | `odom` | The frame everything is drawn relative to |
+| `camera_distance_m` | `4.0` | How far back the view opens |
+| `camera_height_m` | `0.6` | What height it looks at |
+| `grid` | `true` | The ground grid |
+| `urdf` | `true` | The robot model |
+| `show_collision` | `false` | Draw collision geometry instead of visual |
+
+**`views.tf`** — the frame axes. RViz filters frames by regex, so `frames`
+genuinely limits what is drawn.
+
+| Key | Default | Effect |
+| --- | --- | --- |
+| `name` | `TF` | The display's name in the tree |
+| `enable` | `false` | Ticked or not; the display is always listed |
+| `label` | `false` | Draw each frame's name |
+| `axis_scale` | `0.4` | Size of the axis markers |
+| `frames` | all | Only these frames are drawn |
+| `exclude` | none | These are not |
+
+**`views.cameras.<name>`** — one Image display per camera, plus its depth
+image and cloud.
+
+| Key | Default | Effect |
+| --- | --- | --- |
+| `name` | from the descriptor | The panel's name |
+| `enable` | `true` | Whether the camera appears at all |
+| `use_compressed` | `true` for colour, `false` for depth | Subscribe to `/compressed` rather than the raw topic |
+| `depth.name` | `<name> depth` | The depth panel's name |
+| `depth.use_compressed` | `true` | `/compressedDepth` rather than raw |
+| `depth.range_m` | unset | `[min, max]` metres across the greyscale; unset auto-normalizes |
+| `depth.points.name` | `<name> points` | The cloud display's name |
+| `depth.points.enable` | `false` | Ticked or not; always listed |
+| `depth.points.size_px` | `2.0` | Point size |
+
+**`views.lidars.<name>`** — one LaserScan display per scanner.
+
+| Key | Default | Effect |
+| --- | --- | --- |
+| `name` | from the descriptor | The display's name |
+| `enable` | `true` | Whether the scanner appears at all |
+| `scan` | `true` | Ticked or not |
+| `point_size_px` | `3.0` | Point size |
+| `color` | white | `[r, g, b]`, 0–255 |
+
+**`views.base`** adds an Odometry display, named by `name` and ticked by
+`enable`.
+
+The frame prefix is not in this file: the launch takes `enable_tf_prefix`
+and prepends `<robot_name>/` to every frame, matching the robot's own
+argument of the same name.
 
 Regenerate the config after editing:
 

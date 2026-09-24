@@ -68,6 +68,7 @@ The layout is imported once; the app remembers it.
 | `robot_description_topic` | `robot_description` | Where `robot_state_publisher` latches the URDF, under `/<robot_name>/` |
 | `tf_rate_hz` | `10.0` | Rate `/tf` is republished at for the viewer; `0` serves it untouched |
 | `use_sim_time` | `false` | Set this to `true` in simulation |
+| `viewer_mode` | `spawn` | `spawn` opens the desktop app on the bridge, `connect` only serves the data |
 | `enable_tf_prefix` | `false` | Frames are prefixed with `<robot_name>/`, matching the robot's own argument of the same name |
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
@@ -75,20 +76,62 @@ The layout is imported once; the app remembers it.
 ## The views file
 
 `config/<robot>/<robot>.yaml` says what is shown and, because the bridge is
-given exactly those topics, what is served. `views.scene` sets the fixed frame,
-frames the opening view with `camera_distance_m` and `camera_height_m`, and
-switches the model; `views.tf` draws the frame axes with
-`label`, `axis_scale`, `line_width` and `line_color`, and hides the frames
-named in `exclude`, which is the only way to drop one: the panel shows every
-frame it has not been told about, so on a robot with dozens the labels bury
-the model and `enable` ships `false`; `views.cameras.<name>` names a
-camera's panel, draws its `frustum` from camera_info, and picks compressed
-or raw for colour and depth;
-`views.lidars.<name>` draws a `scan` and sets its point size and colour; `views.joints.tabs` lists the
-plot tabs, each merging descriptor groups with optional `add_joints` and
-`exclude_joints`; `views.base` plots the odometry twist. `frame_prefix` is
-prepended to the fixed frame and given to the model layer, for robots whose
-driver prefixes its frames.
+given exactly those topics, what is served. Every setting is optional; the
+default is what the table shows.
+
+**`views.scene`** — the 3D panel.
+
+| Key | Default | Effect |
+| --- | --- | --- |
+| `enable` | `true` | `false` leaves the 3D panel out |
+| `fixed_frame` | `odom` | The frame everything is drawn relative to |
+| `camera_distance_m` | `4.0` | How far back the view opens |
+| `camera_height_m` | `0.6` | What height it looks at |
+| `urdf` | `true` | The robot model layer |
+| `show_collision` | `false` | Draw collision geometry instead of visual |
+
+**`views.tf`** — the frame axes. The panel draws every frame it has not been
+told about, so `exclude` is the only way to drop one, and `enable` ships
+`false` because a robot with dozens of frames buries the model in labels.
+
+| Key | Default | Effect |
+| --- | --- | --- |
+| `enable` | `false` | Draws the axes, lines and labels |
+| `label` | `true` | Name each frame |
+| `label_size` | `0.05` | Label size; the app's own default is far larger |
+| `axis_scale` | `0.1` | Size of the axis markers |
+| `line_width` | `0.1` | Width of the line to each parent |
+| `line_color` | `#ffff00` | Its colour |
+| `exclude` | none | Frames to hide |
+
+**`views.cameras.<name>`** — one Image panel per camera.
+
+| Key | Default | Effect |
+| --- | --- | --- |
+| `name` | from the descriptor | The panel's title |
+| `enable` | `true` | Whether the camera appears at all |
+| `frustum` | `false` | Draw its field of view in 3D from `camera_info` |
+| `frustum_size_m` | `0.3` | How far the cone extends |
+| `use_compressed` | `true` for colour, `false` for depth | Subscribe to `/compressed` |
+| `depth.enable` | `true` | Whether the depth panel appears |
+| `depth.range_m` | `[0.1, 10.0]` | `[min, max]` metres across the greyscale |
+
+**`views.lidars.<name>`** — the scan points in 3D.
+
+| Key | Default | Effect |
+| --- | --- | --- |
+| `enable` | `true` | Whether the scanner appears at all |
+| `scan` | `true` | Visible or not |
+| `point_size_px` | `4.0` | Point size |
+| `color` | white | `[r, g, b]`, 0–255 |
+
+**`views.joints.tabs`** lists the plot tabs, each merging descriptor groups
+with optional `add_joints` and `exclude_joints`, and choosing `position`,
+`velocity`, `effort` and `command`. **`views.base`** plots the odometry twist.
+
+The frame prefix is not in this file: the launch takes `enable_tf_prefix`
+and prepends `<robot_name>/` to every frame, matching the robot's own
+argument of the same name.
 
 Regenerate the layout after editing:
 

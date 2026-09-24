@@ -22,8 +22,8 @@
       tf:
         name: "TF"
         enable: false
-        names: true
-        scale: 0.4
+        label: true
+        axis_scale: 0.4
         frames:
           - base_footprint
           - head_camera_color_frame
@@ -43,7 +43,7 @@
             # RViz decodes every compressedDepth variant, and the compressed
             # frame is a few kB against more than a megabyte raw.
             use_compressed: true
-            range_m: 10.0
+            range_m: [0.1, 10.0]
             # Listed in the display tree; unticked, being one point per pixel.
             points:
               name: "Head cloud"
@@ -59,7 +59,7 @@
             name: "Hand depth"
             enable: true
             use_compressed: true
-            range_m: 10.0
+            range_m: [0.1, 10.0]
             # Listed in the display tree; unticked, being one point per pixel.
             points:
               name: "Hand cloud"

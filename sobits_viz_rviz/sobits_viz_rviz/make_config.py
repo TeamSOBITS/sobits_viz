@@ -114,10 +114,10 @@ def _tf_display(tf: dict, prefix: str) -> dict:
         'Enabled': shown,
         'Value': shown,
         'Frame Timeout': 15,
-        'Marker Scale': float(tf.get('scale', 0.5)),
+        'Marker Scale': float(tf.get('axis_scale', 0.4)),
         'Show Arrows': False,
         'Show Axes': True,
-        'Show Names': bool(tf.get('names', False)),
+        'Show Names': bool(tf.get('label', False)),
         'Update Interval': 0,
         'Filter (whitelist)': framed('frames'),
         'Filter (blacklist)': framed('exclude'),
@@ -127,14 +127,16 @@ def _tf_display(tf: dict, prefix: str) -> dict:
 def _image_display(name: str, topic: str, depth_range=None) -> dict:
     # A depth image is mostly infinity where nothing is in range, so
     # normalising it spreads noise over the whole greyscale.
+    low, high = (depth_range or [0.0, 0.0])[:2]
+    ranged = high > low
     return {
         'Class': 'rviz_default_plugins/Image',
         'Name': name,
         'Enabled': True,
         'Value': True,
-        'Normalize Range': depth_range is None,
-        'Min Value': 0.0 if depth_range else 0,
-        'Max Value': float(depth_range) if depth_range else 1,
+        'Normalize Range': not ranged,
+        'Min Value': float(low) if ranged else 0,
+        'Max Value': float(high) if ranged else 1,
         'Median window': 5,
         'Topic': _best_effort_topic(topic),
     }

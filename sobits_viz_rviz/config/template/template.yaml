@@ -27,8 +27,8 @@
       tf:
         name: "TF"
         enable: false
-        names: true
-        scale: 0.4
+        label: true
+        axis_scale: 0.4
         # Empty lists every frame; name a few to keep the view readable.
         frames: []
         exclude: []
@@ -47,7 +47,7 @@
             enable: true
             name: "<camera> depth"
             use_compressed: true
-            range_m: 10.0
+            range_m: [0.1, 10.0]
             # Listed in the display tree; unticked, being one point per pixel.
             points:
               name: "<camera> cloud"
