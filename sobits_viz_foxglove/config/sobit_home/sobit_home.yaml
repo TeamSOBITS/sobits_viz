@@ -23,8 +23,6 @@
         camera_height_m: 0.6
         show_collision: false
         urdf: true
-        frusta: false
-        scans: true
 
       tf:
         enable: false
@@ -40,6 +38,8 @@
         head_camera:
           name: "Head"
           enable: true
+          # The panel draws the cone from camera_info.
+          frustum: false
           frustum_size_m: 0.3
           color:
             use_compressed: true
@@ -52,12 +52,16 @@
         hand_left_camera:
           name: "Hand Left"
           enable: true
+          # The panel draws the cone from camera_info.
+          frustum: false
           frustum_size_m: 0.3
           color:
             use_compressed: true
         hand_right_camera:
           name: "Hand Right"
           enable: true
+          # The panel draws the cone from camera_info.
+          frustum: false
           frustum_size_m: 0.3
           color:
             use_compressed: true
@@ -65,10 +69,12 @@
       lidars:
         lidar_front:
           enable: true
+          scan: true
           point_size_px: 4.0
           color: [255, 96, 96]
         lidar_back:
           enable: true
+          scan: true
           point_size_px: 4.0
           color: [96, 160, 255]
 

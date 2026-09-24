@@ -71,7 +71,7 @@ def _scene_panel(params: dict, robot: dict, views: dict) -> dict:
 
     for name, entry, view in lidars(robot, views.get('lidars') or {}):
         topics[entry['scan_topic']] = {
-            'visible': scene.get('scans', True),
+            'visible': bool(view.get('scan', True)),
             'colorMode': 'flat',
             'flatColor': _rgba(view.get('color') or [255, 255, 255]),
             'pointSize': view.get('point_size_px', 4.0),
@@ -81,7 +81,7 @@ def _scene_panel(params: dict, robot: dict, views: dict) -> dict:
         camera = views.get('cameras', {}).get(name) or {}
         if entry.get('info_topic'):
             topics[entry['info_topic']] = {
-                'visible': scene.get('frusta', True),
+                'visible': bool(camera.get('frustum', False)),
                 'distance': camera.get('frustum_size_m', 0.3),
             }
 

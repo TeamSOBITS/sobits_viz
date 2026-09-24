@@ -167,11 +167,12 @@ def _point_cloud_display(name: str, topic: str, points: dict) -> dict:
 
 
 def _laser_scan_display(name: str, topic: str, view: dict) -> dict:
+    shown = bool(view.get('scan', True))
     return {
         'Class': 'rviz_default_plugins/LaserScan',
         'Name': name,
-        'Enabled': True,
-        'Value': True,
+        'Enabled': shown,
+        'Value': shown,
         'Alpha': 1,
         'Color': _rgb(view.get('color') or [255, 255, 255]),
         'Color Transformer': 'FlatColor',
@@ -212,9 +213,9 @@ def _displays(params: dict, robot: dict, views: dict, prefix: str) -> list:
     # Listed whatever `enable` says, so the frames are one click away.
     displays.append(_tf_display(views.get('tf') or {}, prefix))
 
+    # Listed whatever `scan` says, so a scan is one click away.
     for name, entry, view in lidars(robot, views.get('lidars') or {}):
-        if scene.get('scans', True):
-            displays.append(_laser_scan_display(name, entry['scan_topic'], view))
+        displays.append(_laser_scan_display(name, entry['scan_topic'], view))
 
     for name, label, entry, view in cameras(robot, views.get('cameras') or {}):
         compressed = view.get('use_compressed', not entry.get('is_depth'))

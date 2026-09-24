@@ -21,7 +21,6 @@
         show_collision: false
         urdf: true
         grid: true
-        scans: true
         description_topic: "robot_description"
 
       # One entry per camera name in the descriptor; each gets an Image display.
@@ -60,6 +59,7 @@
         <lidar>:
           name: "<lidar>"
           enable: true
+          scan: true
           point_size_px: 3.0
           color: [255, 0, 0]
 

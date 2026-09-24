@@ -17,7 +17,6 @@
         show_collision: false
         urdf: true
         grid: true
-        scans: true
         description_topic: "robot_description"
 
       tf:
@@ -69,11 +68,13 @@
         lidar_front:
           name: "Lidar Front"
           enable: true
+          scan: true
           point_size_px: 3.0
           color: [255, 0, 0]
         lidar_back:
           name: "Lidar Back"
           enable: true
+          scan: true
           point_size_px: 3.0
           color: [0, 0, 255]
 

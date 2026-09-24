@@ -77,13 +77,14 @@ The layout is imported once; the app remembers it.
 `config/<robot>/<robot>.yaml` says what is shown and, because the bridge is
 given exactly those topics, what is served. `views.scene` sets the fixed frame,
 frames the opening view with `camera_distance_m` and `camera_height_m`, and
-switches the model, frustums and scans; `views.tf` draws the frame axes with
+switches the model; `views.tf` draws the frame axes with
 `label`, `axis_scale`, `line_width` and `line_color`, and hides the frames
 named in `exclude`, which is the only way to drop one: the panel shows every
 frame it has not been told about, so on a robot with dozens the labels bury
 the model and `enable` ships `false`; `views.cameras.<name>` names a
-camera's panel and picks compressed or raw for colour and depth;
-`views.lidars.<name>` sets point size and colour; `views.joints.tabs` lists the
+camera's panel, draws its `frustum` from camera_info, and picks compressed
+or raw for colour and depth;
+`views.lidars.<name>` draws a `scan` and sets its point size and colour; `views.joints.tabs` lists the
 plot tabs, each merging descriptor groups with optional `add_joints` and
 `exclude_joints`; `views.base` plots the odometry twist. `frame_prefix` is
 prepended to the fixed frame and given to the model layer, for robots whose
