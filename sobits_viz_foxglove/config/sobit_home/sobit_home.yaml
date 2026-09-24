@@ -6,9 +6,6 @@
   ros__parameters:
     app_id: "sobit_home"
 
-    # SOBIT HOME publishes bare frame names; Foxglove does no stripping, so a
-    # robot whose driver prefixes its frames sets this instead.
-    frame_prefix: ""
 
     # The bridge only serves package:// meshes to a viewer, so the relay
     # rewrites the description's installed file:// paths and republishes it.

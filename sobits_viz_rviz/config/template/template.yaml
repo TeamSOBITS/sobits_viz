@@ -8,9 +8,6 @@
   ros__parameters:
     app_id: "<robot>"
 
-    # Empty when the driver publishes bare frame names; "<robot>/" when it
-    # prefixes them, since RViz shows frames exactly as they arrive.
-    frame_prefix: ""
 
     views:
       # The model, grid, TF tree and laser scans.

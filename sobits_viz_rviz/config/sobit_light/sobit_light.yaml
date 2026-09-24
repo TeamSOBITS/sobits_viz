@@ -6,9 +6,6 @@
   ros__parameters:
     app_id: "sobit_light"
 
-    # Empty: the bringup passes enable_tf_prefix, and the launch prefixes
-    # every frame from robot_name when it is set.
-    frame_prefix: ""
 
     views:
       scene:
@@ -28,7 +25,6 @@
         enable: false
         names: true
         scale: 0.4
-        # Names are bare here; frame_prefix is prepended for you.
         frames:
           - base_footprint
           - head_camera_color_frame

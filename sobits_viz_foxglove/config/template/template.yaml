@@ -8,9 +8,6 @@
   ros__parameters:
     app_id: "<robot>"
 
-    # Empty when the driver publishes bare frame names; "<robot>/" when it
-    # prefixes them, since Foxglove shows frames exactly as they arrive.
-    frame_prefix: ""
 
     # The bridge only serves package:// meshes to a viewer, so the relay
     # rewrites the description's installed file:// paths and republishes it.

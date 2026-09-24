@@ -6,9 +6,6 @@
   ros__parameters:
     app_id: "sobit_home"
 
-    # SOBIT HOME publishes bare frame names; RViz does no stripping, so a
-    # robot whose driver prefixes its frames sets this instead.
-    frame_prefix: ""
 
     views:
       scene:
