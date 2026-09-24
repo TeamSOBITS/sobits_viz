@@ -35,7 +35,8 @@
         "meshUpAxis": "z_up",
         "transforms": {
           "axisScale": 0.0,
-          "showLabel": false
+          "showLabel": false,
+          "showLine": false
         }
       },
       "topics": {
@@ -70,15 +71,23 @@
       },
       "transforms": {
         "frame:base_footprint": {
+          "axisScale": 0.0,
+          "lineWidth": 0.0,
           "visible": false
         },
         "frame:hand_left_end_effector_link": {
+          "axisScale": 0.0,
+          "lineWidth": 0.0,
           "visible": false
         },
         "frame:hand_right_end_effector_link": {
+          "axisScale": 0.0,
+          "lineWidth": 0.0,
           "visible": false
         },
         "frame:head_camera_color_frame": {
+          "axisScale": 0.0,
+          "lineWidth": 0.0,
           "visible": false
         }
       }

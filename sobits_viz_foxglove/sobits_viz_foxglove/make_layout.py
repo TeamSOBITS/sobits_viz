@@ -110,7 +110,10 @@ def _scene_panel(params: dict, robot: dict, views: dict) -> dict:
         },
         # Foxglove assumes meshes are Y-up; ROS meshes are Z-up.
         'scene': {'meshUpAxis': 'z_up', 'transforms': {
+            # showLine defaults on, drawing a line between every parent and
+            # child whatever the axes do.
             'showLabel': bool(tf.get('enable')) and bool(tf.get('names', False)),
+            'showLine': bool(tf.get('enable')),
             'axisScale': float(tf.get('scale', 0.0)) if tf.get('enable') else 0.0,
         }},
         'transforms': _frames(tf, prefix),
@@ -125,8 +128,11 @@ def _frames(tf: dict, prefix: str) -> dict:
     # never heard of, so `frames` can only turn the named ones on: hiding the
     # rest means naming them in `exclude`.
     on = bool(tf.get('enable'))
-    frames = {f'frame:{prefix}{f}': {'visible': on} for f in (tf.get('frames') or [])}
-    frames.update({f'frame:{prefix}{f}': {'visible': False}
+    scale = float(tf.get('scale', 0.0)) if on else 0.0
+    shown = {'visible': on, 'axisScale': scale, 'lineWidth': scale / 4 if on else 0.0}
+    frames = {f'frame:{prefix}{f}': dict(shown) for f in (tf.get('frames') or [])}
+    frames.update({f'frame:{prefix}{f}': {'visible': False, 'axisScale': 0.0,
+                                          'lineWidth': 0.0}
                    for f in (tf.get('exclude') or [])})
     return frames
 

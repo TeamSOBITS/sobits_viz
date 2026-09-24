@@ -35,7 +35,8 @@
         "meshUpAxis": "z_up",
         "transforms": {
           "axisScale": 0.0,
-          "showLabel": false
+          "showLabel": false,
+          "showLine": false
         }
       },
       "topics": {
@@ -72,12 +73,18 @@
       },
       "transforms": {
         "frame:sobit_light/base_footprint": {
+          "axisScale": 0.0,
+          "lineWidth": 0.0,
           "visible": false
         },
         "frame:sobit_light/hand_end_effector_link": {
+          "axisScale": 0.0,
+          "lineWidth": 0.0,
           "visible": false
         },
         "frame:sobit_light/head_camera_color_frame": {
+          "axisScale": 0.0,
+          "lineWidth": 0.0,
           "visible": false
         }
       }
