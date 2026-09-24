@@ -20,6 +20,8 @@
 
     # The order joint_states uses, since a message path indexes the value
     # arrays: ros2 topic echo --once /<robot>/joint_states --field name
+    # A plot reads a joint by index, so this must match the publisher.
+    # The launch replaces it with the live order when the robot is up.
     joint_order:
       - <joint>
 

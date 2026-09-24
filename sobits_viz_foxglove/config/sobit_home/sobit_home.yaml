@@ -18,6 +18,8 @@
 
     # The order joint_states uses, since a message path indexes the value
     # arrays; regenerate the layout when the robot's joint set changes.
+    # A plot reads a joint by index, so this must match the publisher.
+    # The launch replaces it with the live order when the robot is up.
     joint_order:
       - body_lift_joint
       - arm_left_shoulder_tilt_joint

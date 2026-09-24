@@ -117,10 +117,33 @@ def _install_layout(robot_name: str, layout: str) -> None:
         json.dump(entry, out)
 
 
-def _prefixed(robot_name: str, params_path: str, descriptor: str) -> str:
-    """Write a layout whose frames carry the robot's prefix, and return it."""
-    params = load_params(params_path)
-    params['frame_prefix'] = f'{robot_name}/'
+def _live_joint_order(topic: str, timeout: float = 5.0) -> list:
+    """Read the joint names from one JointState message, in wire order."""
+    # A plot addresses a joint by its index in the message, so the order has to
+    # come from the robot: a stale copy plots the wrong joint without erroring.
+    try:
+        import rclpy
+        from rclpy.node import Node
+        from sensor_msgs.msg import JointState
+    except ImportError:
+        return []
+    seen = []
+    started = rclpy.ok()
+    if not started:
+        rclpy.init()
+    node = Node('foxglove_joint_order')
+    node.create_subscription(JointState, topic, lambda m: seen.append(list(m.name)), 10)
+    deadline = time.time() + timeout
+    while not seen and time.time() < deadline:
+        rclpy.spin_once(node, timeout_sec=0.2)
+    node.destroy_node()
+    if not started:
+        rclpy.shutdown()
+    return seen[0] if seen else []
+
+
+def _regenerated(robot_name: str, params: dict, descriptor: str) -> str:
+    """Write a layout built from these params, and return its path."""
     handle, path = tempfile.mkstemp(prefix=f'{robot_name}_', suffix='.foxglove.json')
     with os.fdopen(handle, 'w') as out:
         json.dump(build(params, descriptor), out, indent=2)
@@ -150,11 +173,23 @@ def launch_setup(context, *args, **kwargs):
             f"Robots in sobits_viz_robots: {', '.join(robots)}")
     robot_params = robot_file('robot_params', '.yaml')
     layout = robot_file('layout', '.foxglove.json')
-    if _bool(LaunchConfiguration('enable_tf_prefix'), context) == 'true':
-        layout = _prefixed(robot_name, robot_params, robot_descriptor)
 
     params = load_params(robot_params)
-    topics = bridged_topics(params, load_descriptor(robot_descriptor))
+    robot = load_descriptor(robot_descriptor)
+    stale = False
+    if _bool(LaunchConfiguration('enable_tf_prefix'), context) == 'true':
+        params['frame_prefix'] = f'{robot_name}/'
+        stale = True
+    # A plot reads a joint by index, so the order has to match the robot that
+    # is running, not whatever the file was written against.
+    live = _live_joint_order(robot.get('joint_states_topic', '/joint_states'))
+    if live and live != (params.get('joint_order') or []):
+        params['joint_order'] = live
+        stale = True
+    if stale:
+        layout = _regenerated(robot_name, params, robot_descriptor)
+
+    topics = bridged_topics(params, robot)
     use_sim_time = _bool(LaunchConfiguration('use_sim_time'), context) == 'true'
     port = LaunchConfiguration('port').perform(context)
 

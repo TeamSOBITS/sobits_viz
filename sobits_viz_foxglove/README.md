@@ -136,9 +136,11 @@ their timestamps fall far enough behind for transform lookups to fail.
 **Joints are plotted by index.** A `JointState` keeps its names in an array
 parallel to the values, and a message path filter can only test fields of the
 array it slices, so `position[:]{name=="…"}` matches nothing. Each series is
-`position[<index>]` instead, the index coming from `joint_order` in the views
-file — the order the robot's `joint_states` actually uses. Capture it from the
-running robot, in wire order:
+`position[<index>]` instead. The index cannot be trusted to a file, since a
+publisher that reorders its joints would leave every plot reading the wrong
+one without erroring, so the launch subscribes once and rebuilds the layout
+with the live order. `joint_order` in the views file is the fallback for when
+the robot is not running; capture it in wire order:
 
 ```sh
 $ ros2 topic echo --once /<robot>/joint_states --field name
