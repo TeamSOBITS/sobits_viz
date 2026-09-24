@@ -47,13 +47,13 @@
 
       tf:
         enable: false
-        names: true
-        scale: 0.4
+        # The panel shows every frame, so `exclude` is the only way to drop one.
         # Names are bare here; frame_prefix is prepended for you.
-        frames:
-          - base_footprint
-          - head_camera_color_frame
-          - hand_end_effector_link
+        label: true
+        axis_scale: 0.1
+        label_size: 0.05
+        line_width: 0.1
+        line_color: "#ffff00"
         exclude: []
 
       cameras:

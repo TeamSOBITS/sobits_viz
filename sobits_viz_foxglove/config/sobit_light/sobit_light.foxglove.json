@@ -35,6 +35,10 @@
         "meshUpAxis": "z_up",
         "transforms": {
           "axisScale": 0.0,
+          "axisSize": 0.0,
+          "labelSize": 0.05,
+          "lineColor": "#ffff00",
+          "lineWidth": 0.0,
           "showLabel": false,
           "showLine": false
         }
@@ -71,23 +75,7 @@
           "visible": true
         }
       },
-      "transforms": {
-        "frame:sobit_light/base_footprint": {
-          "axisScale": 0.0,
-          "lineWidth": 0.0,
-          "visible": false
-        },
-        "frame:sobit_light/hand_end_effector_link": {
-          "axisScale": 0.0,
-          "lineWidth": 0.0,
-          "visible": false
-        },
-        "frame:sobit_light/head_camera_color_frame": {
-          "axisScale": 0.0,
-          "lineWidth": 0.0,
-          "visible": false
-        }
-      }
+      "transforms": {}
     },
     "Image!camera_front": {
       "foxglovePanelTitle": "Front",

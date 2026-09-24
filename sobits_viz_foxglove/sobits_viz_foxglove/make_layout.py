@@ -109,13 +109,7 @@ def _scene_panel(params: dict, robot: dict, views: dict) -> dict:
             'fovy': 45.0, 'near': 0.05, 'far': 200.0,
         },
         # Foxglove assumes meshes are Y-up; ROS meshes are Z-up.
-        'scene': {'meshUpAxis': 'z_up', 'transforms': {
-            # showLine defaults on, drawing a line between every parent and
-            # child whatever the axes do.
-            'showLabel': bool(tf.get('enable')) and bool(tf.get('names', False)),
-            'showLine': bool(tf.get('enable')),
-            'axisScale': float(tf.get('scale', 0.0)) if tf.get('enable') else 0.0,
-        }},
+        'scene': {'meshUpAxis': 'z_up', 'transforms': _transform_style(tf)},
         'transforms': _frames(tf, prefix),
         'topics': topics,
         'layers': layers,
@@ -123,18 +117,28 @@ def _scene_panel(params: dict, robot: dict, views: dict) -> dict:
     }
 
 
-def _frames(tf: dict, prefix: str) -> dict:
-    # Foxglove gives every frame its own visible flag and shows the ones it has
-    # never heard of, so `frames` can only turn the named ones on: hiding the
-    # rest means naming them in `exclude`.
+def _transform_style(tf: dict) -> dict:
+    # showLine draws a line to each parent and defaults on, so it goes off with
+    # the axes rather than outliving them.
     on = bool(tf.get('enable'))
-    scale = float(tf.get('scale', 0.0)) if on else 0.0
-    shown = {'visible': on, 'axisScale': scale, 'lineWidth': scale / 4 if on else 0.0}
-    frames = {f'frame:{prefix}{f}': dict(shown) for f in (tf.get('frames') or [])}
-    frames.update({f'frame:{prefix}{f}': {'visible': False, 'axisScale': 0.0,
-                                          'lineWidth': 0.0}
-                   for f in (tf.get('exclude') or [])})
-    return frames
+    axis = float(tf.get('axis_scale', 0.1)) if on else 0.0
+    return {
+        'showLabel': on and bool(tf.get('label', True)),
+        'showLine': on,
+        # The app writes axisSize and axisScale together; keep both in step.
+        'axisScale': axis,
+        'axisSize': axis,
+        'labelSize': float(tf.get('label_size', 0.05)),
+        'lineWidth': float(tf.get('line_width', 0.1)) if on else 0.0,
+        'lineColor': tf.get('line_color', '#ffff00'),
+    }
+
+
+def _frames(tf: dict, prefix: str) -> dict:
+    # The panel shows every frame it has not been told about, so a list of the
+    # ones to show cannot hide the rest; only `exclude` can.
+    return {f'frame:{prefix}{f}': {'visible': False}
+            for f in (tf.get('exclude') or [])}
 
 
 def _image_panels(params: dict, robot: dict, views: dict) -> tuple:

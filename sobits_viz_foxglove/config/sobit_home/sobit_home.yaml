@@ -75,14 +75,12 @@
 
       tf:
         enable: false
-        names: true
-        scale: 0.4
-        # Empty lists every frame, which buries the model in axes.
-        frames:
-          - base_footprint
-          - head_camera_color_frame
-          - hand_left_end_effector_link
-          - hand_right_end_effector_link
+        # The panel shows every frame, so `exclude` is the only way to drop one.
+        label: true
+        axis_scale: 0.1
+        label_size: 0.05
+        line_width: 0.1
+        line_color: "#ffff00"
         exclude: []
 
       cameras:

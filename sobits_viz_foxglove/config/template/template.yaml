@@ -40,10 +40,12 @@
       # One entry per camera name in the descriptor; each gets an image panel.
       tf:
         enable: false
-        names: true
-        scale: 0.4
-        # Empty lists every frame; name a few to keep the view readable.
-        frames: []
+        # The panel shows every frame, so `exclude` is the only way to drop one.
+        label: true
+        axis_scale: 0.1
+        label_size: 0.05
+        line_width: 0.1
+        line_color: "#ffff00"
         exclude: []
 
       cameras:
