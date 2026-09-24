@@ -53,38 +53,35 @@ colcon build --symlink-install --packages-up-to sobits_viz
 
 ### Quickstart
 
-After the robot's bringup:
+The robot's own bringup starts a viewer, so ask it for one:
+
+```sh
+ros2 launch sobit_home_bringup gz_minimal.launch.py enable_viz:=rerun
+```
+
+`enable_viz` takes `rerun`, `rviz` or `foxglove`, and starts nothing when
+empty. To attach a viewer to a robot that is already running, launch it
+directly instead, with `robot_name` naming the robot:
 
 ```sh
 ros2 launch sobits_viz_rerun rerun.launch.py robot_name:=sobit_home use_sim_time:=true
-```
-
-or, for SOBIT LIGHT:
-
-```sh
-ros2 launch sobits_viz_rerun rerun.launch.py robot_name:=sobit_light use_sim_time:=true
-```
-
-For RViz:
-
-```sh
-ros2 launch sobits_viz_rviz rviz.launch.py robot_name:=sobit_home use_sim_time:=true
-```
-
-For Foxglove instead, start the bridge and open `ws://localhost:8765` in the
-[desktop app](https://foxglove.dev/download) or at
-[app.foxglove.dev](https://app.foxglove.dev), then import the layout it names:
-
-```sh
+ros2 launch sobits_viz_rviz rviz.launch.py robot_name:=sobit_light use_sim_time:=true
 ros2 launch sobits_viz_foxglove foxglove.launch.py robot_name:=sobit_home use_sim_time:=true
 ```
+
+Rerun and RViz open their own window. Foxglove serves the data and the
+[desktop app](https://foxglove.dev/download) or
+[app.foxglove.dev](https://app.foxglove.dev) connects to `ws://localhost:8765`;
+the launch opens the app for you and prints the layout it generated.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ## Acknowledgments
 
+- [Foxglove](https://foxglove.dev) — Visualization app and the `foxglove_bridge` it connects through
 - [Rerun](https://rerun.io) — Visualization SDK and viewer
 - [ROS 2 Jazzy](https://docs.ros.org/en/jazzy/) — Robot middleware
+- [RViz](https://github.com/ros2/rviz) — The ROS visualizer
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 

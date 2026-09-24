@@ -53,38 +53,34 @@ colcon build --symlink-install --packages-up-to sobits_viz
 
 ### クイックスタート
 
-ロボットのbringup後:
+ロボットのbringupがビューアを起動するので，そこで指定します：
+
+```sh
+ros2 launch sobit_home_bringup gz_minimal.launch.py enable_viz:=rerun
+```
+
+`enable_viz`には`rerun`，`rviz`，`foxglove`を指定でき，空の場合は何も起動しません．
+すでに動作中のロボットに接続する場合は，`robot_name`を指定して直接起動します：
 
 ```sh
 ros2 launch sobits_viz_rerun rerun.launch.py robot_name:=sobit_home use_sim_time:=true
-```
-
-SOBIT LIGHTの場合も同様です:
-
-```sh
-ros2 launch sobits_viz_rerun rerun.launch.py robot_name:=sobit_light use_sim_time:=true
-```
-
-RVizを使う場合：
-
-```sh
-ros2 launch sobits_viz_rviz rviz.launch.py robot_name:=sobit_home use_sim_time:=true
-```
-
-Foxgloveを使う場合は，ブリッジを起動し，[デスクトップアプリ](https://foxglove.dev/download)
-または[app.foxglove.dev](https://app.foxglove.dev)で`ws://localhost:8765`に接続し，
-起動時に表示されるレイアウトをインポートします：
-
-```sh
+ros2 launch sobits_viz_rviz rviz.launch.py robot_name:=sobit_light use_sim_time:=true
 ros2 launch sobits_viz_foxglove foxglove.launch.py robot_name:=sobit_home use_sim_time:=true
 ```
+
+RerunとRVizは自身のウィンドウを開きます．Foxgloveはデータを配信し，
+[デスクトップアプリ](https://foxglove.dev/download)または
+[app.foxglove.dev](https://app.foxglove.dev)が`ws://localhost:8765`に接続します．
+起動時にアプリを開き，生成したレイアウトのパスを表示します．
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ## 謝辞
 
+- [Foxglove](https://foxglove.dev) — 可視化アプリと接続に使う`foxglove_bridge`
 - [Rerun](https://rerun.io) — 可視化SDKとビューア
 - [ROS 2 Jazzy](https://docs.ros.org/en/jazzy/) — ロボットミドルウェア
+- [RViz](https://github.com/ros2/rviz) — ROSの可視化ツール
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
