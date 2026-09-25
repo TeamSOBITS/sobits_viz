@@ -37,6 +37,9 @@ def generate_launch_description():
                         'config/<robot_name>/<robot_name>.rviz',
         ),
         DeclareLaunchArgument('use_sim_time', default_value='false'),
+        # Wraps the viewer, so it can be pinned: prefix:='taskset -c 0-3'.
+        DeclareLaunchArgument('prefix', default_value='',
+                              description='Command the viewer runs under, e.g. taskset'),
         # The robot's own flag, so the same value can be passed to both: with
         # it the driver stamps frames as "<robot_name>/<link>".
         DeclareLaunchArgument(
@@ -90,6 +93,7 @@ def launch_setup(context, *args, **kwargs):
     use_sim_time = LaunchConfiguration('use_sim_time').perform(context).lower() \
         in ('true', '1', 'yes')
 
+    prefix = LaunchConfiguration('prefix').perform(context).strip()
     rviz = Node(
         package='rviz2',
         executable='rviz2',
@@ -97,6 +101,7 @@ def launch_setup(context, *args, **kwargs):
         output='screen',
         arguments=['-d', config_path],
         parameters=[{'use_sim_time': use_sim_time}],
+        prefix=prefix or None,
     )
 
     return [rviz]

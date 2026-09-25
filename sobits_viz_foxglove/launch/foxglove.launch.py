@@ -51,6 +51,10 @@ def generate_launch_description():
                               description='Where robot_state_publisher latches the URDF. '
                                           'Relative to /<robot_name>/, or absolute with a slash'),
         DeclareLaunchArgument('use_sim_time', default_value='false'),
+        # Wraps every node this starts, so they can be pinned together:
+        # prefix:='taskset -c 0-3'.
+        DeclareLaunchArgument('prefix', default_value='',
+                              description='Command the nodes run under, e.g. taskset'),
         # The bridge only serves data; this says who opens a window on it.
         DeclareLaunchArgument('viewer_mode', default_value='spawn',
                               description='spawn (the desktop app) | connect (serve only)'),
@@ -199,10 +203,12 @@ def launch_setup(context, *args, **kwargs):
         topics = ['/tf_throttled' if topic == '/tf' else topic for topic in topics]
 
     # Only what the layout shows is served; the bridge advertises everything by default.
+    prefix = LaunchConfiguration('prefix').perform(context).strip() or None
     bridge = Node(
         package='foxglove_bridge',
         executable='foxglove_bridge',
         name='foxglove_bridge',
+        prefix=prefix,
         output='screen',
         parameters=[{
             'port': int(port),
@@ -224,6 +230,7 @@ def launch_setup(context, *args, **kwargs):
         package='sobits_viz_foxglove',
         executable='description_relay',
         name='description_relay',
+        prefix=prefix,
         output='screen',
         parameters=[robot_params, {
             'robot_name': robot_name,
@@ -236,6 +243,7 @@ def launch_setup(context, *args, **kwargs):
         package='sobits_viz_foxglove',
         executable='transform_throttle',
         name='transform_throttle',
+        prefix=prefix,
         output='screen',
         parameters=[{'rate_hz': tf_rate, 'use_sim_time': use_sim_time}],
     )
@@ -251,6 +259,7 @@ def launch_setup(context, *args, **kwargs):
             cmd=['foxglove-studio', '--no-sandbox',
                  f'foxglove://open?ds=foxglove-websocket&ds.url=ws://127.0.0.1:{port}'],
             output='log',
+            prefix=prefix,
         ))
 
     return [

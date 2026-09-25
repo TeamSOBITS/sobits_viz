@@ -50,6 +50,10 @@ def generate_launch_description():
         # The streams and the views are the robot's
         # parameter file; the launch file adds only how this machine runs it.
         DeclareLaunchArgument('use_sim_time',    default_value='false'),
+        # Wraps the bridge and the viewer, so they can be pinned together:
+        # prefix:='taskset -c 0-3'.
+        DeclareLaunchArgument('prefix',          default_value='',
+                              description='Command the bridge and viewer run under'),
         DeclareLaunchArgument('robot_description_topic', default_value='robot_description',
                               description='Where robot_state_publisher latches the URDF; the one '
                                           'topic no descriptor names. Relative to /<robot_name>/, '
@@ -107,6 +111,7 @@ def launch_setup(context, *args, **kwargs):
     # SDK spawn one, so it can be handed the layout as a file. In both the
     # bridge hosts the stream and the viewer connects to it: a client sink drops
     # everything logged before a viewer accepts, while serving buffers it.
+    prefix = LaunchConfiguration('prefix').perform(context).strip() or None
     node_mode = viewer_mode
     if viewer_mode == 'spawn':
         node_mode = 'serve'
@@ -123,6 +128,7 @@ def launch_setup(context, *args, **kwargs):
                 ],
                 name='rerun_viewer',
                 output='screen',
+                prefix=prefix,
             )
         )
     elif viewer_mode == 'web':
@@ -142,6 +148,7 @@ def launch_setup(context, *args, **kwargs):
                 ],
                 name='rerun_web_viewer',
                 output='screen',
+                prefix=prefix,
             )
         )
 
@@ -162,6 +169,7 @@ def launch_setup(context, *args, **kwargs):
     launch_params['connect_url'] = connect_url
 
     bridge = Node(
+        prefix=prefix,
         package='sobits_viz_rerun',
         executable='bridge',
         name='rerun_bridge',

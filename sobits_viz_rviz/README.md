@@ -41,6 +41,7 @@ $ ros2 launch sobits_viz_rviz rviz.launch.py robot_name:=sobit_light use_sim_tim
 | `robot_descriptor` | `sobits_viz_robots` `config/<robot_name>/<robot_name>.robot.yaml` | The descriptor naming the cameras and lidars |
 | `config` | `config/<robot_name>/<robot_name>.rviz` | The RViz2 config `rviz2` opens with `-d` |
 | `use_sim_time` | `false` | Set this to `true` in simulation |
+| `prefix` | `''` | Command the viewer runs under, e.g. `taskset -c 0-3` to pin it to those cores |
 | `enable_tf_prefix` | `false` | Frames are prefixed with `<robot_name>/`, matching the robot's own argument of the same name |
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>

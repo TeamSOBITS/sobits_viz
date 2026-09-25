@@ -116,6 +116,7 @@ snapshot is ever wanted.
 | `frame_prefix` | `<robot_name>/` | The prefix to strip |
 | `urdf_path` | `''` | Where the description is written, for opening in a viewer by hand when `embed_urdf` is off |
 | `use_sim_time` | `false` | Set this to `true` in simulation |
+| `prefix` | `''` | Command the bridge and viewer run under, e.g. `taskset -c 0-3` to pin them to those cores |
 | `viewer_mode` | `spawn` | See the table above |
 | `grpc_port` | `9876` | Port the bridge and viewer talk over |
 | `connect_url` | `rerun+http://127.0.0.1:9876/proxy` | Viewer to stream to in `connect` mode |
