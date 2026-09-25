@@ -40,6 +40,7 @@ $ ros2 launch sobits_viz_rviz rviz.launch.py robot_name:=sobit_light use_sim_tim
 | `robot_params` | `config/<robot_name>/<robot_name>.yaml` | The robot's views |
 | `robot_descriptor` | `sobits_viz_robots` `config/<robot_name>/<robot_name>.robot.yaml` | The descriptor naming the cameras and lidars |
 | `config` | `config/<robot_name>/<robot_name>.rviz` | The RViz2 config `rviz2` opens with `-d` |
+| `output` | `''` | Where the generated config is written; empty writes a temporary file |
 | `use_sim_time` | `false` | Set this to `true` in simulation |
 | `prefix` | `''` | Command the viewer runs under, e.g. `taskset -c 0-3` to pin it to those cores |
 | `enable_tf_prefix` | `false` | Frames are prefixed with `<robot_name>/`, matching the robot's own argument of the same name |
@@ -47,6 +48,10 @@ $ ros2 launch sobits_viz_rviz rviz.launch.py robot_name:=sobit_light use_sim_tim
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ## The views file
+
+The launch builds the config from this file every time, because a robot's parts can be
+switched off at launch and a config written earlier would still show them. Nothing
+is kept in the repository; `output` says where the generated config lands.
 
 `config/<robot>/<robot>.yaml` says what the config displays. Every setting
 below is optional; the default is what the table shows.
@@ -107,10 +112,12 @@ The frame prefix is not in this file: the launch takes `enable_tf_prefix`
 and prepends `<robot_name>/` to every frame, matching the robot's own
 argument of the same name.
 
-Regenerate the config after editing:
+Editing this file is enough; the next launch picks it up. To write a config
+without launching, for inspection or to hand to RViz yourself:
 
 ```sh
-$ ros2 run sobits_viz_rviz make_config --params config/sobit_home/sobit_home.yaml
+$ ros2 run sobits_viz_rviz make_config --params config/sobit_home/sobit_home.yaml \
+    --output /tmp/sobit_home.rviz
 ```
 
 A new robot takes the descriptor template in `sobits_viz_robots` and

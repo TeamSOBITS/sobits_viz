@@ -62,6 +62,7 @@ The layout is imported once; the app remembers it.
 | `robot_params` | `config/<robot_name>/<robot_name>.yaml` | The robot's views |
 | `robot_descriptor` | `sobits_viz_robots` `config/<robot_name>/<robot_name>.robot.yaml` | The descriptor naming the cameras, groups and lidars |
 | `layout` | `config/<robot_name>/<robot_name>.foxglove.json` | The layout to import; only printed, never loaded by the node |
+| `output` | `''` | Where the generated layout is written; empty writes a temporary file |
 | `port` | `8765` | Port the Foxglove WebSocket listens on |
 | `address` | `0.0.0.0` | Address it binds to |
 | `video_transcode` | `false` | `true` lets the bridge re-encode images to video, which costs CPU and is unnecessary on a local network |
@@ -75,6 +76,10 @@ The layout is imported once; the app remembers it.
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ## The views file
+
+The launch builds the layout from this file every time, because a robot's parts can be
+switched off at launch and a layout written earlier would still show them. Nothing
+is kept in the repository; `output` says where the generated layout lands.
 
 `config/<robot>/<robot>.yaml` says what is shown and, because the bridge is
 given exactly those topics, what is served. Every setting is optional; the
@@ -134,10 +139,12 @@ The frame prefix is not in this file: the launch takes `enable_tf_prefix`
 and prepends `<robot_name>/` to every frame, matching the robot's own
 argument of the same name.
 
-Regenerate the layout after editing:
+Editing this file is enough; the next launch picks it up. To write a layout
+without launching, for inspection or to import by hand:
 
 ```sh
-$ ros2 run sobits_viz_foxglove make_layout --params config/sobit_home/sobit_home.yaml
+$ ros2 run sobits_viz_foxglove make_layout --params config/sobit_home/sobit_home.yaml \
+    --output /tmp/sobit_home.foxglove.json
 ```
 
 A new robot takes the descriptor template in `sobits_viz_robots` and

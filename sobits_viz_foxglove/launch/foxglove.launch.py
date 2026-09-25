@@ -53,6 +53,9 @@ def generate_launch_description():
         DeclareLaunchArgument('use_sim_time', default_value='false'),
         # Wraps every node this starts, so they can be pinned together:
         # prefix:='taskset -c 0-3'.
+        DeclareLaunchArgument(
+            'output', default_value='',
+            description='Where the generated layout is written; empty means a temporary file'),
         DeclareLaunchArgument('prefix', default_value='',
                               description='Command the nodes run under, e.g. taskset'),
         # The bridge only serves data; this says who opens a window on it.
@@ -146,10 +149,15 @@ def _live_joint_order(topic: str, timeout: float = 5.0) -> list:
     return seen[0] if seen else []
 
 
-def _regenerated(robot_name: str, params: dict, descriptor: str) -> str:
-    """Write a layout built from these params, and return its path."""
-    handle, path = tempfile.mkstemp(prefix=f'{robot_name}_', suffix='.foxglove.json')
-    with os.fdopen(handle, 'w') as out:
+def _generate(robot_name: str, params: dict, descriptor: str, out_path: str) -> str:
+    """Write the layout this robot's views file describes, and return its path."""
+    if out_path:
+        os.makedirs(os.path.dirname(out_path) or '.', exist_ok=True)
+        handle, path = open(out_path, 'w'), out_path
+    else:
+        fd, path = tempfile.mkstemp(prefix=f'{robot_name}_', suffix='.foxglove.json')
+        handle = os.fdopen(fd, 'w')
+    with handle as out:
         json.dump(build(params, descriptor), out, indent=2)
     return path
 
@@ -176,22 +184,22 @@ def launch_setup(context, *args, **kwargs):
             f'No robot descriptor at {robot_descriptor}. '
             f"Robots in sobits_viz_robots: {', '.join(robots)}")
     robot_params = robot_file('robot_params', '.yaml')
-    layout = robot_file('layout', '.foxglove.json')
-
     params = load_params(robot_params)
     robot = load_descriptor(robot_descriptor)
-    stale = False
-    if _bool(LaunchConfiguration('enable_tf_prefix'), context) == 'true':
-        params['frame_prefix'] = f'{robot_name}/'
-        stale = True
-    # A plot reads a joint by index, so the order has to match the robot that
-    # is running, not whatever the file was written against.
-    live = _live_joint_order(robot.get('joint_states_topic', '/joint_states'))
-    if live and live != (params.get('joint_order') or []):
-        params['joint_order'] = live
-        stale = True
-    if stale:
-        layout = _regenerated(robot_name, params, robot_descriptor)
+
+    # A robot's parts can be switched off at launch, so the layout is built from
+    # the views file every time rather than read from one written earlier.
+    layout = LaunchConfiguration('layout').perform(context)
+    if not layout:
+        if _bool(LaunchConfiguration('enable_tf_prefix'), context) == 'true':
+            params['frame_prefix'] = f'{robot_name}/'
+        # A plot reads a joint by index, so the order comes from the robot that
+        # is running, not from whatever a file was written against.
+        live = _live_joint_order(robot.get('joint_states_topic', '/joint_states'))
+        if live:
+            params['joint_order'] = live
+        layout = _generate(robot_name, params, robot_descriptor,
+                           LaunchConfiguration('output').perform(context).strip())
 
     topics = bridged_topics(params, robot)
     use_sim_time = _bool(LaunchConfiguration('use_sim_time'), context) == 'true'

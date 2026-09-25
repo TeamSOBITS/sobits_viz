@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: BSD-3-Clause
 """Tests for the generated Foxglove layouts."""
 
-import json
 from pathlib import Path
 
 import pytest
@@ -62,10 +61,3 @@ def test_every_plotted_topic_is_bridged(robot):
         for key in ('imageTopic', 'calibrationTopic'):
             if image.get(key):
                 assert image[key] in served, f'{panel_id} shows unserved {image[key]}'
-
-
-@pytest.mark.parametrize('robot', robots())
-def test_committed_layout_matches_the_generator(robot):
-    _, layout = layout_of(robot)
-    committed = (PACKAGE / 'config' / robot / f'{robot}.foxglove.json').read_text()
-    assert committed == json.dumps(layout, indent=2, sort_keys=True) + '\n'

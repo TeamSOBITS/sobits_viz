@@ -5,9 +5,8 @@
 from pathlib import Path
 
 import pytest
-from sobits_viz_rviz.make_config import _HEADER, build
+from sobits_viz_rviz.make_config import build
 from sobits_viz_rviz.robot_views import load_params
-import yaml
 
 PACKAGE = Path(__file__).resolve().parent.parent
 ROBOTS = PACKAGE.parent / 'sobits_viz_robots' / 'config'
@@ -84,14 +83,6 @@ def test_no_runtime_derived_keys(robot):
     _, config = config_of(robot)
     found = {key for key, _ in walk(config) if key in FORBIDDEN_KEYS}
     assert not found, f'runtime-derived keys leaked into the config: {found}'
-
-
-@pytest.mark.parametrize('robot', robots())
-def test_committed_config_matches_the_generator(robot):
-    _, config = config_of(robot)
-    committed = (PACKAGE / 'config' / robot / f'{robot}.rviz').read_text()
-    expected = _HEADER + yaml.safe_dump(config, default_flow_style=False, sort_keys=False)
-    assert committed == expected
 
 
 @pytest.mark.parametrize('robot', robots())
