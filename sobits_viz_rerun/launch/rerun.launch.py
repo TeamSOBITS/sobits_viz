@@ -1,4 +1,7 @@
 import os
+import subprocess
+import sys
+import tempfile
 
 from ament_index_python.packages import get_package_share_directory
 
@@ -27,8 +30,11 @@ def generate_launch_description():
                         'config/<robot_name>/<robot_name>.yaml',
         ),
         DeclareLaunchArgument(
+            'output', default_value='',
+            description='Where the generated layout is written; empty means a temporary file'),
+        DeclareLaunchArgument(
             'blueprint', default_value='',
-            description='The viewer layout; empty means config/<robot_name>/<robot_name>.rbl',
+            description='A layout to use as it is; empty builds one from the views file',
         ),
         # The real robot's drivers stamp frames as "<robot_name>/<link>" while
         # the URDF uses bare link names; the prefix is stripped so they meet.
@@ -75,6 +81,18 @@ def _bool(lc, context):
     return 'true' if lc.perform(context).lower() in ('true', '1', 'yes') else 'false'
 
 
+def _generate(robot_name: str, params: str, descriptor: str, out_path: str) -> str:
+    """Write the layout this robot's views file describes, and return its path."""
+    script = os.path.join(get_package_share_directory('sobits_viz_rerun'),
+                          'blueprint', 'make_blueprint.py')
+    path = out_path or tempfile.mkstemp(prefix=f'{robot_name}_', suffix='.rbl')[1]
+    if out_path:
+        os.makedirs(os.path.dirname(out_path) or '.', exist_ok=True)
+    subprocess.run([sys.executable, script, '--params', params,
+                    '--descriptor', descriptor, '--output', path], check=True)
+    return path
+
+
 def launch_setup(context, *args, **kwargs):
     robot_name = LaunchConfiguration('robot_name').perform(context)
 
@@ -97,7 +115,12 @@ def launch_setup(context, *args, **kwargs):
             f'No robot descriptor at {robot_descriptor}. '
             f"Robots in sobits_viz_robots: {', '.join(robots)}")
     robot_params = robot_file('robot_params', '.yaml')
-    blueprint = robot_file('blueprint', '.rbl')
+    # A robot's parts can be switched off at launch, so the layout is built from
+    # the views file every time rather than read from one written earlier.
+    blueprint = LaunchConfiguration('blueprint').perform(context)
+    if not blueprint:
+        blueprint = _generate(robot_name, robot_params, robot_descriptor,
+                              LaunchConfiguration('output').perform(context).strip())
     viewer_mode = LaunchConfiguration('viewer_mode').perform(context)
     grpc_port = LaunchConfiguration('grpc_port').perform(context)
     connect_url = LaunchConfiguration('connect_url').perform(context)

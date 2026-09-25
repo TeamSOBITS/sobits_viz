@@ -21,7 +21,7 @@ don't compress it.
 ## Naming
 
 - Packages: `sobits_viz_<viewer>` (e.g. `sobits_viz_rerun`).
-- Per-robot config: `config/<robot>/<robot>{.robot.yaml,.yaml,.rbl}`, one
+- Per-robot config: `config/<robot>/<robot>{.robot.yaml,.yaml}`, one
   folder per robot.
 
 ## Commits

@@ -110,7 +110,8 @@ snapshot is ever wanted.
 | `robot_name` | required | Names the robot's folder, `config/<robot_name>/`, and its topic namespace |
 | `robot_descriptor` | `sobits_viz_robots` `config/<robot_name>/<robot_name>.robot.yaml` | The `sobits_vla_tools` `.robot.yaml` describing the robot. Required. |
 | `robot_params` | `config/<robot_name>/<robot_name>.yaml` | The robot's `app_id`, sink and `views` |
-| `blueprint` | `config/<robot_name>/<robot_name>.rbl` | The viewer layout generated from the two above |
+| `blueprint` | `''` | A layout to use as it is; the views file is not read and nothing is generated |
+| `output` | `''` | Where the generated layout is written; empty writes a temporary file |
 | `robot_description_topic` | `robot_description` | Where `robot_state_publisher` latches the URDF, under `/<robot_name>/` unless it starts with `/` |
 | `enable_frame_prefix` | `true` | Strip `frame_prefix` from every frame id the drivers send |
 | `frame_prefix` | `<robot_name>/` | The prefix to strip |
@@ -148,9 +149,8 @@ A new robot takes two templates: copy
 `sobits_viz_robots/config/template/template.robot.yaml` to
 `sobits_viz_robots/config/<robot>/<robot>.robot.yaml` (or use the robot's own
 descriptor from `sobits_vla_common/robots/`), and `config/template/template.yaml`
-here to `config/<robot>/<robot>.yaml`. Fill in the `<...>` placeholders, generate
-the layout with `make_blueprint.py --params config/<robot>/<robot>.yaml`, and
-launch with `robot_name:=<robot>`. There is no second description to fall back
+here to `config/<robot>/<robot>.yaml`. Fill in the `<...>` placeholders and
+launch with `robot_name:=<robot>`; the layout is built from that file. There is no second description to fall back
 on: the launch file stops, naming the robots it does have, if the descriptor is
 missing.
 
@@ -223,10 +223,12 @@ views:
   base: {name: "Base", enable: true, position: false, velocity: true, command: true}
 ```
 
-After changing the descriptor or `views`, regenerate the layout:
+Editing this file is enough; the next launch picks it up. To write a layout
+without launching, for inspection or to hand to a viewer yourself:
 
 ```sh
-$ python3 blueprint/make_blueprint.py --params config/sobit_home/sobit_home.yaml
+$ python3 blueprint/make_blueprint.py --params config/sobit_home/sobit_home.yaml \
+    --output /tmp/sobit_home.rbl
 ```
 
 For another robot, point it at that robot's descriptor and parameter file. The
