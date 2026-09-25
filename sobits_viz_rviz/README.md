@@ -39,7 +39,7 @@ $ ros2 launch sobits_viz_rviz rviz.launch.py robot_name:=sobit_light use_sim_tim
 | `robot_name` | required | Robot folder under `config/`, and its topic namespace |
 | `robot_params` | `config/<robot_name>/<robot_name>.yaml` | The robot's views |
 | `robot_descriptor` | `sobits_viz_robots` `config/<robot_name>/<robot_name>.robot.yaml` | The descriptor naming the cameras and lidars |
-| `config` | `config/<robot_name>/<robot_name>.rviz` | The RViz2 config `rviz2` opens with `-d` |
+| `config` | `''` | An RViz2 config to open as it is; the views file is not read and nothing is generated |
 | `output` | `''` | Where the generated config is written; empty writes a temporary file |
 | `use_sim_time` | `false` | Set this to `true` in simulation |
 | `prefix` | `''` | Command the viewer runs under, e.g. `taskset -c 0-3` to pin it to those cores |

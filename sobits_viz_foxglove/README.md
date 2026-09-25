@@ -61,7 +61,7 @@ The layout is imported once; the app remembers it.
 | `robot_name` | required | Robot folder under `config/`, and its topic namespace |
 | `robot_params` | `config/<robot_name>/<robot_name>.yaml` | The robot's views |
 | `robot_descriptor` | `sobits_viz_robots` `config/<robot_name>/<robot_name>.robot.yaml` | The descriptor naming the cameras, groups and lidars |
-| `layout` | `config/<robot_name>/<robot_name>.foxglove.json` | The layout to import; only printed, never loaded by the node |
+| `layout` | `''` | A layout to use as it is; the views file is not read and nothing is generated |
 | `output` | `''` | Where the generated layout is written; empty writes a temporary file |
 | `port` | `8765` | Port the Foxglove WebSocket listens on |
 | `address` | `0.0.0.0` | Address it binds to |
