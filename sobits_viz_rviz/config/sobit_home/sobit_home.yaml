@@ -1,6 +1,6 @@
 # SOBIT HOME in RViz2: which displays the generated config shows. The
-# cameras and lidars it names come from sobits_viz_robots
-# config/sobit_home/sobit_home.robot.yaml. Regenerate after editing:
+# cameras, lidars and frames it names come from sobit_home_description
+# config/sobit_home.robot.yaml. Regenerate after editing:
 #   ros2 run sobits_viz_rviz make_config --params config/sobit_home/sobit_home.yaml
 /**:
   ros__parameters:
@@ -11,7 +11,6 @@
       scene:
         name: "Scene"
         enable: true
-        fixed_frame: "odom"
         camera_distance_m: 4.0
         camera_height_m: 0.6
         show_collision: false
@@ -24,12 +23,7 @@
         enable: false
         label: true
         axis_scale: 0.4
-        # Empty lists every frame, which buries the model in axes.
-        frames:
-          - base_footprint
-          - head_camera_color_frame
-          - hand_left_end_effector_link
-          - hand_right_end_effector_link
+        # `frames` defaults to the descriptor's base, end effector and camera frames.
         exclude: []
 
       cameras:
@@ -45,7 +39,6 @@
             # RViz decodes every compressedDepth variant, and the compressed
             # frame is a few kB against more than a megabyte raw.
             use_compressed: true
-            range_m: [0.1, 10.0]
             # Listed in the display tree; unticked, being one point per pixel.
             points:
               name: "Head cloud"
@@ -77,6 +70,9 @@
           scan: true
           point_size_px: 3.0
           color: [0, 0, 255]
+        # The two above merged into one scan; redundant next to them.
+        lidar_merged:
+          enable: false
 
       base:
         name: "Base"

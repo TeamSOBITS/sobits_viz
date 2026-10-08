@@ -1,7 +1,7 @@
 # Skeleton of a robot's RViz2 settings: which displays the generated config
 # shows. Copy to config/<robot>/<robot>.yaml, fill in every <...>, drop what
-# the robot lacks, then generate its config (the descriptor it names lives in
-# sobits_viz_robots):
+# the robot lacks, then generate its config (the descriptor is
+# <robot>_description/config/<robot>.robot.yaml):
 #   ros2 run sobits_viz_rviz make_config --params config/<robot>/<robot>.yaml
 # ROS rejects an empty list or map, so leave a key out rather than empty.
 /**:
@@ -14,8 +14,7 @@
       scene:
         name: "Scene"
         enable: true
-        # A frame the TF tree reaches, with the prefix above applied.
-        fixed_frame: "odom"
+        # fixed_frame defaults to the descriptor's odom_frame.
         camera_distance_m: 4.0
         camera_height_m: 0.6
         show_collision: false
@@ -29,8 +28,8 @@
         enable: false
         label: true
         axis_scale: 0.4
-        # Empty lists every frame; name a few to keep the view readable.
-        frames: []
+        # `frames` defaults to the descriptor's base, end effector and camera
+        # frames; list others to replace them.
         exclude: []
 
       cameras:
@@ -40,14 +39,13 @@
           color:
             enable: true
             use_compressed: true
-          # Only for a camera the descriptor marks is_depth. RViz decodes
-          # RViz decodes every compressedDepth variant, so depth compresses
-          # like colour does.
+          # Only for a camera with a depth stream in the descriptor. RViz
+          # decodes every compressedDepth variant, so depth compresses like
+          # colour does. range_m defaults to the descriptor's.
           depth:
             enable: true
             name: "<camera> depth"
             use_compressed: true
-            range_m: [0.1, 10.0]
             # Listed in the display tree; unticked, being one point per pixel.
             points:
               name: "<camera> cloud"

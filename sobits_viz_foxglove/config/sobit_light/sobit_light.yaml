@@ -98,8 +98,6 @@
         arm:
           name: "Arm"
           groups: ["manipulator"]
-          # Passive mimic, published but not commanded.
-          add_joints: ["arm_shoulder_pitch_sub_joint"]
           position: true
           velocity: true
           effort: false
