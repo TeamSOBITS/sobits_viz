@@ -1,7 +1,7 @@
 # Skeleton of a robot's Foxglove settings: which topics the bridge serves and
 # how the generated layout arranges them. Copy to config/<robot>/<robot>.yaml,
 # fill in every <...>, drop what the robot lacks, then generate its layout (the
-# descriptor it names lives in sobits_viz_robots):
+# descriptor is <robot>_description/config/<robot>.robot.yaml):
 #   ros2 run sobits_viz_foxglove make_layout --params config/<robot>/<robot>.yaml
 # ROS rejects an empty list or map, so leave a key out rather than empty.
 /**:
@@ -21,8 +21,7 @@
       scene:
         name: "Scene"
         enable: true
-        # A frame the TF tree reaches, with the prefix above applied.
-        fixed_frame: "odom"
+        # fixed_frame defaults to the descriptor's odom_frame.
         camera_distance_m: 4.0
         camera_height_m: 0.6
         show_collision: false
@@ -48,12 +47,12 @@
           frustum_size_m: 0.3
           color:
             use_compressed: true
-          # Only for a camera the descriptor marks is_depth. Foxglove decodes
-          # 16-bit PNG compressedDepth only; anything else must be raw.
+          # Only for a camera with a depth stream in the descriptor. Foxglove
+          # decodes 16-bit PNG compressedDepth only; anything else must be raw.
+          # range_m defaults to the descriptor's.
           depth:
             enable: true
             use_compressed: false
-            range_m: [0.1, 10.0]
 
       # One entry per lidar name in the descriptor.
       lidars:

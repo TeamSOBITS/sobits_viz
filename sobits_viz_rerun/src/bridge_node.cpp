@@ -10,8 +10,6 @@
 #include <string>
 #include <utility>
 
-#include <yaml-cpp/yaml.h>
-
 #include "sobits_viz_rerun/frame_utils.hpp"
 #include "sobits_viz_rerun/image_codec.hpp"
 
@@ -111,12 +109,9 @@ void RerunBridge::declare_parameters()
             "robot_name is required: the launch file sets it from robot_name:=<robot>");
   }
   // Whether the driver's frame ids carry a prefix the URDF's do not. The
-  // launch file sets both; empty means "<robot_name>/".
+  // launch file sets both; empty means the descriptor's "<namespace>/".
   enable_frame_prefix_ = declare_parameter<bool>("enable_frame_prefix", true);
   frame_prefix_ = declare_parameter<std::string>("frame_prefix", "");
-  if (frame_prefix_.empty()) {
-    frame_prefix_ = robot_name_ + "/";
-  }
 
   // The launch file chooses where the expanded description is written.
   urdf_path_ = declare_parameter<std::string>("urdf_path", "");
@@ -136,79 +131,80 @@ void RerunBridge::load_descriptor(std::vector<CameraSpec> & cameras)
   const auto path = declare_parameter<std::string>("robot_descriptor", "");
   if (path.empty()) {
     throw std::runtime_error(
-            "robot_descriptor is not set. The robot is described by a sobits_vla_tools "
-            ".robot.yaml, which names the cameras and topics to bridge.");
+            "robot_descriptor is not set. The robot is described by a <robot>.robot.yaml, "
+            "which names the cameras and topics to bridge.");
   }
 
-  YAML::Node doc;
+  namespace srd = sobits_robot_descriptor;
+  srd::RobotDescriptor desc;
   try {
-    doc = YAML::LoadFile(path);
+    desc = srd::load_file(path);
   } catch (const std::exception & error) {
     throw std::runtime_error(
             "Could not read the robot descriptor " + path + ": " + error.what());
   }
 
-  // The entity tree and the frame prefix follow the robot's own name for itself.
-  if (doc["robot_id"]) {
-    robot_name_ = doc["robot_id"].as<std::string>();
-    if (frame_prefix_.empty() || frame_prefix_ == "/") {
-      frame_prefix_ = robot_name_ + "/";
+  // The entity tree follows the robot's own name for itself, and the frame
+  // prefix its namespace, which is what the driver stamps frames with.
+  robot_name_ = desc.robot_id;
+  if (frame_prefix_.empty()) {
+    std::string ns = desc.namespace_;
+    while (!ns.empty() && ns.front() == '/') {ns.erase(ns.begin());}
+    while (!ns.empty() && ns.back() == '/') {ns.pop_back();}
+    frame_prefix_ = ns.empty() ? "" : ns + "/";
+  }
+
+  described_joint_states_ = desc.topic(desc.joint_states_topic);
+  if (desc.mobile_base) {
+    described_odom_ = desc.topic(desc.mobile_base->odom_topic);
+    described_base_command_ = desc.topic(desc.mobile_base->command_topic);
+  }
+
+  for (const auto & group : desc.groups) {
+    auto & described = described_groups_[group.name];
+    // Mimic joints are in joint_states but never commanded, so plotted all the same.
+    described.joints = group.joints;
+    described.joints.insert(
+      described.joints.end(), group.uncommanded_joints.begin(), group.uncommanded_joints.end());
+    // Only a trajectory controller's command is a JointTrajectory.
+    if (group.interface == "trajectory" && !group.command_topic.empty()) {
+      described.command_topic = desc.topic(group.command_topic);
     }
   }
 
-  if (doc["joint_states_topic"]) {
-    described_joint_states_ = doc["joint_states_topic"].as<std::string>();
-  }
-  if (doc["mobile_base"] && doc["mobile_base"]["odom_topic"]) {
-    described_odom_ = doc["mobile_base"]["odom_topic"].as<std::string>();
-  }
-  if (doc["mobile_base"] && doc["mobile_base"]["command_topic"]) {
-    described_base_command_ = doc["mobile_base"]["command_topic"].as<std::string>();
-  }
-
-  for (const auto & group : doc["groups"]) {
-    if (group["active"] && !group["active"].as<bool>()) {
-      continue;
+  auto topic = [&desc](const std::string & rel) {
+      return rel.empty() ? std::string() : desc.topic(rel);
+    };
+  for (const auto & camera : desc.cameras) {
+    std::vector<double> range{0.0, 0.0};
+    if (camera.depth && camera.depth->range_m) {
+      range = {camera.depth->range_m->first, camera.depth->range_m->second};
     }
-    auto & described = described_groups_[group["name"].as<std::string>()];
-    for (const auto & joint : group["joints"]) {
-      described.joints.push_back(joint["ros_name"].as<std::string>());
-    }
-    if (group["command_topic"]) {
-      described.command_topic = group["command_topic"].as<std::string>();
+    for (const auto & stream : camera.streams()) {
+      CameraSpec spec;
+      spec.name = camera.name;
+      spec.raw_topic = topic(stream.raw_topic);
+      spec.compressed_topic = topic(stream.compressed_topic);
+      spec.info_topic = topic(stream.info_topic);
+      spec.frame = stream.frame;
+      spec.depth_range_m = range;
+      spec.is_depth = stream.kind == "depth";
+      cameras.push_back(std::move(spec));
     }
   }
 
-  for (const auto & entry : doc["sensors"]["cameras"]) {
-    // A descriptor carries every camera the robot has, including ones this
-    // session is not meant to look at.
-    if (entry["active"] && !entry["active"].as<bool>()) {
-      continue;
-    }
-    CameraSpec camera;
-    camera.name = entry["name"].as<std::string>();
-    camera.raw_topic = entry["raw_topic"] ? entry["raw_topic"].as<std::string>() : "";
-    camera.compressed_topic =
-      entry["compressed_topic"] ? entry["compressed_topic"].as<std::string>() : "";
-    camera.info_topic = entry["info_topic"] ? entry["info_topic"].as<std::string>() : "";
-    camera.is_depth = entry["is_depth"] && entry["is_depth"].as<bool>();
-    cameras.push_back(std::move(camera));
-  }
-
-  for (const auto & entry : doc["sensors"]["lidars"]) {
-    if (entry["active"] && !entry["active"].as<bool>()) {
+  for (const auto & entry : desc.lidars) {
+    if (entry.scan_topic.empty()) {
       continue;
     }
     LidarSpec lidar;
-    lidar.name = entry["name"].as<std::string>();
-    lidar.scan_topic = entry["scan_topic"] ? entry["scan_topic"].as<std::string>() : "";
-    if (!lidar.scan_topic.empty()) {
-      described_lidars_.push_back(std::move(lidar));
-    }
+    lidar.name = entry.name;
+    lidar.scan_topic = desc.topic(entry.scan_topic);
+    described_lidars_.push_back(std::move(lidar));
   }
 
   RCLCPP_INFO(
-    get_logger(), "Read %zu active cameras and %zu lidars for '%s' from %s.",
+    get_logger(), "Read %zu camera streams and %zu lidars for '%s' from %s.",
     cameras.size(), described_lidars_.size(), robot_name_.c_str(), path.c_str());
 }
 
@@ -399,9 +395,11 @@ T RerunBridge::declare_or_get(const std::string & name, const T & value)
   return declare_parameter<T>(name, value);
 }
 
-RerunBridge::CameraSettings RerunBridge::read_camera_settings(const std::string & prefix)
+RerunBridge::CameraSettings RerunBridge::read_camera_settings(
+  const std::string & prefix, const std::vector<double> & depth_range_m)
 {
-  const CameraSettings defaults;
+  CameraSettings defaults;
+  defaults.depth_range_m = depth_range_m;
   CameraSettings out;
   out.depth_rate_limit_hz =
     declare_or_get(prefix + "depth.rate_limit_hz", defaults.depth_rate_limit_hz);
@@ -433,8 +431,6 @@ RerunBridge::CameraSettings RerunBridge::read_camera_settings(const std::string 
   out.color_history = declare_or_get(prefix + "color.history", defaults.color_history);
   out.image_plane_distance =
     declare_or_get(prefix + "frustum_size_m", defaults.image_plane_distance);
-  out.color_frame = declare_or_get(prefix + "color.info_frame", defaults.color_frame);
-  out.depth_frame = declare_or_get(prefix + "depth.info_frame", defaults.depth_frame);
   out.use_compressed = declare_or_get(prefix + "color.use_compressed", defaults.use_compressed);
   return out;
 }
@@ -446,7 +442,8 @@ void RerunBridge::subscribe_camera_topics(
   stream->entity_path = entity_path + "/image";
   stream->info_entity_path = entity_path + "/camera_info";
   stream->is_depth = camera.is_depth;
-  stream->settings = read_camera_settings("views.cameras." + camera.name + ".");
+  stream->settings =
+    read_camera_settings("views.cameras." + camera.name + ".", camera.depth_range_m);
   if (camera.is_depth) {
     const auto & s = stream->settings;
     RCLCPP_INFO(
@@ -490,10 +487,7 @@ void RerunBridge::subscribe_camera_topics(
   if (!camera.info_topic.empty()) {
     // Colour and depth often share one camera_info, so each stream takes only
     // the messages stamped with its own frame or the pinhole flips between them.
-    std::string expected = camera.is_depth ? raw->settings.depth_frame : raw->settings.color_frame;
-    if (expected.empty()) {
-      expected = camera.name + (camera.is_depth ? "_depth_optical_frame" : "_color_optical_frame");
-    }
+    const std::string expected = camera.frame;
     subscriptions_.push_back(
       create_subscription<sensor_msgs::msg::CameraInfo>(
         camera.info_topic, qos,

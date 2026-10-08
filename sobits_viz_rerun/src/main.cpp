@@ -9,6 +9,7 @@
 
 #include <rclcpp/rclcpp.hpp>
 #include <rerun.hpp>
+#include <sobits_robot_descriptor/loader.hpp>
 
 #include "bridge_node.hpp"
 
@@ -125,7 +126,19 @@ int main(int argc, char ** argv)
   rclcpp::NodeOptions config_options;
   config_options.use_global_arguments(true);
   auto config = std::make_shared<rclcpp::Node>("rerun_bridge", config_options);
-  const auto app_id = config->declare_parameter<std::string>("app_id", "robot");
+  auto app_id = config->declare_parameter<std::string>("app_id", "");
+  if (app_id.empty()) {
+    // Unset, it is the descriptor's robot_id, as make_blueprint.py takes it; the
+    // bridge reports an unreadable descriptor itself.
+    app_id = "robot";
+    const auto descriptor = config->declare_parameter<std::string>("robot_descriptor", "");
+    try {
+      if (!descriptor.empty()) {
+        app_id = sobits_robot_descriptor::load_file(descriptor).robot_id;
+      }
+    } catch (const std::exception &) {
+    }
+  }
   const auto mode = config->declare_parameter<std::string>("viewer_mode", "spawn");
   config->declare_parameter<std::string>(
     "connect_url", "rerun+http://127.0.0.1:9876/proxy");

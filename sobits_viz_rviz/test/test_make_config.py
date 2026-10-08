@@ -5,11 +5,12 @@
 from pathlib import Path
 
 import pytest
+from sobits_robot_descriptor import DescriptorError, resolve_path
 from sobits_viz_rviz.make_config import build
-from sobits_viz_rviz.robot_views import load_params
+from sobits_viz_rviz.robot_views import load_descriptor, load_params
 
 PACKAGE = Path(__file__).resolve().parent.parent
-ROBOTS = PACKAGE.parent / 'sobits_viz_robots' / 'config'
+SRC = PACKAGE.parent.parent
 TOP_LEVEL_KEYS = {'Panels', 'Visualization Manager', 'Window Geometry'}
 FORBIDDEN_KEYS = {'Links', 'Frames', 'Tree', 'Namespaces'}
 
@@ -19,9 +20,18 @@ def robots():
                   if p.is_dir() and p.name != 'template')
 
 
+def descriptor_for(robot):
+    """Resolve the robot's descriptor from its description package."""
+    search = [*sorted(SRC.glob('*/*_description/config'))]
+    try:
+        return resolve_path(robot, search_dirs=search)
+    except DescriptorError as error:
+        pytest.skip(f'no descriptor for {robot}: {error}')
+
+
 def config_of(robot):
     params = load_params(PACKAGE / 'config' / robot / f'{robot}.yaml')
-    return params, build(params, ROBOTS / robot / f'{robot}.robot.yaml')
+    return params, build(params, descriptor_for(robot))
 
 
 def walk(node):
@@ -90,9 +100,11 @@ def test_fixed_frame_carries_the_frame_prefix(robot):
     # The prefix is empty in the file and set by the launch, so the test drives
     # it rather than asserting what a robot happens to ship with.
     params, config = config_of(robot)
+    desc = load_descriptor(descriptor_for(robot))
     fixed_frame = config['Visualization Manager']['Global Options']['Fixed Frame']
-    assert fixed_frame == params.get('frame_prefix', '') + params['views']['scene']['fixed_frame']
+    expected = params['views']['scene'].get('fixed_frame', desc.odom_frame)
+    assert fixed_frame == params.get('frame_prefix', '') + expected
     params['frame_prefix'] = 'prefixed/'
-    prefixed = build(params, ROBOTS / robot / f'{robot}.robot.yaml')
+    prefixed = build(params, descriptor_for(robot))
     assert prefixed['Visualization Manager']['Global Options']['Fixed Frame'].startswith(
         'prefixed/')

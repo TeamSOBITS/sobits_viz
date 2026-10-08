@@ -2,7 +2,7 @@
 # shows, how it runs, and the `views` block, which says what is shown
 # and so what is bridged. Copy to config/<robot>/<robot>.yaml, fill in every
 # <...>, drop what the robot lacks, then generate its layout (the descriptor
-# it names lives in sobits_viz_robots):
+# is <robot>_description/config/<robot>.robot.yaml):
 #   python3 blueprint/make_blueprint.py --params config/<robot>/<robot>.yaml
 # ROS rejects an empty list or map, so leave a key out rather than empty.
 /**:
@@ -28,8 +28,7 @@
       scene:
         name: "Scene"
         enable: true
-        # A frame the TF tree reaches; the odometry frame lets the robot move.
-        target_frame: "odom"
+        # target_frame defaults to the descriptor's odom_frame.
         show_collision: false
         embed_urdf: true
         tf_rate_limit_hz: 20.0
@@ -44,17 +43,13 @@
           color:
             use_compressed: true
             history: false
-            # The frame id its camera_info carries, without the robot prefix.
-            info_frame: "<camera>_color_optical_frame"
-          # Only for a camera the descriptor marks is_depth.
+          # Only for a camera with a depth stream in the descriptor.
           depth:
             enable: true
             rate_limit_hz: 30.0
             datatype: "u16"
             history: false
             colormap: "viridis"
-            colormap_range_m: [0.0, 0.0]
-            info_frame: "<camera>_depth_optical_frame"
 
       # One entry per lidar name in the descriptor.
       lidars:

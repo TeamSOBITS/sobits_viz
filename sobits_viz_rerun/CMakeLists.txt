@@ -19,7 +19,7 @@ find_package(geometry_msgs REQUIRED)
 find_package(tf2_msgs REQUIRED)
 find_package(nav_msgs REQUIRED)
 find_package(trajectory_msgs REQUIRED)
-find_package(yaml-cpp REQUIRED)
+find_package(sobits_robot_descriptor REQUIRED)
 find_package(OpenCV REQUIRED COMPONENTS imgcodecs)
 
 # Rerun C++ SDK.
@@ -53,7 +53,8 @@ add_executable(bridge
 target_include_directories(bridge PRIVATE
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 )
-target_link_libraries(bridge PRIVATE ${PROJECT_NAME}_codec rerun_sdk ${YAML_CPP_LIBRARIES})
+target_link_libraries(bridge PRIVATE
+  ${PROJECT_NAME}_codec rerun_sdk sobits_robot_descriptor::sobits_robot_descriptor)
 ament_target_dependencies(bridge PUBLIC
   rclcpp
   nav_msgs

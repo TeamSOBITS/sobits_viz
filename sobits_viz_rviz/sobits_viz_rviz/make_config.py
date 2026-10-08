@@ -8,8 +8,8 @@ writes a `.rviz` to open once, so every robot starts with the same displays —
 the model, TF tree and laser scans in 3D, one Image display per camera, and
 odometry for the base.
 
-The cameras and lidars come from the robot descriptor in sobits_viz_robots.
-Run it after changing either file:
+The cameras, lidars and frames come from the robot's `<robot>.robot.yaml`,
+which sobits_robot_descriptor resolves. Run it after changing either file:
 
     ros2 run sobits_viz_rviz make_config --params config/<robot>/<robot>.yaml
 """
@@ -20,10 +20,11 @@ import re
 
 from sobits_viz_rviz.robot_views import (
     cameras,
-    default_descriptor,
+    find_descriptor,
     lidars,
     load_descriptor,
     load_params,
+    tf_frames,
 )
 import yaml
 
@@ -82,9 +83,8 @@ def _grid_display() -> dict:
     }
 
 
-def _robot_model_display(params: dict, scene: dict, prefix: str) -> dict:
-    description = scene.get('description_topic', 'robot_description')
-    topic = params.get('app_id', 'robot') + '/' + description
+def _robot_model_display(robot, scene: dict, prefix: str) -> dict:
+    topic = robot.topic(scene.get('description_topic', 'robot_description'))
     return {
         'Class': 'rviz_default_plugins/RobotModel',
         'Name': 'RobotModel',
@@ -95,16 +95,16 @@ def _robot_model_display(params: dict, scene: dict, prefix: str) -> dict:
         'Alpha': 1,
         'Description Source': 'Topic',
         'Description File': '',
-        'Description Topic': _reliable_topic('/' + topic, durability='Transient Local'),
+        'Description Topic': _reliable_topic(topic, durability='Transient Local'),
         'TF Prefix': prefix,
         'Update Interval': 0,
     }
 
 
-def _tf_display(tf: dict, prefix: str) -> dict:
+def _tf_display(tf: dict, prefix: str, frames: list) -> dict:
     # Both filters are a single regex, so the frames become one alternation.
-    def framed(key):
-        names = [re.escape(prefix + f) for f in (tf.get(key) or [])]
+    def framed(key, default=None):
+        names = [re.escape(prefix + f) for f in (tf.get(key, default) or [])]
         return '^(' + '|'.join(names) + ')$' if names else ''
 
     shown = bool(tf.get('enable'))
@@ -119,7 +119,7 @@ def _tf_display(tf: dict, prefix: str) -> dict:
         'Show Axes': True,
         'Show Names': bool(tf.get('label', False)),
         'Update Interval': 0,
-        'Filter (whitelist)': framed('frames'),
+        'Filter (whitelist)': framed('frames', frames),
         'Filter (blacklist)': framed('exclude'),
     }
 
@@ -204,16 +204,16 @@ def _odometry_display(name: str, topic: str) -> dict:
     }
 
 
-def _displays(params: dict, robot: dict, views: dict, prefix: str) -> list:
+def _displays(robot, views: dict, prefix: str) -> list:
     scene = views.get('scene') or {}
     displays = []
 
     if scene.get('grid', True):
         displays.append(_grid_display())
     if scene.get('urdf', True):
-        displays.append(_robot_model_display(params, scene, prefix.rstrip('/')))
+        displays.append(_robot_model_display(robot, scene, prefix.rstrip('/')))
     # Listed whatever `enable` says, so the frames are one click away.
-    displays.append(_tf_display(views.get('tf') or {}, prefix))
+    displays.append(_tf_display(views.get('tf') or {}, prefix, tf_frames(robot)))
 
     # Listed whatever `scan` says, so a scan is one click away.
     for name, entry, view in lidars(robot, views.get('lidars') or {}):
@@ -222,7 +222,7 @@ def _displays(params: dict, robot: dict, views: dict, prefix: str) -> list:
     for name, label, entry, view in cameras(robot, views.get('cameras') or {}):
         compressed = view.get('use_compressed', not entry.get('is_depth'))
         topic = entry.get('compressed_topic') if compressed else entry.get('raw_topic')
-        depth_range = view.get('range_m') if entry.get('is_depth') else None
+        depth_range = view.get('range_m', entry['range_m']) if entry['is_depth'] else None
         displays.append(_image_display(label, topic, depth_range))
         # Listed whatever `enable` says, so the cloud is one click away.
         if entry.get('points_topic'):
@@ -232,9 +232,10 @@ def _displays(params: dict, robot: dict, views: dict, prefix: str) -> list:
                 _point_cloud_display(cloud, entry['points_topic'], points))
 
     base = views.get('base') or {}
-    mobile = robot.get('mobile_base') or {}
-    if base.get('enable', True) and mobile.get('odom_topic'):
-        displays.append(_odometry_display(base.get('name', 'Base'), mobile['odom_topic']))
+    mobile = robot.mobile_base
+    if base.get('enable', True) and mobile and mobile.odom_topic:
+        displays.append(
+            _odometry_display(base.get('name', 'Base'), robot.topic(mobile.odom_topic)))
 
     return displays
 
@@ -262,8 +263,7 @@ def _tools() -> list:
     ]
 
 
-def _views(scene: dict, prefix: str) -> dict:
-    fixed_frame = prefix + scene.get('fixed_frame', 'odom')
+def _views(scene: dict, fixed_frame: str) -> dict:
     return {
         'Current': {
             'Class': 'rviz_default_plugins/Orbit',
@@ -343,9 +343,10 @@ def build(params: dict, descriptor) -> dict:
     views = params.get('views') or {}
     scene = views.get('scene') or {}
     prefix = params.get('frame_prefix', '')
+    fixed_frame = prefix + scene.get('fixed_frame', robot.odom_frame)
 
     config = {'Panels': _panels()}
-    displays = _displays(params, robot, views, prefix) if scene.get('enable', True) else []
+    displays = _displays(robot, views, prefix) if scene.get('enable', True) else []
     if scene.get('enable', True):
         config['Visualization Manager'] = {
             'Class': '',
@@ -353,14 +354,14 @@ def build(params: dict, descriptor) -> dict:
             'Enabled': True,
             'Global Options': {
                 'Background Color': '48; 48; 48',
-                'Fixed Frame': prefix + scene.get('fixed_frame', 'odom'),
+                'Fixed Frame': fixed_frame,
                 'Frame Rate': 30,
             },
             'Name': 'root',
             'Tools': _tools(),
             'Transformation': {'Current': {'Class': 'rviz_default_plugins/TF'}},
             'Value': True,
-            'Views': _views(scene, prefix),
+            'Views': _views(scene, fixed_frame),
         }
         config['Window Geometry'] = _window(displays)
     return config
@@ -374,16 +375,18 @@ def main() -> None:
         help="the robot's parameter file, config/<robot>/<robot>.yaml")
     parser.add_argument(
         '--descriptor', type=Path,
-        help='the sobits_vla_tools .robot.yaml; defaults to the copy '
-             'sobits_viz_robots keeps for <app_id>, as the launch file does')
+        help='the <robot>.robot.yaml; defaults to the one sobits_robot_descriptor '
+             'resolves for <app_id>, as the launch file does')
     parser.add_argument(
         '--output', type=Path,
         help='defaults to <app_id>.rviz next to the parameter file')
     args = parser.parse_args()
 
     params = load_params(args.params)
-    app_id = params.get('app_id', 'robot')
-    descriptor = args.descriptor or default_descriptor(app_id)
+    if not args.descriptor and not params.get('app_id'):
+        raise SystemExit(f'{args.params} has no app_id; pass the robot with --descriptor')
+    descriptor = args.descriptor or find_descriptor(params['app_id'])
+    app_id = params.get('app_id') or load_descriptor(descriptor).robot_id
     output = args.output or args.params.resolve().parent / f'{app_id}.rviz'
 
     output.parent.mkdir(parents=True, exist_ok=True)

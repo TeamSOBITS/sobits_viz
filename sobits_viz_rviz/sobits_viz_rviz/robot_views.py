@@ -4,18 +4,16 @@
 
 from pathlib import Path
 
+from sobits_robot_descriptor import DescriptorError, load_file, resolve_path
 import yaml
 
 
-def default_descriptor(app_id: str) -> Path:
-    """Where sobits_viz_robots keeps this robot's descriptor."""
+def find_descriptor(robot_id: str) -> str:
+    """Resolve `<robot>.robot.yaml` through sobits_robot_descriptor."""
     try:
-        from ament_index_python.packages import get_package_share_directory
-        config = Path(get_package_share_directory('sobits_viz_robots')) / 'config'
-    except Exception:
-        # Running from the source tree, before the workspace is built.
-        config = Path(__file__).resolve().parents[3] / 'sobits_viz_robots' / 'config'
-    return config / app_id / f'{app_id}.robot.yaml'
+        return resolve_path(robot_id)
+    except DescriptorError as error:
+        raise SystemExit(str(error))
 
 
 def load_params(path) -> dict:
@@ -28,15 +26,16 @@ def load_params(path) -> dict:
     raise SystemExit(f'{path} has no ros__parameters block')
 
 
-def load_descriptor(path) -> dict:
-    """Read a sobits_vla_tools robot descriptor."""
-    path = Path(path)
-    if not path.is_file():
+def load_descriptor(path):
+    """Read a schema v2 robot descriptor into a sobits_robot_descriptor.RobotDescriptor."""
+    if not Path(path).is_file():
         raise SystemExit(
-            f'{path} is not a file. The robot is described by a sobits_vla_tools '
-            '.robot.yaml, which sobits_viz_robots keeps; pass it with --descriptor.')
-    with path.open() as handle:
-        return yaml.safe_load(handle) or {}
+            f'{path} is not a file. The robot is described by a <robot>.robot.yaml, '
+            'which sobits_robot_descriptor resolves; pass it with --descriptor.')
+    try:
+        return load_file(path)
+    except DescriptorError as error:
+        raise SystemExit(str(error))
 
 
 def title(name: str) -> str:
@@ -44,35 +43,60 @@ def title(name: str) -> str:
     return name.replace('_camera', '').replace('_', ' ').title()
 
 
-def cameras(robot: dict, settings: dict) -> list:
-    """Active cameras the views file shows, as (name, label, entry, view) tuples."""
+def _topic(desc, rel):
+    return desc.topic(rel) if rel else None
+
+
+def stream_entry(desc, camera, stream) -> dict:
+    """One camera stream with its topics made absolute."""
+    return {
+        'name': camera.name,
+        'mount': camera.frame,
+        'frame': stream.frame,
+        'is_depth': stream.kind == 'depth',
+        'raw_topic': _topic(desc, stream.raw_topic),
+        'compressed_topic': _topic(desc, stream.compressed_topic),
+        'info_topic': _topic(desc, stream.info_topic),
+        'points_topic': _topic(desc, stream.points_topic),
+        'range_m': stream.range_m,
+    }
+
+
+def cameras(desc, settings: dict) -> list:
+    """Camera streams the views file shows, colour then depth, as (name, label, entry, view)."""
     shown = []
-    for entry in (robot.get('sensors') or {}).get('cameras') or []:
-        if not entry.get('active', True):
-            continue
-        camera = entry['name']
-        view = settings.get(camera) or {}
+    for camera in desc.cameras:
+        view = settings.get(camera.name) or {}
         if not view.get('enable', True):
             continue
-        label = view.get('name', title(camera))
-        if entry.get('is_depth'):
-            depth = view.get('depth') or {}
-            if not depth.get('enable', True):
-                continue
-            shown.append((camera, depth.get('name', f'{label} depth'), entry, depth))
-        else:
-            shown.append((camera, label, entry, view.get('color') or {}))
+        label = view.get('name', title(camera.name))
+        for stream in camera.streams():
+            entry = stream_entry(desc, camera, stream)
+            if entry['is_depth']:
+                depth = view.get('depth') or {}
+                if not depth.get('enable', True):
+                    continue
+                shown.append((camera.name, depth.get('name', f'{label} depth'), entry, depth))
+            else:
+                shown.append((camera.name, label, entry, view.get('color') or {}))
     return shown
 
 
-def lidars(robot: dict, settings: dict) -> list:
-    """Active laser scanners the views file shows, as (name, entry, view) tuples."""
+def lidars(desc, settings: dict) -> list:
+    """Laser scanners the views file shows, as (name, entry, view) tuples."""
     shown = []
-    for entry in (robot.get('sensors') or {}).get('lidars') or []:
-        if not entry.get('active', True):
-            continue
-        view = settings.get(entry['name']) or {}
+    for lidar in desc.lidars:
+        view = settings.get(lidar.name) or {}
         if not view.get('enable', True):
             continue
-        shown.append((view.get('name', title(entry['name'])), entry, view))
+        entry = {'name': lidar.name, 'frame': lidar.frame,
+                 'scan_topic': desc.topic(lidar.scan_topic),
+                 'points_topic': _topic(desc, lidar.points_topic)}
+        shown.append((view.get('name', title(lidar.name)), entry, view))
     return shown
+
+
+def tf_frames(desc) -> list:
+    """Frames worth an axis by default: the base, the end effectors, the camera mounts."""
+    frames = [desc.base_frame] + [e.ee_link for e in desc.ee] + [c.frame for c in desc.cameras]
+    return list(dict.fromkeys(frames))

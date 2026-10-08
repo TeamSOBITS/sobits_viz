@@ -108,13 +108,13 @@ snapshot is ever wanted.
 | Argument | Default | Meaning |
 | --- | --- | --- |
 | `robot_name` | required | Names the robot's folder, `config/<robot_name>/`, and its topic namespace |
-| `robot_descriptor` | `sobits_viz_robots` `config/<robot_name>/<robot_name>.robot.yaml` | The `sobits_vla_tools` `.robot.yaml` describing the robot. Required. |
+| `robot_descriptor` | resolved by sobits_robot_descriptor (`<robot>_description/config/<robot>.robot.yaml`) | The `<robot>.robot.yaml` describing the robot; set it to a path to bridge a robot from a file that is not installed |
 | `robot_params` | `config/<robot_name>/<robot_name>.yaml` | The robot's `app_id`, sink and `views` |
 | `blueprint` | `''` | A layout to use as it is; the views file is not read and nothing is generated |
 | `output` | `''` | Where the generated layout is written; empty writes a temporary file |
 | `robot_description_topic` | `robot_description` | Where `robot_state_publisher` latches the URDF, under `/<robot_name>/` unless it starts with `/` |
 | `enable_frame_prefix` | `true` | Strip `frame_prefix` from every frame id the drivers send |
-| `frame_prefix` | `<robot_name>/` | The prefix to strip |
+| `frame_prefix` | the descriptor's `<namespace>/` | The prefix to strip |
 | `urdf_path` | `''` | Where the description is written, for opening in a viewer by hand when `embed_urdf` is off |
 | `use_sim_time` | `false` | Set this to `true` in simulation |
 | `prefix` | `''` | Command the bridge and viewer run under, e.g. `taskset -c 0-3` to pin them to those cores |
@@ -129,36 +129,35 @@ parameter file, `config/<robot_name>/<robot_name>.yaml`.
 
 ### Describing another robot
 
-The robot is described by a
-[sobits_vla_tools](https://github.com/TeamSOBITS/sobits_vla_tools) descriptor,
-which names every camera and topic. A copy for each supported robot ships in
-the `sobits_viz_robots` package, shared by every viewer in this repository, and
-is used by default from `robot_name`; point the node at a different descriptor
-to override it:
+The robot is described by its `<robot>.robot.yaml` descriptor, which names
+every camera stream, lidar, joint group, frame and topic. The launch file
+resolves it from `robot_name` through
+[sobits_robot_descriptor](https://github.com/TeamSOBITS/sobits_robot_descriptor):
+`SOBITS_ROBOT_DESCRIPTOR_PATH` first, then
+`<robot>_description/config/<robot>.robot.yaml`. Point `robot_descriptor` at a
+file to override it:
 
 ```sh
 $ ros2 launch sobits_viz_rerun rerun.launch.py robot_name:=sobit_light \
-      robot_descriptor:=.../sobits_vla_common/robots/sobit_light.robot.yaml
+      robot_descriptor:=/path/to/sobit_light.robot.yaml
 ```
 
-Cameras marked `active: false` are skipped, and a camera with `is_depth: true`
-is read as depth. Laser scanners come from a `sensors.lidars` list of
-`{name, scan_topic, active}`, which the bundled copy adds to the schema.
+Each camera's `color` and `depth` streams become their own views, each taking
+only the `camera_info` stamped with its stream `frame`. The depth colormap spans
+the depth stream's `range_m` unless `depth.colormap_range_m` says otherwise, and
+topics are made absolute under the descriptor's `namespace`, which is also the
+default `frame_prefix`.
 
-A new robot takes two templates: copy
-`sobits_viz_robots/config/template/template.robot.yaml` to
-`sobits_viz_robots/config/<robot>/<robot>.robot.yaml` (or use the robot's own
-descriptor from `sobits_vla_common/robots/`), and `config/template/template.yaml`
-here to `config/<robot>/<robot>.yaml`. Fill in the `<...>` placeholders and
-launch with `robot_name:=<robot>`; the layout is built from that file. There is no second description to fall back
-on: the launch file stops, naming the robots it does have, if the descriptor is
-missing.
+A new robot takes a descriptor in its description package (`ros2 run
+sobits_robot_descriptor new_robot --robot-id <robot>`) and
+`config/template/template.yaml` here, copied to `config/<robot>/<robot>.yaml`.
+Fill in the `<...>` placeholders and launch with `robot_name:=<robot>`; the
+layout is built from that file. If no descriptor resolves, the launch file
+stops and lists every path it tried.
 
 Everything else a robot needs, its `app_id`, where the data goes and its
-`views`, is in `config/<robot_name>/<robot_name>.yaml`. Among them, the cameras' `color.info_frame` and `depth.info_frame`
-describe the robot rather than the viewer: a different
-robot needs its own values for these, and nothing in the node assumes any one
-robot's layout.
+`views`, is in `config/<robot_name>/<robot_name>.yaml`; what the robot is
+stays in the descriptor, so nothing in the node assumes any one robot's layout.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -176,13 +175,13 @@ they approximate:
 $ rerun $(ros2 pkg prefix sobits_viz_rerun)/share/sobits_viz_rerun/config/sobit_home/sobit_home.rbl
 ```
 
-The layout follows the robot descriptor: every active camera gets a 2D view and
+The layout follows the robot descriptor: every camera stream gets a 2D view and
 every joint group a plot tab, with the base velocity from `mobile_base`. The
 `views` block of the robot's parameter file, e.g.
 [config/sobit_home/sobit_home.yaml](config/sobit_home/sobit_home.yaml) for
 SOBIT HOME, adjusts that without touching the descriptor: it renames a view,
 turns one off, sets the frame the scene is resolved into, and for the joint
-tabs merges groups and adds or excludes single joints. The node reads the
+tabs merges groups (with their `uncommanded_joints`) and adds or excludes single joints. The node reads the
 same block: a view that is off is not bridged either, and a camera's stream
 settings live in its entry, so each camera is described in one place. A
 camera, or a setting, left out gets the built-in defaults, shown here for
@@ -190,19 +189,17 @@ SOBIT HOME:
 
 ```yaml
 views:
-  scene: {name: "Scene", enable: true, target_frame: "odom", show_collision: false,
+  scene: {name: "Scene", enable: true, show_collision: false,   # target_frame: odom_frame
           embed_urdf: true, tf_rate_limit_hz: 20.0}
   cameras:
     head_camera:                         # its depth view is "<name> depth"
       name: "Head"
       frustum_size_m: 0.3
-      color: {use_compressed: true, history: false, info_frame: "head_camera_color_optical_frame"}
+      color: {use_compressed: true, history: false}
       depth:                             # also datatype, colormap
         enable: true
         rate_limit_hz: 30.0
-        history: false
-        colormap_range_m: [0.1, 10.0]
-        info_frame: "head_camera_depth_optical_frame"
+        history: false                   # colormap_range_m: the descriptor's range_m
   joints:
     rate_limit_hz: 30.0
     tabs: ["arms", "hands"]              # the tabs shown; a group no tab lists is not plotted
@@ -216,7 +213,7 @@ views:
     hands:
       name: "Hands"
       groups: ["hand_left", "hand_right"]
-      add_joints: ["hand_left_finger_r_mcp_joint"]   # in joint_states, not in a group
+      add_joints: ["some_extra_joint"]   # beyond the groups and their uncommanded joints
       exclude_joints: ["hand_right_finger_c_ip_joint"]
   lidars:
     lidar_front: {enable: true, rate_limit_hz: 10.0, point_radius_m: 0.02, color: [255, 96, 96]}
@@ -232,7 +229,7 @@ $ python3 blueprint/make_blueprint.py --params config/sobit_home/sobit_home.yaml
 ```
 
 For another robot, point it at that robot's descriptor and parameter file. The
-output name and the application id follow `app_id`:
+output name and the application id follow `app_id`, else the descriptor's `robot_id`:
 
 ```sh
 $ python3 blueprint/make_blueprint.py --params /path/to/other_robot.yaml \

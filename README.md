@@ -12,8 +12,9 @@
 
 SOBITS Viz is a monorepo of visualizers for TeamSOBITS robots (SOBIT HOME,
 SOBIT LIGHT, ...). Every visualizer shares one robot description: the
-[sobits_vla_tools](https://github.com/TeamSOBITS/sobits_vla_tools)
-`.robot.yaml` descriptor plus a per-robot views file. See
+robot's `<robot>.robot.yaml` descriptor, owned by its description package and
+read through [sobits_robot_descriptor](https://github.com/TeamSOBITS/sobits_robot_descriptor),
+plus a per-robot views file. See
 [CONTRIBUTING.md](CONTRIBUTING.md) for the conventions new code must follow.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
@@ -22,7 +23,6 @@ SOBIT LIGHT, ...). Every visualizer shares one robot description: the
 
 | Package | Purpose | README |
 | ------- | ------- | ------ |
-| `sobits_viz_robots` | The robot descriptors every viewer shares | [README](sobits_viz_robots/README.md) |
 | `sobits_viz_rerun` | Streams cameras, depth, laser scans, TF, joints, odometry and the robot model into the Rerun viewer | [README](sobits_viz_rerun/README.md) |
 | `sobits_viz_foxglove` | Serves the same to the Foxglove viewer, with a layout generated per robot | [README](sobits_viz_foxglove/README.md) |
 | `sobits_viz_rviz` | Generates an RViz2 config per robot from the same descriptor | [README](sobits_viz_rviz/README.md) |

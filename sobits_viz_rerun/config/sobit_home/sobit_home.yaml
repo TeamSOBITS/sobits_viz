@@ -1,7 +1,7 @@
 # SOBIT HOME in the viewer: the application id the viewer shows, how it
 # runs, and the `views` block, which says what is shown and so what is
-# bridged. The cameras, joint groups and lidars it names come from
-# sobits_viz_robots config/sobit_home/sobit_home.robot.yaml. Regenerate the layout:
+# bridged. The cameras, joint groups, lidars and frames it names come from
+# sobit_home_description config/sobit_home.robot.yaml. Regenerate the layout:
 #   python3 blueprint/make_blueprint.py --params config/sobit_home/sobit_home.yaml
 # Override anything from the launch file or with `--ros-args -p <name>:=<value>`.
 /**:
@@ -34,9 +34,8 @@
       scene:
         name: "Scene"
         enable: true
-        # Frame every pose is resolved into. Must be one the TF tree reaches;
-        # the world-fixed odometry frame lets the robot move in place.
-        target_frame: "odom"
+        # target_frame, the frame every pose is resolved into, defaults to the
+        # descriptor's odom_frame, which lets the robot move in place.
         # The collision boxes swallow the visual mesh, so they are hidden.
         show_collision: false
         # Put the meshes in the stream, so the model shares a stream with
@@ -51,9 +50,9 @@
         # `color` and a `depth` block saying how each stream is logged. A depth
         # camera's view is "<name> depth". An unlisted camera, or a setting
         # left out, gets the built-in defaults: compressed colour with history,
-        # depth at 3 Hz as u16 with history, viridis over each frame's own
-        # range, a 0.3 m frustum, and camera_info frame ids
-        # <camera>_color_optical_frame / <camera>_depth_optical_frame.
+        # depth at 3 Hz as u16 with history, viridis over the descriptor's
+        # depth range_m (each frame's own range without one), a 0.3 m frustum.
+        # Each stream's camera_info frame is the descriptor's stream frame.
         head_camera:
           name: "Head"
           enable: true
@@ -65,9 +64,6 @@
             # false logs the stream as static: the panel still refreshes every
             # frame but the viewer keeps none, so the session stops growing.
             history: false
-            # Frame id this stream's camera_info carries, without the robot prefix.
-            # Tells colour from depth when the driver serves both on one topic.
-            info_frame: "head_camera_color_optical_frame"
           depth:
             enable: true
             # The sensor's own rate. With history on, each frame is a 300k
@@ -79,10 +75,8 @@
             # As for colour; true keeps frames to scrub back through.
             history: false
             colormap: "viridis"
-            # Depths the colormap spans, so one depth keeps one colour; here the
-            # sensor's clip range. Both zero rescales per frame. Nothing is cropped.
-            colormap_range_m: [0.1, 10.0]
-            info_frame: "head_camera_depth_optical_frame"
+            # colormap_range_m, the depths the colormap spans, defaults to the
+            # descriptor's range_m; [0.0, 0.0] rescales per frame. Nothing is cropped.
         hand_left_camera:
           name: "Hand Left"
           enable: true
@@ -90,8 +84,6 @@
           color:
             use_compressed: true
             history: false
-            # The wrist cameras name their frame without "color".
-            info_frame: "hand_left_camera_optical_frame"
         hand_right_camera:
           name: "Hand Right"
           enable: true
@@ -99,7 +91,6 @@
           color:
             use_compressed: true
             history: false
-            info_frame: "hand_right_camera_optical_frame"
 
       # <lidar name from the descriptor>: laser scans, drawn as points in the
       # Scene in their own frame, so they go with it. Returns are kept out to
@@ -116,13 +107,17 @@
           rate_limit_hz: 10.0
           point_radius_m: 0.02
           color: [96, 160, 255]
+        # The two above merged into one scan; redundant next to them.
+        lidar_merged:
+          enable: false
 
       joints:
         # The source publishes joint states at ~1 kHz; a plot needs far fewer.
         rate_limit_hz: 30.0
         # One plot tab per entry, in this order; leave a tab out to hide it. A
-        # tab plots the joints of the descriptor groups it lists, plus `add_joints`,
-        # minus `exclude_joints` (leave a list out rather than empty: ROS rejects
+        # tab plots the joints of the descriptor groups it lists (with their
+        # uncommanded mimic joints), plus `add_joints`, minus `exclude_joints`
+        # (leave a list out rather than empty: ROS rejects
         # `[]`), and the series it switches on: position, velocity, effort.
         # More than one are stacked in the tab. `command` adds the same series
         # from the groups' command topics as "<joint> cmd". Only what some tab
@@ -146,8 +141,6 @@
         hands:
           name: "Hands"
           groups: ["hand_left", "hand_right"]
-          # Published in joint_states but not commanded, so not in the group.
-          add_joints: ["hand_left_finger_r_mcp_joint", "hand_right_finger_r_mcp_joint"]
           position: true
           velocity: false
           effort: false

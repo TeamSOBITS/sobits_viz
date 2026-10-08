@@ -12,8 +12,9 @@
 
 SOBITS Vizは，TeamSOBITSのロボット（SOBIT HOME，SOBIT LIGHT，...）向けの
 可視化ツールをまとめたモノレポです。すべての可視化ツールは1つのロボット
-記述を共有します: [sobits_vla_tools](https://github.com/TeamSOBITS/sobits_vla_tools)
-の`.robot.yaml`記述子と，ロボットごとのビュー設定ファイルです。新規コードが
+記述を共有します: 各ロボットのdescriptionパッケージが持つ`<robot>.robot.yaml`記述子
+（[sobits_robot_descriptor](https://github.com/TeamSOBITS/sobits_robot_descriptor)で読み込み）と，
+ロボットごとのビュー設定ファイルです。新規コードが
 従うべき規約は[CONTRIBUTING.md](CONTRIBUTING.md)を参照してください。
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
@@ -22,7 +23,6 @@ SOBITS Vizは，TeamSOBITSのロボット（SOBIT HOME，SOBIT LIGHT，...）向
 
 | パッケージ | 役割 | README |
 | ------- | ------- | ------ |
-| `sobits_viz_robots` | すべてのビューアが共有するロボット記述子 | [README](sobits_viz_robots/README.md) |
 | `sobits_viz_rerun` | カメラ，深度，レーザースキャン，TF，関節，オドメトリ，ロボットモデルをRerunビューアにストリーミング | [README](sobits_viz_rerun/README.md) |
 | `sobits_viz_foxglove` | 同じデータをFoxgloveビューアに配信し，ロボットごとのレイアウトを生成 | [README](sobits_viz_foxglove/README.md) |
 | `sobits_viz_rviz` | 同じ記述子からロボットごとのRViz2設定を生成 | [README](sobits_viz_rviz/README.md) |

@@ -1,7 +1,5 @@
-# SOBIT LIGHT in the viewer: the application id the viewer shows, how it
-# runs, and the `views` block, which says what is shown and so what is
-# bridged. The cameras, joint groups and lidars it names come from
-# sobits_viz_robots config/sobit_light/sobit_light.robot.yaml. Regenerate the layout:
+# SOBIT LIGHT in the viewer: the application id, behaviour, and `views` block,
+# which says what is shown and bridged. Regenerate the layout:
 #   python3 blueprint/make_blueprint.py --params config/sobit_light/sobit_light.yaml
 # Override anything from the launch file or with `--ros-args -p <name>:=<value>`.
 /**:
@@ -44,7 +42,6 @@
             # false logs the stream as static: the panel still refreshes every
             # frame but the viewer keeps none, so the session stops growing.
             history: false
-            info_frame: "head_camera_color_optical_frame"
           depth:
             enable: true
             rate_limit_hz: 30.0
@@ -53,7 +50,6 @@
             colormap: "viridis"
             # The simulated sensor's clip range, not a real D435-class range.
             colormap_range_m: [0.1, 10.0]
-            info_frame: "head_camera_depth_optical_frame"
         hand_camera:
           name: "Hand"
           enable: true
@@ -61,7 +57,6 @@
           color:
             use_compressed: true
             history: false
-            info_frame: "hand_camera_color_optical_frame"
           depth:
             enable: true
             rate_limit_hz: 30.0
@@ -70,9 +65,6 @@
             colormap: "viridis"
             # The real D405 measures ~0.07-0.5 m; this range is for the simulation.
             colormap_range_m: [0.1, 10.0]
-            info_frame: "hand_camera_depth_optical_frame"
-        # The Kachaka base cameras have no optical frame in the URDF, so their
-        # camera_info names the camera link itself.
         camera_front:
           name: "Front"
           enable: true
@@ -80,7 +72,6 @@
           color:
             use_compressed: true
             history: false
-            info_frame: "camera_front_link"
         camera_rear:
           name: "Back"
           enable: true
@@ -88,7 +79,6 @@
           color:
             use_compressed: true
             history: false
-            info_frame: "camera_back_link"
 
       lidars:
         lidar:
@@ -110,8 +100,6 @@
         arm:
           name: "Arm"
           groups: ["manipulator"]
-          # Passive mimic, published but not commanded.
-          add_joints: ["arm_shoulder_pitch_sub_joint"]
           position: true
           velocity: true
           effort: false

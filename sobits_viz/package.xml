@@ -21,7 +21,6 @@
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 
-  <depend>sobits_viz_robots</depend>
   <depend>sobits_viz_rerun</depend>
   <depend>sobits_viz_foxglove</depend>
   <depend>sobits_viz_rviz</depend>
