@@ -6,9 +6,9 @@ Generate an RViz2 `.rviz` config for a TeamSOBITS robot: the model, TF tree
 and laser scans in the 3D view, one Image display per camera, and odometry
 for the base — arranged the same way for every robot the package supports.
 
-The robot is described by the same
-[sobits_vla_tools](https://github.com/TeamSOBITS/sobits_vla_tools) descriptor
-the other viewers read, shared through the `sobits_viz_robots` package.
+The robot is described by the same `<robot>.robot.yaml` descriptor the other
+viewers read, resolved by
+[sobits_robot_descriptor](https://github.com/TeamSOBITS/sobits_robot_descriptor).
 
 ## Supported robots
 
@@ -38,7 +38,7 @@ $ ros2 launch sobits_viz_rviz rviz.launch.py robot_name:=sobit_light use_sim_tim
 | --- | --- | --- |
 | `robot_name` | required | Robot folder under `config/`, and its topic namespace |
 | `robot_params` | `config/<robot_name>/<robot_name>.yaml` | The robot's views |
-| `robot_descriptor` | `sobits_viz_robots` `config/<robot_name>/<robot_name>.robot.yaml` | The descriptor naming the cameras and lidars |
+| `robot_descriptor` | resolved by sobits_robot_descriptor (`<robot>_description/config/<robot>.robot.yaml`) | The descriptor naming the cameras, lidars and frames; set it to a path to show a robot from a file that is not installed |
 | `config` | `''` | An RViz2 config to open as it is; the views file is not read and nothing is generated |
 | `output` | `''` | Where the generated config is written; empty writes a temporary file |
 | `use_sim_time` | `false` | Set this to `true` in simulation |
@@ -61,7 +61,7 @@ below is optional; the default is what the table shows.
 | Key | Default | Effect |
 | --- | --- | --- |
 | `enable` | `true` | `false` writes a config with no displays at all |
-| `fixed_frame` | `odom` | The frame everything is drawn relative to |
+| `fixed_frame` | the descriptor's `odom_frame` | The frame everything is drawn relative to |
 | `camera_distance_m` | `4.0` | How far back the view opens |
 | `camera_height_m` | `0.6` | What height it looks at |
 | `grid` | `true` | The ground grid |
@@ -77,7 +77,7 @@ genuinely limits what is drawn.
 | `enable` | `false` | Ticked or not; the display is always listed |
 | `label` | `false` | Draw each frame's name |
 | `axis_scale` | `0.4` | Size of the axis markers |
-| `frames` | all | Only these frames are drawn |
+| `frames` | the descriptor's `base_frame`, `ee` links and camera mount frames | Only these frames are drawn |
 | `exclude` | none | These are not |
 
 **`views.cameras.<name>`** — one Image display per camera, plus its depth
@@ -90,7 +90,7 @@ image and cloud.
 | `use_compressed` | `true` for colour, `false` for depth | Subscribe to `/compressed` rather than the raw topic |
 | `depth.name` | `<name> depth` | The depth panel's name |
 | `depth.use_compressed` | `true` | `/compressedDepth` rather than raw |
-| `depth.range_m` | unset | `[min, max]` metres across the greyscale; unset auto-normalizes |
+| `depth.range_m` | the descriptor's depth `range_m` | `[min, max]` metres across the greyscale; without either it auto-normalizes |
 | `depth.points.name` | `<name> points` | The cloud display's name |
 | `depth.points.enable` | `false` | Ticked or not; always listed |
 | `depth.points.size_px` | `2.0` | Point size |
@@ -120,8 +120,8 @@ $ ros2 run sobits_viz_rviz make_config --params config/sobit_home/sobit_home.yam
     --output /tmp/sobit_home.rviz
 ```
 
-A new robot takes the descriptor template in `sobits_viz_robots` and
-`config/template/template.yaml` here.
+A new robot takes a descriptor in its description package (`ros2 run
+sobits_robot_descriptor new_robot`) and `config/template/template.yaml` here.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 

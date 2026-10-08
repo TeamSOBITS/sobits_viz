@@ -7,9 +7,9 @@ Serve a TeamSOBITS robot to the [Foxglove](https://foxglove.dev) viewer: the
 a relay that makes the robot model's meshes fetchable, and a layout generated
 per robot so the app opens with the panels already arranged.
 
-The robot is described by the same
-[sobits_vla_tools](https://github.com/TeamSOBITS/sobits_vla_tools) descriptor
-the other viewers read, shared through the `sobits_viz_robots` package.
+The robot is described by the same `<robot>.robot.yaml` descriptor the other
+viewers read, resolved by
+[sobits_robot_descriptor](https://github.com/TeamSOBITS/sobits_robot_descriptor).
 
 ## Supported robots
 
@@ -60,7 +60,7 @@ The layout is imported once; the app remembers it.
 | --- | --- | --- |
 | `robot_name` | required | Robot folder under `config/`, and its topic namespace |
 | `robot_params` | `config/<robot_name>/<robot_name>.yaml` | The robot's views |
-| `robot_descriptor` | `sobits_viz_robots` `config/<robot_name>/<robot_name>.robot.yaml` | The descriptor naming the cameras, groups and lidars |
+| `robot_descriptor` | resolved by sobits_robot_descriptor (`<robot>_description/config/<robot>.robot.yaml`) | The descriptor naming the cameras, groups and lidars; set it to a path to serve a robot from a file that is not installed |
 | `layout` | `''` | A layout to use as it is; the views file is not read and nothing is generated |
 | `output` | `''` | Where the generated layout is written; empty writes a temporary file |
 | `port` | `8765` | Port the Foxglove WebSocket listens on |
@@ -90,7 +90,7 @@ default is what the table shows.
 | Key | Default | Effect |
 | --- | --- | --- |
 | `enable` | `true` | `false` leaves the 3D panel out |
-| `fixed_frame` | `odom` | The frame everything is drawn relative to |
+| `fixed_frame` | the descriptor's `odom_frame` | The frame everything is drawn relative to |
 | `camera_distance_m` | `4.0` | How far back the view opens |
 | `camera_height_m` | `0.6` | What height it looks at |
 | `urdf` | `true` | The robot model layer |
@@ -120,7 +120,7 @@ told about, so `exclude` is the only way to drop one, and `enable` ships
 | `frustum_size_m` | `0.3` | How far the cone extends |
 | `use_compressed` | `true` for colour, `false` for depth | Subscribe to `/compressed` |
 | `depth.enable` | `true` | Whether the depth panel appears |
-| `depth.range_m` | `[0.1, 10.0]` | `[min, max]` metres across the greyscale |
+| `depth.range_m` | the descriptor's depth `range_m` | `[min, max]` metres across the greyscale |
 
 **`views.lidars.<name>`** — the scan points in 3D.
 
@@ -132,7 +132,7 @@ told about, so `exclude` is the only way to drop one, and `enable` ships
 | `color` | white | `[r, g, b]`, 0–255 |
 
 **`views.joints.tabs`** lists the plot tabs, each merging descriptor groups
-with optional `add_joints` and `exclude_joints`, and choosing `position`,
+(with their `uncommanded_joints`) and optional `add_joints` and `exclude_joints`, and choosing `position`,
 `velocity`, `effort` and `command`. **`views.base`** plots the odometry twist.
 
 The frame prefix is not in this file: the launch takes `enable_tf_prefix`
@@ -147,8 +147,8 @@ $ ros2 run sobits_viz_foxglove make_layout --params config/sobit_home/sobit_home
     --output /tmp/sobit_home.foxglove.json
 ```
 
-A new robot takes the descriptor template in `sobits_viz_robots` and
-`config/template/template.yaml` here.
+A new robot takes a descriptor in its description package (`ros2 run
+sobits_robot_descriptor new_robot`) and `config/template/template.yaml` here.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
