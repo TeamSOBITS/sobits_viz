@@ -24,12 +24,12 @@
   <depend>trajectory_msgs</depend>
   <depend>yaml-cpp</depend>
   <depend>libopencv-dev</depend>
+  <depend>sobits_robot_descriptor</depend>
 
   <exec_depend>launch</exec_depend>
   <exec_depend>launch_ros</exec_depend>
   <!-- blueprint/make_blueprint.py reads the node's own parameter file. -->
   <exec_depend>python3-yaml</exec_depend>
-  <exec_depend>sobits_viz_robots</exec_depend>
   <!-- The Rerun viewer binary comes from the pip package `rerun-sdk==0.37.2`,
        installed by sobits_viz/install.sh. There is no rosdep key for it. -->
   <test_depend>ament_lint_auto</test_depend>

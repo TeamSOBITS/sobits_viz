@@ -10,19 +10,22 @@ from launch.actions import DeclareLaunchArgument, ExecuteProcess, OpaqueFunction
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 
+from sobits_robot_descriptor import DescriptorError, resolve_path
+
 
 def generate_launch_description():
     return LaunchDescription([
         # A robot's parameters and layout live in config/<robot_name>/; its
-        # descriptor in sobits_viz_robots. Each can be pointed elsewhere.
+        # descriptor in <robot_name>_description. Each can be pointed elsewhere.
         DeclareLaunchArgument(
             'robot_name',
             description='Robot folder under config/ (sobit_home, sobit_light, ...)',
         ),
         DeclareLaunchArgument(
             'robot_descriptor', default_value='',
-            description='The sobits_vla_tools .robot.yaml describing the robot to bridge; empty '
-                        'means sobits_viz_robots config/<robot_name>/<robot_name>.robot.yaml',
+            description='The <robot>.robot.yaml describing the robot to bridge; empty means '
+                        'resolved by sobits_robot_descriptor '
+                        '(<robot_name>_description/config/<robot_name>.robot.yaml)',
         ),
         DeclareLaunchArgument(
             'robot_params', default_value='',
@@ -93,27 +96,30 @@ def _generate(robot_name: str, params: str, descriptor: str, out_path: str) -> s
     return path
 
 
+def _find_descriptor(robot_name: str) -> str:
+    """Resolve <robot_name>.robot.yaml, trying sobits_viz_robots last while it holds some."""
+    try:
+        search = [os.path.join(get_package_share_directory('sobits_viz_robots'), 'config')]
+    except Exception:
+        search = []
+    try:
+        return resolve_path(robot_name, search_dirs=search)
+    except DescriptorError as error:
+        raise RuntimeError(str(error)) from None
+
+
 def launch_setup(context, *args, **kwargs):
     robot_name = LaunchConfiguration('robot_name').perform(context)
 
     config_dir = os.path.join(get_package_share_directory('sobits_viz_rerun'), 'config')
     robot_dir = os.path.join(config_dir, robot_name)
-    robots_dir = os.path.join(get_package_share_directory('sobits_viz_robots'), 'config')
 
     def robot_file(arg, suffix):
         return LaunchConfiguration(arg).perform(context) or \
             os.path.join(robot_dir, f'{robot_name}{suffix}')
 
     robot_descriptor = LaunchConfiguration('robot_descriptor').perform(context) or \
-        os.path.join(robots_dir, robot_name, f'{robot_name}.robot.yaml')
-    if not os.path.isfile(robot_descriptor):
-        robots = sorted(
-            d for d in os.listdir(robots_dir)
-            if d != 'template' and os.path.isdir(os.path.join(robots_dir, d))
-        )
-        raise RuntimeError(
-            f'No robot descriptor at {robot_descriptor}. '
-            f"Robots in sobits_viz_robots: {', '.join(robots)}")
+        _find_descriptor(robot_name)
     robot_params = robot_file('robot_params', '.yaml')
     # A robot's parts can be switched off at launch, so the layout is built from
     # the views file every time rather than read from one written earlier.
