@@ -24,6 +24,7 @@
 #include <trajectory_msgs/msg/joint_trajectory.hpp>
 #include <std_msgs/msg/string.hpp>
 #include <tf2_msgs/msg/tf_message.hpp>
+#include <sobits_robot_descriptor/loader.hpp>
 
 #include "sobits_viz_rerun/image_codec.hpp"
 
@@ -52,9 +53,6 @@ private:
     bool depth_history = true;
     bool color_history = true;
     double image_plane_distance = 0.3;
-    /// Frame ids of this camera's camera_info; empty derives them from its name.
-    std::string color_frame;
-    std::string depth_frame;
     bool use_compressed = true;
   };
 
@@ -77,13 +75,17 @@ private:
     std::mutex rate_mutex;
   };
 
-  /// One camera as a robot descriptor names it, with its topics spelled out.
+  /// One camera stream as the robot descriptor names it, with absolute topics.
   struct CameraSpec
   {
     std::string name;
     std::string raw_topic;
     std::string compressed_topic;
     std::string info_topic;
+    /// Optical frame its camera_info carries, without the robot prefix.
+    std::string frame;
+    /// The camera's depth range_m, the colormap range when the views leave it out.
+    std::vector<double> depth_range_m{0.0, 0.0};
     bool is_depth = false;
   };
 
@@ -110,7 +112,7 @@ private:
   void subscribe_lidar(const LidarSpec & lidar);
   void on_scan(const sensor_msgs::msg::LaserScan::ConstSharedPtr msg, LidarStream * stream);
 
-  /// Read `robot_descriptor`, a `sobits_vla_tools` `.robot.yaml`. Throws when
+  /// Read `robot_descriptor`, a schema v2 `<robot>.robot.yaml`. Throws when
   /// unset or unreadable: nothing else describes the robot.
   void load_descriptor(std::vector<CameraSpec> & cameras);
 
@@ -136,7 +138,8 @@ private:
 
   /// Declare a camera's settings under `prefix`, or read them back if another
   /// stream of the same camera already did.
-  CameraSettings read_camera_settings(const std::string & prefix);
+  CameraSettings read_camera_settings(
+    const std::string & prefix, const std::vector<double> & depth_range_m);
 
   /// Apply the configured frame prefix policy to a raw ROS frame id.
   std::string normalize_frame(const std::string & frame) const;

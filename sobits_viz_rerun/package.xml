@@ -22,7 +22,6 @@
   <depend>tf2_msgs</depend>
   <depend>nav_msgs</depend>
   <depend>trajectory_msgs</depend>
-  <depend>yaml-cpp</depend>
   <depend>libopencv-dev</depend>
   <depend>sobits_robot_descriptor</depend>
 

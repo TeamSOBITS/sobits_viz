@@ -44,7 +44,8 @@ def generate_launch_description():
         DeclareLaunchArgument('enable_frame_prefix', default_value='true',
                               description='Strip frame_prefix from every frame id'),
         DeclareLaunchArgument('frame_prefix',    default_value='',
-                              description='The prefix to strip; empty means "<robot_name>/"'),
+                              description='The prefix to strip; empty means '
+                                          '"<namespace>/" from the descriptor'),
         # The viewer is the launch file's: it starts the process the mode asks
         # for, so the mode and ports are arguments here and not in the file.
         DeclareLaunchArgument('viewer_mode',     default_value='spawn',

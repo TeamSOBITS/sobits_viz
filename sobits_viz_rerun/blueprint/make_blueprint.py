@@ -9,8 +9,9 @@ each camera its own 2D view next to the 3D scene, so the layout is the same
 every time instead of depending on what the viewer guesses.
 
 The cameras and joint groups come from the robot descriptor the node reads,
-which lives in sobits_viz_robots, and the `views` block of the robot's
-parameter file names, enables or merges them. Run it after changing either:
+the `<robot>.robot.yaml` sobits_robot_descriptor resolves, and the `views`
+block of the robot's parameter file names, enables or merges them. Run it
+after changing either:
 
     python3 blueprint/make_blueprint.py --params config/<robot>/<robot>.yaml
 """
@@ -21,18 +22,22 @@ import argparse
 from pathlib import Path
 
 import rerun.blueprint as rrb
+from sobits_robot_descriptor import DescriptorError, load_file, resolve_path
 import yaml
 
 
-def default_descriptor(app_id: str) -> Path:
-    """Where sobits_viz_robots keeps this robot's descriptor."""
+def find_descriptor(robot_id: str) -> str:
+    """Resolve `<robot>.robot.yaml` as sobits_robot_descriptor does, then sobits_viz_robots."""
     try:
         from ament_index_python.packages import get_package_share_directory
-        config = Path(get_package_share_directory('sobits_viz_robots')) / 'config'
+        search = [Path(get_package_share_directory('sobits_viz_robots')) / 'config']
     except Exception:
         # Running from the source tree, before the workspace is built.
-        config = Path(__file__).resolve().parents[2] / 'sobits_viz_robots' / 'config'
-    return config / app_id / f'{app_id}.robot.yaml'
+        search = [Path(__file__).resolve().parents[2] / 'sobits_viz_robots' / 'config']
+    try:
+        return resolve_path(robot_id, search_dirs=search)
+    except DescriptorError as error:
+        raise SystemExit(str(error))
 
 
 def load_params(path: Path) -> dict:
@@ -47,20 +52,17 @@ def load_params(path: Path) -> dict:
     raise SystemExit(f'{path} has no ros__parameters block')
 
 
-def load_descriptor(path: Path) -> dict:
-    """Read a `sobits_vla_tools` robot descriptor."""
-    with path.open() as handle:
-        return yaml.safe_load(handle) or {}
-
-
-def describe_robot(descriptor: Path) -> dict:
+def describe_robot(descriptor: Path):
     """Load the robot descriptor, which is what names the cameras and groups."""
-    if not descriptor.is_file():
+    if not Path(descriptor).is_file():
         raise SystemExit(
-            f'{descriptor} is not a file. The robot is described by a sobits_vla_tools '
-            '.robot.yaml, which this needs to lay out its views; pass it with --descriptor.'
+            f'{descriptor} is not a file. The robot is described by a <robot>.robot.yaml, '
+            'which this needs to lay out its views; pass it with --descriptor.'
         )
-    return load_descriptor(descriptor)
+    try:
+        return load_file(descriptor)
+    except DescriptorError as error:
+        raise SystemExit(str(error))
 
 
 def title(name: str) -> str:
@@ -68,25 +70,21 @@ def title(name: str) -> str:
     return name.replace('_camera', '').replace('_', ' ').title()
 
 
-def camera_views(robot: dict, settings: dict) -> list[rrb.View]:
-    """One 2D view per active camera in the descriptor, named as `settings` says."""
+def camera_views(robot, settings: dict) -> list[rrb.View]:
+    """One 2D view per camera stream in the descriptor, named as `settings` says."""
     views = []
-    for entry in (robot.get('sensors') or {}).get('cameras') or []:
-        if not entry.get('active', True):
-            continue
-        camera = entry['name']
-        view = settings.get(camera) or {}
+    for camera in robot.cameras:
+        view = settings.get(camera.name) or {}
         if not view.get('enable', True):
             continue
-        name = view.get('name', title(camera))
-        if entry.get('is_depth'):
-            if not (view.get('depth') or {}).get('enable', True):
-                continue
+        name = view.get('name', title(camera.name))
+        if camera.color:
             views.append(
-                rrb.Spatial2DView(name=f'{name} depth', origin=f'/cameras/{camera}/depth')
+                rrb.Spatial2DView(name=name, origin=f'/cameras/{camera.name}/color'))
+        if camera.depth and (view.get('depth') or {}).get('enable', True):
+            views.append(
+                rrb.Spatial2DView(name=f'{name} depth', origin=f'/cameras/{camera.name}/depth')
             )
-        else:
-            views.append(rrb.Spatial2DView(name=name, origin=f'/cameras/{camera}/color'))
     return views
 
 
@@ -99,11 +97,8 @@ def joint_tabs(robot: dict, settings: dict) -> list[rrb.View]:
     segments, not part of a name, so a tab lists its joints rather than
     matching a prefix like `arm_**`.
     """
-    groups = {
-        group['name']: [joint['ros_name'] for joint in group.get('joints', [])]
-        for group in robot.get('groups') or []
-        if group.get('active', True)
-    }
+    # Mimic joints are in joint_states but not commanded, so a tab plots them too.
+    groups = {group.name: group.joints + group.uncommanded_joints for group in robot.groups}
 
     # A tab says which series it plots; one that says nothing gets the position.
     kinds = ('position', 'velocity', 'effort')
@@ -149,7 +144,7 @@ def joint_tabs(robot: dict, settings: dict) -> list[rrb.View]:
 
 def build(params: dict, descriptor: Path) -> rrb.Blueprint:
     robot = describe_robot(descriptor)
-    robot_name = robot.get('robot_id', 'robot')
+    robot_name = robot.robot_id
     views = params.get('views') or {}
 
     # The whole tree: the robot model, which the URDF loader puts under its own
@@ -164,14 +159,14 @@ def build(params: dict, descriptor: Path) -> rrb.Blueprint:
         name=scene_settings.get('name', 'Scene'),
         origin='/',
         spatial_information=rrb.SpatialInformation(
-            target_frame=scene_settings.get('target_frame', 'odom')
+            target_frame=scene_settings.get('target_frame', robot.odom_frame)
         ),
         contents=contents,
     )
 
     plots = joint_tabs(robot, views.get('joints') or {})
     base_settings = views.get('base') or {}
-    if base_settings.get('enable', True) and robot.get('mobile_base'):
+    if base_settings.get('enable', True) and robot.mobile_base:
         name = base_settings.get('name', 'Base')
         kinds = [
             kind for kind in ('position', 'velocity')
@@ -222,13 +217,13 @@ def main() -> None:
     parser.add_argument(
         '--descriptor',
         type=Path,
-        help='the sobits_vla_tools .robot.yaml; defaults to the copy '
-             'sobits_viz_robots keeps for <app_id>, as the launch file does',
+        help='the <robot>.robot.yaml; defaults to the one sobits_robot_descriptor '
+             'resolves for <app_id>, as the launch file does',
     )
     parser.add_argument(
         '--application-id',
         help="must match the bridge's app_id parameter; taken from the "
-             'parameter file when not given',
+             "parameter file, else the descriptor's robot_id, when not given",
     )
     parser.add_argument(
         '--output',
@@ -238,9 +233,12 @@ def main() -> None:
     args = parser.parse_args()
 
     params = load_params(args.params)
-    app_id = args.application_id or params.get('app_id', 'robot')
+    robot_id = args.application_id or params.get('app_id')
+    if not args.descriptor and not robot_id:
+        raise SystemExit(f'{args.params} has no app_id; pass the robot with --descriptor')
+    descriptor = args.descriptor or find_descriptor(robot_id)
+    app_id = robot_id or describe_robot(descriptor).robot_id
     output = args.output or args.params.resolve().parent / f'{app_id}.rbl'
-    descriptor = args.descriptor or default_descriptor(app_id)
 
     output.parent.mkdir(parents=True, exist_ok=True)
     build(params, descriptor).save(app_id, output)
