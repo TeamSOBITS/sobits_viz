@@ -1,131 +1,112 @@
-# Copy of sobits_vla_common/robots/sobit_light.robot.yaml, taken 2026-09-18.
-# That file is the original: this one does not track it, so check the two
-# agree before trusting this copy. Intended differences: groups use the
-# controllers that actually run (`*_position_controller`, not `*_joint_controller`);
-# `manipulator` and `end_effector` drop their passive/excluded mimic joints;
-# cameras gain a depth stream each; `sensors.lidars` lists the laser
-# scanner, which the original schema has no place for yet; and the base
-# cameras are active.
-schema_version: 1
+# Stop-gap: SOBIT LIGHT's schema v2 descriptor lives here until
+# sobit_light_description ships its own config/sobit_light.robot.yaml.
+# Converted from sobits_vla_common/robots/sobit_light.robot.yaml (v1) with the
+# viewer additions: controllers that actually run, depth streams, the lidar.
+schema_version: 2
 robot_id: sobit_light
+version: "1.0.0"
+namespace: sobit_light
+description_package: sobit_light_description
 
-joint_states_topic: /sobit_light/joint_states
+urdf:
+  xacro: urdf/sobit_light.urdf.xacro
+
+base_frame: base_footprint
+odom_frame: odom
+joint_states_topic: joint_states
 
 groups:
   - name: head
-    command_topic: /sobit_light/head_position_controller/joint_trajectory
-    command_action: /sobit_light/head_position_controller/follow_joint_trajectory
-    max_joint_delta: 0.10
-    active: true
+    controller: head_position_controller
     joints:
-      - ros_name: head_yaw_joint
-        feature: head_yaw_joint
-      - ros_name: head_pitch_joint
-        feature: head_pitch_joint
+      - head_yaw_joint
+      - head_pitch_joint
 
   - name: manipulator
-    command_topic: /sobit_light/arm_position_controller/joint_trajectory
-    command_action: /sobit_light/arm_position_controller/follow_joint_trajectory
-    max_joint_delta: 0.15
-    active: true
+    controller: arm_position_controller
+    uncommanded_joints: [arm_shoulder_pitch_sub_joint]
     joints:
-      - ros_name: arm_shoulder_roll_joint
-        feature: arm_shoulder_roll_joint
-      - ros_name: arm_shoulder_pitch_joint
-        feature: arm_shoulder_pitch_joint
-      - ros_name: arm_elbow_pitch_joint
-        feature: arm_elbow_pitch_joint
-      - ros_name: arm_forearm_roll_joint
-        feature: arm_forearm_roll_joint
-      - ros_name: arm_wrist_pitch_joint
-        feature: arm_wrist_pitch_joint
-      - ros_name: arm_wrist_roll_joint
-        feature: arm_wrist_roll_joint
+      - arm_shoulder_roll_joint
+      - arm_shoulder_pitch_joint
+      - arm_elbow_pitch_joint
+      - arm_forearm_roll_joint
+      - arm_wrist_pitch_joint
+      - arm_wrist_roll_joint
 
   - name: end_effector
-    command_topic: /sobit_light/hand_position_controller/joint_trajectory
-    command_action: /sobit_light/hand_position_controller/follow_joint_trajectory
-    max_joint_delta: 0.30
-    active: true
-    relative_exclude: true   # gripper: absolute, never delta-converted
+    controller: hand_position_controller
     joints:
-      - ros_name: hand_joint
-        feature: hand_joint
+      - hand_joint
 
+# Kachaka base: driven by its own driver, no ros2_control wheel controllers.
 mobile_base:
-  command_topic: /sobit_light/manual_control/cmd_vel
-  odom_topic: /sobit_light/odometry/odometry
+  command_topic: manual_control/cmd_vel
+  odom_topic: odometry/odometry
   has_vel_x: true
   has_vel_y: false
   has_vel_z: false
   has_vel_theta: true
-  max_vel_x: 0.0
-  max_vel_y: 0.0
-  max_vel_z: 0.0
-  max_vel_theta: 0.0
-  features: [x.vel, theta.vel]
-  # Commands below these are sent as zero (base creep suppression).
-  linear_deadband: 0.015
-  angular_deadband: 0.005
 
 sensors:
   cameras:
     - name: head_camera
-      compressed_topic: /sobit_light/head_camera/color/image_raw/compressed
-      raw_topic: /sobit_light/head_camera/color/image_raw
-      info_topic: /sobit_light/head_camera/color/camera_info
-      encoding: ""
-      compressed: true
-      active: true
+      frame: head_camera_link
+      color:
+        frame: head_camera_color_optical_frame
+        raw_topic: head_camera/color/image_raw
+        compressed_topic: head_camera/color/image_raw/compressed
+        info_topic: head_camera/color/camera_info
+      depth:
+        frame: head_camera_depth_optical_frame
+        raw_topic: head_camera/depth/image_rect_raw
+        compressed_topic: head_camera/depth/image_rect_raw/compressedDepth
+        info_topic: head_camera/depth/camera_info
+        points_topic: head_camera/depth/points
+        encoding: 16UC1
+        range_m: [0.1, 10.0]
     - name: hand_camera
-      compressed_topic: /sobit_light/hand_camera/color/image_raw/compressed
-      raw_topic: /sobit_light/hand_camera/color/image_raw
-      info_topic: /sobit_light/hand_camera/color/camera_info
-      encoding: ""
-      compressed: true
-      active: true
+      frame: hand_camera_link
+      color:
+        frame: hand_camera_color_optical_frame
+        raw_topic: hand_camera/color/image_raw
+        compressed_topic: hand_camera/color/image_raw/compressed
+        info_topic: hand_camera/color/camera_info
+      depth:
+        frame: hand_camera_depth_optical_frame
+        raw_topic: hand_camera/depth/image_rect_raw
+        compressed_topic: hand_camera/depth/image_rect_raw/compressedDepth
+        info_topic: hand_camera/depth/camera_info
+        points_topic: hand_camera/depth/points
+        encoding: 16UC1
+        range_m: [0.1, 10.0]
+    # The Kachaka base cameras have no optical frame in the URDF, so their
+    # camera_info names the camera link itself.
     - name: camera_front
-      compressed_topic: /sobit_light/front_camera/image_raw/compressed
-      raw_topic: /sobit_light/front_camera/image_raw
-      info_topic: /sobit_light/front_camera/camera_info
-      encoding: ""
-      compressed: true
-      active: true
+      frame: camera_front_link
+      color:
+        frame: camera_front_link
+        raw_topic: front_camera/image_raw
+        compressed_topic: front_camera/image_raw/compressed
+        info_topic: front_camera/camera_info
     - name: camera_rear
-      compressed_topic: /sobit_light/back_camera/image_raw/compressed
-      raw_topic: /sobit_light/back_camera/image_raw
-      info_topic: /sobit_light/back_camera/camera_info
-      encoding: ""
-      compressed: true
-      active: true
-    # Head camera depth. Not in the original schema entry; added for the viewer.
-    - name: head_camera
-      compressed_topic: /sobit_light/head_camera/depth/image_rect_raw/compressedDepth
-      raw_topic: /sobit_light/head_camera/depth/image_rect_raw
-      info_topic: /sobit_light/head_camera/depth/camera_info
-      encoding: "16UC1"
-      compressed: true
-      active: true
-      is_depth: true
-      points_topic: /sobit_light/head_camera/depth/points
-    # Hand camera depth, same treatment.
-    - name: hand_camera
-      compressed_topic: /sobit_light/hand_camera/depth/image_rect_raw/compressedDepth
-      raw_topic: /sobit_light/hand_camera/depth/image_rect_raw
-      info_topic: /sobit_light/hand_camera/depth/camera_info
-      encoding: "16UC1"
-      compressed: true
-      active: true
-      is_depth: true
-      points_topic: /sobit_light/hand_camera/depth/points
-  # Laser scanner, drawn as points in the 3D view. This package's addition to the schema.
+      frame: camera_back_link
+      color:
+        frame: camera_back_link
+        raw_topic: back_camera/image_raw
+        compressed_topic: back_camera/image_raw/compressed
+        info_topic: back_camera/camera_info
+
   lidars:
     - name: lidar
-      scan_topic: /sobit_light/lidar/scan
-      active: true
+      frame: laser_frame
+      scan_topic: lidar/scan
 
-ee_poses: []
+ee:
+  - name: hand
+    ee_link: hand_end_effector_link
+    reference_frame: base_footprint
 
+# Wheels (no controller entry above) and the hand's passive mimic joint.
 excluded_joints:
   - hand_sub_joint
   - base_l_drive_wheel_joint

@@ -3,7 +3,7 @@
 <package format="3">
   <name>sobits_viz_robots</name>
   <version>0.1.0</version>
-  <description>Robot descriptors shared by every sobits_viz visualizer</description>
+  <description>Stop-gap robot descriptors for robots whose description package lacks one</description>
   <maintainer email="kvalentincardenas@gmail.com">VALENTIN Keith</maintainer>
   <license>BSD-3-Clause</license>
 
