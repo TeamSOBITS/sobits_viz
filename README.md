@@ -23,7 +23,6 @@ plus a per-robot views file. See
 
 | Package | Purpose | README |
 | ------- | ------- | ------ |
-| `sobits_viz_robots` | Stop-gap descriptors for robots whose description package has none yet (SOBIT LIGHT) | [README](sobits_viz_robots/README.md) |
 | `sobits_viz_rerun` | Streams cameras, depth, laser scans, TF, joints, odometry and the robot model into the Rerun viewer | [README](sobits_viz_rerun/README.md) |
 | `sobits_viz_foxglove` | Serves the same to the Foxglove viewer, with a layout generated per robot | [README](sobits_viz_foxglove/README.md) |
 | `sobits_viz_rviz` | Generates an RViz2 config per robot from the same descriptor | [README](sobits_viz_rviz/README.md) |

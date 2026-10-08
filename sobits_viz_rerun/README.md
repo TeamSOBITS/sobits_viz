@@ -134,8 +134,8 @@ every camera stream, lidar, joint group, frame and topic. The launch file
 resolves it from `robot_name` through
 [sobits_robot_descriptor](https://github.com/TeamSOBITS/sobits_robot_descriptor):
 `SOBITS_ROBOT_DESCRIPTOR_PATH` first, then
-`<robot>_description/config/<robot>.robot.yaml`, then the stop-gap copies in
-`sobits_viz_robots` (SOBIT LIGHT). Point `robot_descriptor` at a file to override it:
+`<robot>_description/config/<robot>.robot.yaml`. Point `robot_descriptor` at a
+file to override it:
 
 ```sh
 $ ros2 launch sobits_viz_rerun rerun.launch.py robot_name:=sobit_light \

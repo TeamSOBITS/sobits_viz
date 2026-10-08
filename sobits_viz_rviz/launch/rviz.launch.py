@@ -77,13 +77,9 @@ def _generate(robot_name: str, params: dict, descriptor: str, out_path: str) -> 
 
 
 def _find_descriptor(robot_name: str) -> str:
-    """Resolve <robot_name>.robot.yaml, trying sobits_viz_robots last while it holds some."""
+    """Resolve <robot_name>.robot.yaml through sobits_robot_descriptor."""
     try:
-        search = [os.path.join(get_package_share_directory('sobits_viz_robots'), 'config')]
-    except Exception:
-        search = []
-    try:
-        return resolve_path(robot_name, search_dirs=search)
+        return resolve_path(robot_name)
     except DescriptorError as error:
         raise RuntimeError(str(error)) from None
 

@@ -1,6 +1,5 @@
 # SOBIT LIGHT in Foxglove: which topics the bridge serves and how the generated
-# layout arranges them. The cameras, joint groups and lidars it names come from
-# sobits_viz_robots config/sobit_light/sobit_light.robot.yaml. Regenerate after editing:
+# layout arranges them. Regenerate after editing:
 #   ros2 run sobits_viz_foxglove make_layout --params config/sobit_light/sobit_light.yaml
 /**:
   ros__parameters:

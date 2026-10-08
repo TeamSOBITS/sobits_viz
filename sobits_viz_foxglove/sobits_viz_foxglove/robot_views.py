@@ -10,21 +10,10 @@ import yaml
 KINDS = ('position', 'velocity', 'effort')
 
 
-def _robots_config() -> list:
-    """sobits_viz_robots' config dir, which holds descriptors not yet in a description package."""
-    try:
-        from ament_index_python.packages import get_package_share_directory
-        return [Path(get_package_share_directory('sobits_viz_robots')) / 'config']
-    except Exception:
-        # Running from the source tree, before the workspace is built.
-        source = Path(__file__).resolve().parents[2] / 'sobits_viz_robots' / 'config'
-        return [source] if source.is_dir() else []
-
-
 def find_descriptor(robot_id: str) -> str:
-    """Resolve `<robot>.robot.yaml` as sobits_robot_descriptor does, then sobits_viz_robots."""
+    """Resolve `<robot>.robot.yaml` through sobits_robot_descriptor."""
     try:
-        return resolve_path(robot_id, search_dirs=_robots_config())
+        return resolve_path(robot_id)
     except DescriptorError as error:
         raise SystemExit(str(error))
 

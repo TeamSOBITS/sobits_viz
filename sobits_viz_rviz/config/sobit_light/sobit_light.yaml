@@ -1,6 +1,5 @@
-# SOBIT LIGHT in RViz2: which displays the generated config shows. The
-# cameras and lidars it names come from sobits_viz_robots
-# config/sobit_light/sobit_light.robot.yaml. Regenerate after editing:
+# SOBIT LIGHT in RViz2: which displays the generated config shows.
+# Regenerate after editing:
 #   ros2 run sobits_viz_rviz make_config --params config/sobit_light/sobit_light.yaml
 /**:
   ros__parameters:

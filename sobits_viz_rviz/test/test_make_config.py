@@ -10,7 +10,6 @@ from sobits_viz_rviz.make_config import build
 from sobits_viz_rviz.robot_views import load_descriptor, load_params
 
 PACKAGE = Path(__file__).resolve().parent.parent
-ROBOTS = PACKAGE.parent / 'sobits_viz_robots' / 'config'
 SRC = PACKAGE.parent.parent
 TOP_LEVEL_KEYS = {'Panels', 'Visualization Manager', 'Window Geometry'}
 FORBIDDEN_KEYS = {'Links', 'Frames', 'Tree', 'Namespaces'}
@@ -22,8 +21,8 @@ def robots():
 
 
 def descriptor_for(robot):
-    """Resolve the robot's descriptor from its description package or sobits_viz_robots."""
-    search = [ROBOTS, *sorted(SRC.glob('*/*_description/config'))]
+    """Resolve the robot's descriptor from its description package."""
+    search = [*sorted(SRC.glob('*/*_description/config'))]
     try:
         return resolve_path(robot, search_dirs=search)
     except DescriptorError as error:

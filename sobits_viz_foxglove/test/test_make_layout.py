@@ -11,7 +11,6 @@ from sobits_viz_foxglove.make_layout import build
 from sobits_viz_foxglove.robot_views import bridged_topics, load_descriptor, load_params
 
 PACKAGE = Path(__file__).resolve().parent.parent
-ROBOTS = PACKAGE.parent / 'sobits_viz_robots' / 'config'
 SRC = PACKAGE.parent.parent
 TYPES = ('3D', 'Image', 'Plot', 'Tab')
 
@@ -22,8 +21,8 @@ def robots():
 
 
 def descriptor_for(robot):
-    """Resolve the robot's descriptor from its description package or sobits_viz_robots."""
-    search = [ROBOTS, *sorted(SRC.glob('*/*_description/config'))]
+    """Resolve the robot's descriptor from its description package."""
+    search = [*sorted(SRC.glob('*/*_description/config'))]
     try:
         return resolve_path(robot, search_dirs=search)
     except DescriptorError as error:

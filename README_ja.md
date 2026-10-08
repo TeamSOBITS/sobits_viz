@@ -23,7 +23,6 @@ SOBITS Vizは，TeamSOBITSのロボット（SOBIT HOME，SOBIT LIGHT，...）向
 
 | パッケージ | 役割 | README |
 | ------- | ------- | ------ |
-| `sobits_viz_robots` | descriptionパッケージに記述子がまだないロボット（SOBIT LIGHT）の暫定記述子 | [README](sobits_viz_robots/README.md) |
 | `sobits_viz_rerun` | カメラ，深度，レーザースキャン，TF，関節，オドメトリ，ロボットモデルをRerunビューアにストリーミング | [README](sobits_viz_rerun/README.md) |
 | `sobits_viz_foxglove` | 同じデータをFoxgloveビューアに配信し，ロボットごとのレイアウトを生成 | [README](sobits_viz_foxglove/README.md) |
 | `sobits_viz_rviz` | 同じ記述子からロボットごとのRViz2設定を生成 | [README](sobits_viz_rviz/README.md) |
