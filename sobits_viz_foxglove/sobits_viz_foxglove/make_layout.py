@@ -8,8 +8,8 @@ workspace. This writes the layout JSON to import once in the app, so every
 robot opens with the same panels — the model and sensors in 3D, one image
 panel per camera, and the joint plots grouped as the views file says.
 
-The cameras, joint groups and lidars come from the robot descriptor in
-sobits_viz_robots. Run it after changing either file:
+The cameras, joint groups and lidars come from the robot's `<robot>.robot.yaml`,
+which sobits_robot_descriptor resolves. Run it after changing either file:
 
     ros2 run sobits_viz_foxglove make_layout --params config/<robot>/<robot>.yaml
 """
@@ -21,7 +21,7 @@ from pathlib import Path
 from sobits_viz_foxglove.robot_views import (
     bridged_topics,
     cameras,
-    default_descriptor,
+    find_descriptor,
     joint_tabs,
     lidars,
     load_descriptor,
@@ -63,7 +63,7 @@ def _grid(ids: list) -> dict:
     return mosaic
 
 
-def _scene_panel(params: dict, robot: dict, views: dict) -> dict:
+def _scene_panel(params: dict, robot, views: dict) -> dict:
     scene = views.get('scene') or {}
     tf = views.get('tf') or {}
     prefix = params.get('frame_prefix', '')
@@ -90,7 +90,7 @@ def _scene_panel(params: dict, robot: dict, views: dict) -> dict:
         layers['robot_model'] = {
             'instanceId': 'robot_model',
             'layerId': 'foxglove.Urdf',
-            'label': params.get('app_id', 'robot'),
+            'label': params.get('app_id', robot.robot_id),
             'sourceType': 'topic',
             'topic': relay_topics(params)[1],
             'framePrefix': prefix,
@@ -100,7 +100,7 @@ def _scene_panel(params: dict, robot: dict, views: dict) -> dict:
         }
 
     return {
-        'followTf': prefix + scene.get('fixed_frame', 'odom'),
+        'followTf': prefix + scene.get('fixed_frame', robot.odom_frame),
         'followMode': 'follow-pose',
         'cameraState': {
             'distance': float(scene.get('camera_distance_m', 4.0)),
@@ -141,7 +141,7 @@ def _frames(tf: dict, prefix: str) -> dict:
             for f in (tf.get('exclude') or [])}
 
 
-def _image_panels(params: dict, robot: dict, views: dict) -> tuple:
+def _image_panels(params: dict, robot, views: dict) -> tuple:
     panels, ids = {}, []
     for name, label, entry, view in cameras(robot, views.get('cameras') or {}):
         suffix = '_depth' if entry.get('is_depth') else ''
@@ -151,7 +151,7 @@ def _image_panels(params: dict, robot: dict, views: dict) -> tuple:
         mode = {'imageTopic': image, 'calibrationTopic': entry.get('info_topic'),
                 'synchronize': False}
         if entry.get('is_depth'):
-            low, high = (view.get('range_m') or [0.0, 0.0])[:2]
+            low, high = (view.get('range_m', entry['range_m']) or [0.0, 0.0])[:2]
             if high > low:
                 mode['minValue'], mode['maxValue'] = low, high
         panels[panel_id] = {'imageMode': mode, 'foxglovePanelTitle': label}
@@ -208,9 +208,9 @@ def _plot(paths: list, title: str) -> dict:
     }
 
 
-def _plot_panels(params: dict, robot: dict, views: dict) -> tuple:
+def _plot_panels(params: dict, robot, views: dict) -> tuple:
     panels, tabs = {}, []
-    states = robot.get('joint_states_topic', '/joint_states')
+    states = robot.topic(robot.joint_states_topic)
     # The launch reads the order from the running robot. Guessing it instead
     # would plot whichever joint happens to sit at that index, so without one
     # the measured series are left out and only the commands are drawn.
@@ -233,20 +233,20 @@ def _plot_panels(params: dict, robot: dict, views: dict) -> tuple:
             tabs.append({'title': tab['name'], 'layout': _grid(ids) if len(ids) > 1 else ids[0]})
 
     base = views.get('base') or {}
-    mobile = robot.get('mobile_base') or {}
-    if base.get('enable', True) and mobile.get('odom_topic'):
-        odom = mobile['odom_topic']
+    mobile = robot.mobile_base
+    if base.get('enable', True) and mobile and mobile.odom_topic:
+        odom = robot.topic(mobile.odom_topic)
         paths = []
         if base.get('velocity', True):
             paths.append({'value': f'{odom}.twist.twist.linear.x', 'label': 'linear x (m/s)',
                           'enabled': True, 'timestampMethod': 'receiveTime'})
-            if mobile.get('has_vel_y'):
+            if mobile.has_vel_y:
                 paths.append({'value': f'{odom}.twist.twist.linear.y', 'label': 'linear y (m/s)',
                               'enabled': True, 'timestampMethod': 'receiveTime'})
             paths.append({'value': f'{odom}.twist.twist.angular.z', 'label': 'yaw rate (rad/s)',
                           'enabled': True, 'timestampMethod': 'receiveTime'})
-        if base.get('command', False) and mobile.get('command_topic'):
-            command = mobile['command_topic']
+        if base.get('command', False) and mobile.command_topic:
+            command = robot.topic(mobile.command_topic)
             paths.append({'value': f'{command}.linear.x', 'label': 'cmd linear x (m/s)',
                           'enabled': True, 'timestampMethod': 'receiveTime'})
             paths.append({'value': f'{command}.angular.z', 'label': 'cmd yaw rate (rad/s)',
@@ -312,16 +312,18 @@ def main() -> None:
         help="the robot's parameter file, config/<robot>/<robot>.yaml")
     parser.add_argument(
         '--descriptor', type=Path,
-        help='the sobits_vla_tools .robot.yaml; defaults to the copy '
-             'sobits_viz_robots keeps for <app_id>, as the launch file does')
+        help='the <robot>.robot.yaml; defaults to the one sobits_robot_descriptor '
+             'resolves for <app_id>, as the launch file does')
     parser.add_argument(
         '--output', type=Path,
         help='defaults to <app_id>.foxglove.json next to the parameter file')
     args = parser.parse_args()
 
     params = load_params(args.params)
-    app_id = params.get('app_id', 'robot')
-    descriptor = args.descriptor or default_descriptor(app_id)
+    if not args.descriptor and not params.get('app_id'):
+        raise SystemExit(f'{args.params} has no app_id; pass the robot with --descriptor')
+    descriptor = args.descriptor or find_descriptor(params['app_id'])
+    app_id = params.get('app_id') or load_descriptor(descriptor).robot_id
     output = args.output or args.params.resolve().parent / f'{app_id}.foxglove.json'
 
     output.parent.mkdir(parents=True, exist_ok=True)

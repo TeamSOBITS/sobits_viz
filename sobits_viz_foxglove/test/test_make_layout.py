@@ -6,11 +6,13 @@ from pathlib import Path
 
 import pytest
 
+from sobits_robot_descriptor import DescriptorError, resolve_path
 from sobits_viz_foxglove.make_layout import build
 from sobits_viz_foxglove.robot_views import bridged_topics, load_descriptor, load_params
 
 PACKAGE = Path(__file__).resolve().parent.parent
 ROBOTS = PACKAGE.parent / 'sobits_viz_robots' / 'config'
+SRC = PACKAGE.parent.parent
 TYPES = ('3D', 'Image', 'Plot', 'Tab')
 
 
@@ -19,9 +21,18 @@ def robots():
                   if p.is_dir() and p.name != 'template')
 
 
+def descriptor_for(robot):
+    """Resolve the robot's descriptor from its description package or sobits_viz_robots."""
+    search = [ROBOTS, *sorted(SRC.glob('*/*_description/config'))]
+    try:
+        return resolve_path(robot, search_dirs=search)
+    except DescriptorError as error:
+        pytest.skip(f'no descriptor for {robot}: {error}')
+
+
 def layout_of(robot):
     params = load_params(PACKAGE / 'config' / robot / f'{robot}.yaml')
-    return params, build(params, ROBOTS / robot / f'{robot}.robot.yaml')
+    return params, build(params, descriptor_for(robot))
 
 
 def leaves(node):
@@ -52,7 +63,7 @@ def test_panel_types_are_known(robot):
 @pytest.mark.parametrize('robot', robots())
 def test_every_plotted_topic_is_bridged(robot):
     params, layout = layout_of(robot)
-    served = set(bridged_topics(params, load_descriptor(ROBOTS / robot / f'{robot}.robot.yaml')))
+    served = set(bridged_topics(params, load_descriptor(descriptor_for(robot))))
     for panel_id, config in layout['configById'].items():
         for path in config.get('paths', []):
             topic = path['value'].split('.')[0]

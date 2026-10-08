@@ -201,7 +201,7 @@ def launch_setup(context, *args, **kwargs):
             params['frame_prefix'] = f'{robot_name}/'
         # A plot reads a joint by index, so the order comes from the robot that
         # is running, not from whatever a file was written against.
-        live = _live_joint_order(robot.get('joint_states_topic', '/joint_states'))
+        live = _live_joint_order(robot.topic(robot.joint_states_topic))
         if live:
             params['joint_order'] = live
         layout = _generate(robot_name, params, robot_descriptor,
