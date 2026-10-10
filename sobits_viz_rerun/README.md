@@ -29,8 +29,8 @@ cameras, joint groups, lidars and topics come from the robot's descriptor; see
 
 | Robot | `robot_name` | Bringup for testing | Notes |
 | --- | --- | --- | --- |
-| SOBIT HOME | `sobit_home` | `ros2 launch sobit_home_bringup gz_minimal.launch.py headless:=true use_rviz:=false` | Wrist cameras name their frame `hand_*_camera_optical_frame`; five `.dae` covers fail Rerun's COLLADA reader |
-| SOBIT LIGHT | `sobit_light` | `ros2 launch sobit_light_bringup gz_minimal.launch.py headless:=true use_rviz:=false enable_moveit:=false` | TF frames are prefixed `sobit_light/` by default, which the bridge strips |
+| SOBIT HOME | `sobit_home` | `ros2 launch sobit_home_bringup sim_minimal.launch.py headless:=true use_rviz:=false` | Wrist cameras name their frame `hand_*_camera_optical_frame`; five `.dae` covers fail Rerun's COLLADA reader |
+| SOBIT LIGHT | `sobit_light` | `ros2 launch sobit_light_bringup sim_minimal.launch.py headless:=true use_rviz:=false enable_moveit:=false` | TF frames are prefixed `sobit_light/` by default, which the bridge strips |
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -70,7 +70,7 @@ Start the robot first, in simulation or on the real hardware, then the bridge.
 
 ```sh
 # Simulation, SOBIT HOME
-$ ros2 launch sobit_home_bringup gz_minimal.launch.py
+$ ros2 launch sobit_home_bringup sim_minimal.launch.py
 $ ros2 launch sobits_viz_rerun rerun.launch.py robot_name:=sobit_home use_sim_time:=true
 
 # Real robot, SOBIT HOME

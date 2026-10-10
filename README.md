@@ -56,7 +56,7 @@ colcon build --symlink-install --packages-up-to sobits_viz
 The robot's own bringup starts a viewer, so ask it for one:
 
 ```sh
-ros2 launch sobit_home_bringup gz_minimal.launch.py enable_viz:=rerun
+ros2 launch sobit_home_bringup sim_minimal.launch.py enable_viz:=rerun
 ```
 
 `enable_viz` takes `rerun`, `rviz` or `foxglove`, and starts nothing when

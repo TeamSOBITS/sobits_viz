@@ -56,7 +56,7 @@ colcon build --symlink-install --packages-up-to sobits_viz
 ロボットのbringupがビューアを起動するので，そこで指定します：
 
 ```sh
-ros2 launch sobit_home_bringup gz_minimal.launch.py enable_viz:=rerun
+ros2 launch sobit_home_bringup sim_minimal.launch.py enable_viz:=rerun
 ```
 
 `enable_viz`には`rerun`，`rviz`，`foxglove`を指定でき，空の場合は何も起動しません．
